@@ -14,11 +14,15 @@ import javax.persistence.Id;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String country;
     private String url;
+
+    public Country(String country, String url) {
+        this.country = country;
+        this.url = url;
+    }
 }

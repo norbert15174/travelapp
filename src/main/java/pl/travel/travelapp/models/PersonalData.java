@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,10 @@ public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Min(3)
+    @Size(min = 4 , max = 20)
     private String firstName;
-    @Min(3)
+    @Size(min = 4 , max = 20)
     private String surName;
-    @Min(9)
     private long phoneNumber;
     private String profilePicture;
     private LocalDate BirthDate;

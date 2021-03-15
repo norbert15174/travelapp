@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -28,11 +29,8 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private long id;
-    @Min(5)
-    @Max(20)
+    @Size(min = 4 , max = 20)
     private String login;
-    @Min(8)
-    @Max(20)
     private String password;
     private Role role = Role.ROLE_ADMIN;
     private boolean isEnable = false;

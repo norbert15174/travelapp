@@ -26,8 +26,7 @@ public class MailService {
 
     public MailService(){ }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public boolean sendMailByGoogleMailApi(){
+    public boolean sendMailByGoogleMailApi(String to,String topic, String body){
 
         try {
             GmailService gmailService = new GmailServiceImpl(GoogleNetHttpTransport.newTrustedTransport());
@@ -39,7 +38,7 @@ public class MailService {
                     .refreshToken(this.refreshToken)
                     .build());
 
-            gmailService.sendMessage("faronnorbertkrk@gmail.com", "asd", "<h1>it's work fine</h1>");
+            gmailService.sendMessage(to, topic, body);
             return true;
         } catch (GeneralSecurityException | IOException | MessagingException e) {
             e.printStackTrace();
