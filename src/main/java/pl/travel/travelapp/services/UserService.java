@@ -49,6 +49,7 @@ public class UserService implements UserDetailsService {
         userToSave.setLogin(user.getLogin());
         userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
         userPersonalData.setFirstName(user.getFirstName());
+        userPersonalData.setSurName(user.getSurName());
         return true;
     }
 
