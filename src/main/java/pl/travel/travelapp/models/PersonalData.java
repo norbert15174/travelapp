@@ -31,7 +31,8 @@ public class PersonalData {
     private LocalDate BirthDate;
     @OneToOne
     private Country Nationality;
-    //private PersonalDescription personalDescription;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private PersonalDescription personalDescription;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private List<LinkFriends> friends = new ArrayList<>();
     //private List<Group> groups = new ArrayList();

@@ -35,4 +35,7 @@ public class HtmlContent {
     public static String newPasswordHtml(String username,String token) {
         return readHtml("newpassword.html",username,token);
     }
+    public static String deleteAccountTemplate(String username,String token) {
+        return readHtml("delete.html",username,token);
+    }
 }

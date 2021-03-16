@@ -24,6 +24,7 @@ import pl.travel.travelapp.mail.google.MailService;
 import pl.travel.travelapp.mail.google.html.HtmlContent;
 import pl.travel.travelapp.models.Country;
 import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.models.PersonalDescription;
 import pl.travel.travelapp.models.User;
 import pl.travel.travelapp.repositories.CountryRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
@@ -54,6 +55,7 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
     private CountryRepository countryRepository;
     private MailService mailService;
+
     @Autowired
     public UserService(UserRepository userRepository, PersonalDataRepository personalDataRepository, PasswordEncoderConfiguration passwordEncoderConfiguration, PasswordEncoder passwordEncoder, CountryRepository countryRepository, MailService mailService) {
         this.userRepository = userRepository;
@@ -71,50 +73,55 @@ public class UserService implements UserDetailsService {
 
 
     //Checking the data and returning the registration result
-    public ResponseEntity<String> userRegister(UserRegisterDTO user){
-        if(userRepository.checkIfExist(user.getLogin(),user.getEmail()).isPresent()) return new ResponseEntity<>("an account with this login or e-mail address already exists",HttpStatus.CONFLICT);
-        if(!isValidPassword(user.getPassword(),regex)) return new ResponseEntity<>("Your password doesn't suit requirements",HttpStatus.NOT_ACCEPTABLE);
-        if(!countryRepository.findFirstByCountry(user.getNationality()).isPresent()) return new ResponseEntity<>("Country doesn't exist",HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> userRegister(UserRegisterDTO user) {
+        if (userRepository.checkIfExist(user.getLogin(), user.getEmail()).isPresent())
+            return new ResponseEntity<>("an account with this login or e-mail address already exists", HttpStatus.CONFLICT);
+        if (!isValidPassword(user.getPassword(), regex))
+            return new ResponseEntity<>("Your password doesn't suit requirements", HttpStatus.NOT_ACCEPTABLE);
+        if (!countryRepository.findFirstByCountry(user.getNationality()).isPresent())
+            return new ResponseEntity<>("Country doesn't exist", HttpStatus.NOT_FOUND);
         try {
             boolean isCreated = userRegisterSave(user);
-            if(isCreated && mailService.sendMailByGoogleMailApi(user.getEmail(),"Travel App Account", HtmlContent.readHtmlRegistration(user.getLogin(),"")))
-            {
-                return new ResponseEntity<>("Account has been created",HttpStatus.OK);
+            if (isCreated && mailService.sendMailByGoogleMailApi(user.getEmail(), "Travel App Account", HtmlContent.readHtmlRegistration(user.getLogin(), ""))) {
+                return new ResponseEntity<>("Account has been created", HttpStatus.OK);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Account hasn't been created",HttpStatus.NOT_IMPLEMENTED);
+            return new ResponseEntity<>("Account hasn't been created", HttpStatus.NOT_IMPLEMENTED);
         }
-        return new ResponseEntity<>("Undefined error",HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Undefined error", HttpStatus.NOT_FOUND);
     }
+
     //Saving new user to database
     @Transactional
-    public boolean userRegisterSave(UserRegisterDTO user) throws Exception{
+    public boolean userRegisterSave(UserRegisterDTO user) throws Exception {
         try {
             PersonalData userPersonalData = new PersonalData();
             User userToSave = new User();
-            userToSave.setEmail(user.getEmail());
-            userToSave.setLogin(user.getLogin());
+            userToSave.setEmail(user.getEmail().toLowerCase());
+            userToSave.setLogin(user.getLogin().toLowerCase());
             userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
             userPersonalData.setFirstName(user.getFirstName());
             userPersonalData.setSurName(user.getSurName());
             userPersonalData.setBirthDate(user.getBirthDay());
             userPersonalData.setNationality(countryRepository.findFirstByCountry(user.getNationality()).get());
+            userPersonalData.setPersonalDescription(new PersonalDescription());
             userToSave.setPersonalData(userPersonalData);
             userRepository.save(userToSave);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Account hasn't been created " + e);
         }
         return false;
     }
 
+    @Transactional
     public boolean enableUserAccount(String token) {
         JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(key)).build();
         DecodedJWT verify = jwtVerifier.verify(token);
         String username = verify.getClaim("username").asString();
         Optional<User> userApp = userRepository.findFirstByLogin(username);
-        if(userApp.isEmpty()) return false;
+        if (userApp.isEmpty()) return false;
         userApp.ifPresent(userAppUpdate -> {
             userAppUpdate.setEnable(true);
             userRepository.save(userAppUpdate);
@@ -123,7 +130,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public ResponseEntity<String> changePassword(Map<String,String> fields) {
+    public ResponseEntity<String> changePassword(Map<String, String> fields) {
 
         String password = fields.get("password");
         String token = fields.get("token");
@@ -132,65 +139,94 @@ public class UserService implements UserDetailsService {
             DecodedJWT verify = jwtVerifier.verify(token);
             String login = verify.getClaim("username").asString();
             Optional<User> userApp = userRepository.findFirstByLogin(login);
-            if(userApp.isPresent()){
+            if (userApp.isPresent()) {
                 User userToSave = userApp.get();
                 userToSave.setPassword(passwordEncoder.encode(password));
                 try {
                     userRepository.save(userToSave);
                     return new ResponseEntity<>("Password has been changed", HttpStatus.OK);
-                }catch (Exception e){
+                } catch (Exception e) {
                     System.err.println(e);
-                    return new ResponseEntity("Password hasn't been changed",HttpStatus.NOT_MODIFIED);
+                    return new ResponseEntity("Password hasn't been changed", HttpStatus.NOT_MODIFIED);
                 }
             }
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }catch (UsernameNotFoundException e){
+        } catch (UsernameNotFoundException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
 
     //Send mail which allow to change password
-    public boolean forgetPassword(String email){
+    public boolean forgetPassword(String email) {
         Optional<User> user = userRepository.findFirstByEmail(email);
-        if(user.isPresent()){
-            mailService.sendMailByGoogleMailApi(email,"Travel App, new password", HtmlContent.newPasswordHtml(user.get().getLogin(),""));
+        if (user.isPresent()) {
+            mailService.sendMailByGoogleMailApi(email, "Travel App, new password", HtmlContent.newPasswordHtml(user.get().getLogin(), ""));
             return true;
         }
         return false;
     }
+
     //User authorization, method return token and user information
-    public ResponseEntity<UserLoginDTO> login(UserLoginDTO user){
+    public ResponseEntity<UserLoginDTO> login(UserLoginDTO user) {
         try {
             UserDetails loggedUser = loadUserByUsername(user.getLogin());
-            if(passwordEncoder.matches(user.getPassword(),loggedUser.getPassword())){
-                String token = generateJwt(user.getLogin(),user.getPassword());
+            if (passwordEncoder.matches(user.getPassword(), loggedUser.getPassword())) {
+                String token = generateJwt(user.getLogin(), user.getPassword());
                 user.setToken(token);
                 user.setRole(String.valueOf(loggedUser.getAuthorities()));
                 user.setPassword(" ");
-                return new ResponseEntity<>(user,HttpStatus.OK);
+                return new ResponseEntity<>(user, HttpStatus.OK);
             }
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }catch (UsernameNotFoundException e){
+        } catch (UsernameNotFoundException e) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+    }
+
+    public ResponseEntity deleteAccountMessage(UserDetails user) {
+        User userToDelete = userRepository.findFirstByLogin(user.getUsername()).get();
+        mailService.sendMailByGoogleMailApi(userToDelete.getEmail(), "Delete account, Travel App", HtmlContent.deleteAccountTemplate(user.getUsername(), ""));
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteAccount(UserDetails user, String password) {
+        Optional<User> userApp = userRepository.findFirstByLogin(user.getUsername());
+        if (userApp.isPresent()) {
+            User userToDelete = userApp.get();
+            if (passwordEncoder.matches(password,userToDelete.getPassword())) {
+                try {
+                    userRepository.delete(userToDelete);
+                    return new ResponseEntity<>("Account has been deleted", HttpStatus.OK);
+                } catch (Exception e) {
+                    System.err.println(e);
+                    return new ResponseEntity("Account hasn't been deleted", HttpStatus.NOT_MODIFIED);
+                }
+            } else {
+                return new ResponseEntity<>("PASSWORD INCORRECT", HttpStatus.NOT_ACCEPTABLE);
+            }
+
+        }
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         return userRepository.findByLogin(s);
     }
+
     //Checking if the password meets the requirements
-    private static boolean isValidPassword(String password,String regex)
-    {
+    private static boolean isValidPassword(String password, String regex) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
     }
 
-//          Class to test registration process
-  //  @EventListener(ApplicationReadyEvent.class)
- //   public void testRegister(){
+
+    //          Class to test
+    @EventListener(ApplicationReadyEvent.class)
+    public void test() {
 //        UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
 //        userRegisterDTO.setEmail("faronnorbertkrk@gmail.com");
 //        userRegisterDTO.setBirthDay(LocalDate.now());
@@ -207,6 +243,8 @@ public class UserService implements UserDetailsService {
 //        fields.put("token",userLoginDTO.getToken());
 //        System.out.println(changePassword(fields));
 //        forgetPassword("faronnorbertkrk@gmail.com");
- //   }
+//        UserDetails user = userRepository.findByLogin("norbert1517");
+//       deleteAccount(user, "N@jwalxcm123ka");
+    }
 
 }
