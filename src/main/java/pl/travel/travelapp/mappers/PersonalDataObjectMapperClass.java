@@ -33,6 +33,7 @@ public class PersonalDataObjectMapperClass {
                 map().setPhoneNumber(source.getPhoneNumber());
                 map().setProfilePicture(source.getProfilePicture());
                 map().setSurName(source.getSurName());
+                map().setBackgroundPicture(source.getBackgroundPicture());
 
             }
         });

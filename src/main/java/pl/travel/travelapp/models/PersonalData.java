@@ -1,9 +1,6 @@
 package pl.travel.travelapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -18,6 +15,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@ToString
 public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +26,7 @@ public class PersonalData {
     private String surName;
     private long phoneNumber;
     private String profilePicture;
+    private String backgroundPicture;
     private LocalDate BirthDate;
     @OneToOne
     private Country Nationality;

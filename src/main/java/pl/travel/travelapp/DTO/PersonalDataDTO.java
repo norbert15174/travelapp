@@ -23,6 +23,7 @@ public class PersonalDataDTO {
     @Size(min = 9)
     private long phoneNumber;
     private String profilePicture;
+    private String backgroundPicture;
     private LocalDate birthday;
     private Country nationality;
     private PersonalDescription personalDescription;
