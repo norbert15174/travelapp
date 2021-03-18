@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.UserLoginDTO;
 import pl.travel.travelapp.DTO.UserRegisterDTO;
 import pl.travel.travelapp.configuration.PasswordEncoderConfiguration;
+import pl.travel.travelapp.interfaces.UserServiceInterface;
 import pl.travel.travelapp.mail.google.MailService;
 import pl.travel.travelapp.mail.google.html.HtmlContent;
 import pl.travel.travelapp.models.Country;
@@ -44,7 +45,7 @@ import java.util.regex.Pattern;
 
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService, UserServiceInterface {
 
     private final static String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$";
     @Value("${Algorithm-key}")
@@ -73,6 +74,7 @@ public class UserService implements UserDetailsService {
 
 
     //Checking the data and returning the registration result
+    @Override
     public ResponseEntity<String> userRegister(UserRegisterDTO user) {
         if (userRepository.checkIfExist(user.getLogin(), user.getEmail()).isPresent())
             return new ResponseEntity<>("an account with this login or e-mail address already exists", HttpStatus.CONFLICT);
@@ -92,7 +94,7 @@ public class UserService implements UserDetailsService {
         return new ResponseEntity<>("Undefined error", HttpStatus.NOT_FOUND);
     }
 
-    //Saving new user to database
+    @Override
     @Transactional
     public boolean userRegisterSave(UserRegisterDTO user) throws Exception {
         try {
@@ -115,6 +117,9 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
+    //Saving new user to database
+
+    @Override
     @Transactional
     public boolean enableUserAccount(String token) {
         JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(key)).build();
@@ -129,6 +134,7 @@ public class UserService implements UserDetailsService {
         return true;
     }
 
+    @Override
     @Transactional
     public ResponseEntity<String> changePassword(Map<String, String> fields) {
 
@@ -158,6 +164,7 @@ public class UserService implements UserDetailsService {
 
 
     //Send mail which allow to change password
+    @Override
     public boolean forgetPassword(String email) {
         Optional<User> user = userRepository.findFirstByEmail(email);
         if (user.isPresent()) {
@@ -168,6 +175,7 @@ public class UserService implements UserDetailsService {
     }
 
     //User authorization, method return token and user information
+    @Override
     public ResponseEntity<UserLoginDTO> login(UserLoginDTO user) {
         try {
             UserDetails loggedUser = loadUserByUsername(user.getLogin());
@@ -183,13 +191,14 @@ public class UserService implements UserDetailsService {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
-
+    @Override
     public ResponseEntity deleteAccountMessage(UserDetails user) {
         User userToDelete = userRepository.findFirstByLogin(user.getUsername()).get();
         mailService.sendMailByGoogleMailApi(userToDelete.getEmail(), "Delete account, Travel App", HtmlContent.deleteAccountTemplate(user.getUsername(), ""));
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @Override
     @Transactional
     public ResponseEntity<String> deleteAccount(UserDetails user, String password) {
         Optional<User> userApp = userRepository.findFirstByLogin(user.getUsername());
@@ -243,8 +252,8 @@ public class UserService implements UserDetailsService {
 //        fields.put("token",userLoginDTO.getToken());
 //        System.out.println(changePassword(fields));
 //        forgetPassword("faronnorbertkrk@gmail.com");
-//        UserDetails user = userRepository.findByLogin("norbert1517");
-//       deleteAccount(user, "N@jwalxcm123ka");
+        UserDetails user = userRepository.findByLogin("norbert1517");
+       deleteAccount(user, "N@jwalxcm123ka");
     }
 
 }

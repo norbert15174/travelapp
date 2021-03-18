@@ -15,6 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> checkIfExist(String s, String mail);
     Optional<User> findFirstByLogin(String s);
     Optional<User> findFirstByEmail(String mail);
-    @Query("select u from User u left join fetch u.personalData p left join fetch p.personalDescription where u.login = :username")
+    @Query("select u from User u left join fetch u.personalData p left join fetch p.Nationality left join fetch p.personalDescription pd left join fetch pd.visitedCountries where u.login = :username")
     User findPersonalDataByUser(String username);
 }

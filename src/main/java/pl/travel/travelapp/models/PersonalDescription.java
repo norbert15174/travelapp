@@ -1,9 +1,6 @@
 package pl.travel.travelapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -14,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 public class PersonalDescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

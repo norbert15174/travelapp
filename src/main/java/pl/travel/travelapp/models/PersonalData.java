@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@ToString
 public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +37,19 @@ public class PersonalData {
     //private List<Comment> comments = new ArrayList();
     //private List<Album> albums = new ArrayList();
 
+
+    @Override
+    public String toString() {
+        return "PersonalData{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", surName='" + surName + '\'' +
+                ", phoneNumber=" + phoneNumber +
+                ", profilePicture='" + profilePicture + '\'' +
+                ", backgroundPicture='" + backgroundPicture + '\'' +
+                ", BirthDate=" + BirthDate +
+                ", Nationality=" + Nationality +
+                ", personalDescription=" + personalDescription +
+                '}';
+    }
 }

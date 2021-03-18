@@ -1,9 +1,6 @@
 package pl.travel.travelapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +11,7 @@ import javax.persistence.Id;
 @Setter
 @Getter
 @NoArgsConstructor
+@ToString
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
