@@ -56,8 +56,8 @@ public class PersonalService {
         try {
             PersonalData userData = userData = getPersonalInformation(user.getUsername());
             return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData), HttpStatus.OK);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.err.println("User doesn't exist");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -66,6 +66,7 @@ public class PersonalService {
     @Transactional
     public ResponseEntity<PersonalDataDTO> updatePersonalInformation(UserDetails user, PersonalDataDTO userUpdate) {
         try {
+            getPersonalInformation(user.getUsername());
             PersonalData userProfile = fillPersonalInformation(getPersonalInformation(user.getUsername()), userUpdate);
             try {
                 personalDataRepository.save(userProfile);
@@ -74,8 +75,8 @@ public class PersonalService {
                 System.err.println(e);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        } catch (NotFoundException e) {
-            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.err.println("User doesn't exist");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -101,13 +102,11 @@ public class PersonalService {
 
 
     //return personal information (PersonalData and PersonalDescription as field)
-    private PersonalData getPersonalInformation(String username) throws NotFoundException {
-        try {
+
+    private PersonalData getPersonalInformation(String username) {
             return userRepository.findPersonalDataByUser(username).getPersonalData();
-        } catch (Exception e) {
-            throw new NotFoundException();
-        }
     }
+
 
     @Transactional
     public ResponseEntity<PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file, UserDetails user) {
@@ -153,23 +152,23 @@ public class PersonalService {
     @SneakyThrows
     @EventListener(ApplicationReadyEvent.class)
     public void test(){
-//        PersonalDataDTO personalDataDTO = new PersonalDataDTO();
-//        personalDataDTO.setBackgroundPicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-//        personalDataDTO.setSurName("Faron");
-//        personalDataDTO.setProfilePicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-//        personalDataDTO.setPhoneNumber(511422350);
-//        personalDataDTO.setNationality(countryRepository.findFirstByCountry("Poland").get());
-//        personalDataDTO.setFirstName("Norbert");
-//        personalDataDTO.setBirthday(LocalDate.now());
-//        PersonalDescription personalDescription = new PersonalDescription();
-//        personalDescription.setAbout("vblaldsaldlas");
-//        personalDescription.setInterest("sadsadsadsadsadas");
-//        List<Country> countryList = new ArrayList<>();
-//        countryList.add(countryRepository.findFirstByCountry("Poland").get());
-//        countryList.add(countryRepository.findFirstByCountry("Spain").get());
-//        personalDescription.setVisitedCountries(countryList);
-//        personalDataDTO.setPersonalDescription(personalDescription);
-//        updatePersonalInformation(userRepository.findByLogin("norbert1517"),personalDataDTO);
+        PersonalDataDTO personalDataDTO = new PersonalDataDTO();
+        personalDataDTO.setBackgroundPicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
+        personalDataDTO.setSurName("Faron");
+        personalDataDTO.setProfilePicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
+        personalDataDTO.setPhoneNumber(511422350);
+        personalDataDTO.setNationality(countryRepository.findFirstByCountry("Poland").get());
+        personalDataDTO.setFirstName("Norbert");
+        personalDataDTO.setBirthday(LocalDate.now());
+        PersonalDescription personalDescription = new PersonalDescription();
+        personalDescription.setAbout("vblaldsaldlas");
+        personalDescription.setInterest("sadsadsadsadsadas");
+        List<Country> countryList = new ArrayList<>();
+        countryList.add(countryRepository.findFirstByCountry("Poland").get());
+        countryList.add(countryRepository.findFirstByCountry("Spain").get());
+        personalDescription.setVisitedCountries(countryList);
+        personalDataDTO.setPersonalDescription(personalDescription);
+        updatePersonalInformation(userRepository.findByLogin("norbert15174"),personalDataDTO);
 //        System.out.println(getPersonalInformation("norbert1517"));
 
     }

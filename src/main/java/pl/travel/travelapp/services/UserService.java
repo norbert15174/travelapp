@@ -252,8 +252,8 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 //        fields.put("token",userLoginDTO.getToken());
 //        System.out.println(changePassword(fields));
 //        forgetPassword("faronnorbertkrk@gmail.com");
-        UserDetails user = userRepository.findByLogin("norbert1517");
-       deleteAccount(user, "N@jwalxcm123ka");
+//        UserDetails user = userRepository.findByLogin("norbert1517");
+//       deleteAccount(user, "N@jwalxcm123ka");
     }
 
 }
