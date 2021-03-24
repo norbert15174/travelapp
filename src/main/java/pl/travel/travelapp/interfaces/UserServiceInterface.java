@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pl.travel.travelapp.DTO.UserLoginDTO;
 import pl.travel.travelapp.DTO.UserRegisterDTO;
 
+import java.security.Principal;
 import java.util.Map;
 
 public interface UserServiceInterface {
@@ -12,14 +13,13 @@ public interface UserServiceInterface {
 
     boolean enableUserAccount(String token);
 
-    boolean userRegisterSave(UserRegisterDTO user) throws Exception;
     ResponseEntity<String> changePassword(Map<String, String> fields);
 
     boolean forgetPassword(String email);
 
    ResponseEntity<UserLoginDTO> login(UserLoginDTO user);
 
-    ResponseEntity deleteAccountMessage(UserDetails user);
-    ResponseEntity<String> deleteAccount(UserDetails user, String password);
+    ResponseEntity deleteAccountMessage(Principal user);
+    ResponseEntity<String> deleteAccount(Principal user,Map<String, String> fields);
 
 }

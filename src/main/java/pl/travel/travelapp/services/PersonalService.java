@@ -14,12 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
-import pl.travel.travelapp.exceptions.NotFoundException;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
 import pl.travel.travelapp.models.Country;
 import pl.travel.travelapp.models.PersonalData;
 import pl.travel.travelapp.models.PersonalDescription;
-import pl.travel.travelapp.models.User;
 import pl.travel.travelapp.repositories.CountryRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
 import pl.travel.travelapp.repositories.PersonalDescriptionRepository;
@@ -152,26 +150,32 @@ public class PersonalService {
     @SneakyThrows
     @EventListener(ApplicationReadyEvent.class)
     public void test(){
-        PersonalDataDTO personalDataDTO = new PersonalDataDTO();
-        personalDataDTO.setBackgroundPicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-        personalDataDTO.setSurName("Faron");
-        personalDataDTO.setProfilePicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-        personalDataDTO.setPhoneNumber(511422350);
-        personalDataDTO.setNationality(countryRepository.findFirstByCountry("Poland").get());
-        personalDataDTO.setFirstName("Norbert");
-        personalDataDTO.setBirthday(LocalDate.now());
-        PersonalDescription personalDescription = new PersonalDescription();
-        personalDescription.setAbout("vblaldsaldlas");
-        personalDescription.setInterest("sadsadsadsadsadas");
-        List<Country> countryList = new ArrayList<>();
-        countryList.add(countryRepository.findFirstByCountry("Poland").get());
-        countryList.add(countryRepository.findFirstByCountry("Spain").get());
-        personalDescription.setVisitedCountries(countryList);
-        personalDataDTO.setPersonalDescription(personalDescription);
-        updatePersonalInformation(userRepository.findByLogin("norbert15174"),personalDataDTO);
+//        String username = "norbert1517";
+//        PersonalData user = userRepository.findPersonalDataByUser(username).getPersonalData();
+//        System.out.println(user);
+
+//        PersonalDataDTO personalDataDTO = new PersonalDataDTO();
+//        personalDataDTO.setBackgroundPicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
+//        personalDataDTO.setSurName("Faron");
+//        personalDataDTO.setProfilePicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
+//        personalDataDTO.setPhoneNumber(511422350);
+//        personalDataDTO.setNationality(countryRepository.findFirstByCountry("Poland").get());
+//        personalDataDTO.setFirstName("Norbert");
+//        personalDataDTO.setBirthday(LocalDate.now());
+//        PersonalDescription personalDescription = new PersonalDescription();
+//        personalDescription.setAbout("vblaldsaldlas");
+//        personalDescription.setInterest("sadsadsadsadsadas");
+//        List<Country> countryList = new ArrayList<>();
+//        countryList.add(countryRepository.findFirstByCountry("Poland").get());
+//        countryList.add(countryRepository.findFirstByCountry("Spain").get());
+//        personalDescription.setVisitedCountries(countryList);
+//        personalDataDTO.setPersonalDescription(personalDescription);
+//        updatePersonalInformation(userRepository.findByLogin("norbert15174"),personalDataDTO);
 //        System.out.println(getPersonalInformation("norbert1517"));
 
     }
+
+
 
 
 }
