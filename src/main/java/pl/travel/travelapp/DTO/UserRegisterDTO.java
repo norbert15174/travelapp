@@ -37,7 +37,7 @@ public class UserRegisterDTO {
     @Min(3)
     @Max(18)
     private String surName;
-    private LocalDate birthDay;
+    private String birthDay;
     @NotNull
     @Min(3)
     @Max(40)

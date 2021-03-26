@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -110,7 +111,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         if(user.getPassword().isBlank()) throw new NullPointerException();
         if(user.getLogin().isBlank()) throw new NullPointerException();
         if(user.getNationality().isBlank()) throw new NullPointerException();
-        if(user.getBirthDay() == null) throw new NullPointerException();
+        if(user.getBirthDay().isBlank()) throw new NullPointerException();
         if(user.getFirstName().isBlank()) throw new NullPointerException();
         if(user.getSurName().isBlank()) throw new NullPointerException();
         return true;
@@ -121,6 +122,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Transactional
     public boolean userRegisterSave(UserRegisterDTO user) throws Exception {
         try {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM uuuu");
             PersonalData userPersonalData = new PersonalData();
             User userToSave = new User();
             userToSave.setEmail(user.getEmail().toLowerCase());
@@ -128,7 +130,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
             userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
             userPersonalData.setFirstName(user.getFirstName());
             userPersonalData.setSurName(user.getSurName());
-            userPersonalData.setBirthDate(user.getBirthDay());
+            userPersonalData.setBirthDate(LocalDate.parse(user.getBirthDay(),dateTimeFormatter));
             userPersonalData.setNationality(countryRepository.findFirstByCountry(user.getNationality()).get());
             userPersonalData.setPersonalDescription(new PersonalDescription());
             userToSave.setPersonalData(userPersonalData);
