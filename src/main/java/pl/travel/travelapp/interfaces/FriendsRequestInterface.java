@@ -11,6 +11,7 @@ public interface FriendsRequestInterface {
 
     ResponseEntity<FriendsRequest> addUserToFriendsWaitingList(Principal principal,long id);
     ResponseEntity deleteRequest(Principal principal,long id);
-    ResponseEntity<List<UserFriendRequestDTO>> findRequestById(Principal principal);
+    ResponseEntity<List<UserFriendRequestDTO>> findRequestsByPrincipal(Principal principal);
+    boolean checkIfRequestIsCorrect(Principal principal, long id);
 
 }
