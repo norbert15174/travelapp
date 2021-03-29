@@ -7,19 +7,21 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-
-@AllArgsConstructor
+@Entity
 @NoArgsConstructor
 @Setter
 @Getter
-@Entity
-public class LinkFriends {
+public class FriendsRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private PersonalData user;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Friends friend;
+    @OneToOne(fetch = FetchType.LAZY)
+    private PersonalData sender;
+    private long receiver;
 
+    public FriendsRequest(PersonalData sender, long receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
+    }
 }

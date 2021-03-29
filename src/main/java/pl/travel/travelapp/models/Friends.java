@@ -17,6 +17,6 @@ public class Friends {
     private long id;
     @OneToMany(mappedBy = "friend")
     private List<LinkFriends> friends;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FriendMessages messages;
 }

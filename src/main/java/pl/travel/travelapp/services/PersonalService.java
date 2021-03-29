@@ -52,7 +52,7 @@ public class PersonalService {
 
     public ResponseEntity<PersonalDataDTO> getUserProfile(UserDetails user) {
         try {
-            PersonalData userData = userData = getPersonalInformation(user.getUsername());
+            PersonalData userData = getPersonalInformation(user.getUsername());
             return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData), HttpStatus.OK);
         } catch (NullPointerException e) {
             System.err.println("User doesn't exist");
@@ -70,7 +70,7 @@ public class PersonalService {
                 personalDataRepository.save(userProfile);
                 return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userProfile), HttpStatus.OK);
             } catch (Exception e) {
-                System.err.println(e);
+                System.err.println(e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         } catch (NullPointerException e) {
@@ -101,18 +101,18 @@ public class PersonalService {
 
     //return personal information (PersonalData and PersonalDescription as field)
 
-    private PersonalData getPersonalInformation(String username) {
+    public PersonalData getPersonalInformation(String username) {
             return userRepository.findPersonalDataByUser(username).getPersonalData();
     }
 
 
     @Transactional
     public ResponseEntity<PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file, UserDetails user) {
-        PersonalData userData = userRepository.findPersonalDataByUser(user.getUsername()).getPersonalData();
-        String path = "user/" + user.getUsername() + "/picture/" + file.getOriginalFilename();
-        BlobId blobId = BlobId.of(bucket, path);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
         try {
+            PersonalData userData = userRepository.findPersonalDataByUser(user.getUsername()).getPersonalData();
+            String path = "user/" + user.getUsername() + "/picture/" + file.getOriginalFilename();
+            BlobId blobId = BlobId.of(bucket, path);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
             storage.create(blobInfo, file.getBytes());
             if (userData.getProfilePicture() != null) {
                 storage.delete(BlobId.of("telephoners", userData.getProfilePicture().split(bucket + "/")[1]));
@@ -122,8 +122,8 @@ public class PersonalService {
             return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataById(userData.getId())), HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
-        return new ResponseEntity(HttpStatus.NOT_MODIFIED);
     }
 
     @Transactional
@@ -141,7 +141,7 @@ public class PersonalService {
             personalDataRepository.save(userData);
             return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataById(userData.getId())), HttpStatus.OK);
         } catch (IOException e) {
-            System.err.println(e);
+            System.err.println(e.getMessage());
         }
         return new ResponseEntity(HttpStatus.NOT_MODIFIED);
     }
