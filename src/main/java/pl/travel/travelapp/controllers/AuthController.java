@@ -29,7 +29,8 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public RedirectView setUserEnable(@RequestParam String token){
+    public RedirectView setUserEnable(@RequestParam("token") String token){
+        System.out.println(token);
         if(userService.enableUserAccount(token)){
             return new RedirectView("https://www.baeldung.com/spring-redirect-and-forward");
         }
@@ -48,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginDTO> login(UserLoginDTO user){
+    public ResponseEntity<UserLoginDTO> login(@RequestBody UserLoginDTO user){
         return userService.login(user);
     }
 

@@ -5,13 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import pl.travel.travelapp.services.UserService;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private UserService userService;
 
     @Autowired
-    public WebSecurityConfig() {
+    public WebSecurityConfig(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -22,7 +26,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.cors().and().authorizeRequests().antMatchers("/**").permitAll();
+ //       http.cors().and().authorizeRequests().antMatchers("/**").permitAll();
+
+        http.cors().and().authorizeRequests()
+                .antMatchers("/user/picture").authenticated()
+                .and()
+                .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class);
+
 
         http.csrf().disable();
 

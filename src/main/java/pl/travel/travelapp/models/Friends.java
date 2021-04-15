@@ -9,14 +9,21 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Friends {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany(mappedBy = "friend")
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.REMOVE)
     private List<LinkFriends> friends;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FriendMessages messages;
+    private long groupLeader;
+
+    public Friends(long id , List <LinkFriends> friends , FriendMessages messages , long groupLeader) {
+        this.id = id;
+        this.friends = friends;
+        this.messages = messages;
+        this.groupLeader = groupLeader;
+    }
 }

@@ -24,6 +24,7 @@ import pl.travel.travelapp.repositories.PersonalDescriptionRepository;
 import pl.travel.travelapp.repositories.UserRepository;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +51,9 @@ public class PersonalService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<PersonalDataDTO> getUserProfile(UserDetails user) {
+    public ResponseEntity<PersonalDataDTO> getUserProfile(Principal user) {
         try {
-            PersonalData userData = getPersonalInformation(user.getUsername());
+            PersonalData userData = getPersonalInformation(user.getName());
             return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData), HttpStatus.OK);
         } catch (NullPointerException e) {
             System.err.println("User doesn't exist");
@@ -62,10 +63,9 @@ public class PersonalService {
     }
 
     @Transactional
-    public ResponseEntity<PersonalDataDTO> updatePersonalInformation(UserDetails user, PersonalDataDTO userUpdate) {
+    public ResponseEntity<PersonalDataDTO> updatePersonalInformation(Principal user, PersonalDataDTO userUpdate) {
         try {
-            getPersonalInformation(user.getUsername());
-            PersonalData userProfile = fillPersonalInformation(getPersonalInformation(user.getUsername()), userUpdate);
+            PersonalData userProfile = fillPersonalInformation(getPersonalInformation(user.getName()), userUpdate);
             try {
                 personalDataRepository.save(userProfile);
                 return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userProfile), HttpStatus.OK);
@@ -100,17 +100,17 @@ public class PersonalService {
 
 
     //return personal information (PersonalData and PersonalDescription as field)
-
+    @Transactional
     public PersonalData getPersonalInformation(String username) {
             return userRepository.findPersonalDataByUser(username).getPersonalData();
     }
 
 
     @Transactional
-    public ResponseEntity<PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file, UserDetails user) {
+    public ResponseEntity<PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file, Principal user) {
         try {
-            PersonalData userData = userRepository.findPersonalDataByUser(user.getUsername()).getPersonalData();
-            String path = "user/" + user.getUsername() + "/picture/" + file.getOriginalFilename();
+            PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+            String path = "user/" + user.getName() + "/picture/" + file.getOriginalFilename();
             BlobId blobId = BlobId.of(bucket, path);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
             storage.create(blobInfo, file.getBytes());
@@ -119,7 +119,7 @@ public class PersonalService {
             }
             userData.setProfilePicture(url + path);
             personalDataRepository.save(userData);
-            return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataById(userData.getId())), HttpStatus.OK);
+            return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataByUserId(userData.getId())), HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
@@ -127,9 +127,9 @@ public class PersonalService {
     }
 
     @Transactional
-    public ResponseEntity<PersonalDataDTO> setPersonalDataBackgroundPicture(MultipartFile file, UserDetails user) {
-        PersonalData userData = userRepository.findPersonalDataByUser(user.getUsername()).getPersonalData();
-        String path = "user/" + user.getUsername() + "/background/" + file.getOriginalFilename();
+    public ResponseEntity<PersonalDataDTO> setPersonalDataBackgroundPicture(MultipartFile file, Principal user) {
+        PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+        String path = "user/" + user.getName() + "/background/" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket, path);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
         try {
@@ -139,7 +139,7 @@ public class PersonalService {
             }
             userData.setProfilePicture(url + path);
             personalDataRepository.save(userData);
-            return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataById(userData.getId())), HttpStatus.OK);
+            return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataByUserId(userData.getId())), HttpStatus.OK);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

@@ -8,7 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Setter
 @Getter
@@ -19,7 +19,11 @@ public class LinkFriends {
     private long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private PersonalData user;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Friends friend;
 
+    public LinkFriends(PersonalData user , Friends friend) {
+        this.user = user;
+        this.friend = friend;
+    }
 }

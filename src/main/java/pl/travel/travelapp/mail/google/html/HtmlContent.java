@@ -12,7 +12,7 @@ import java.util.Scanner;
 @Component
 public class HtmlContent {
     public HtmlContent(){ }
-    private static String link = "https://www.facebook.com/";
+    private static String link = "http://localhost:8020/auth/register?token=";
     private static String readHtml(String fileName,String username,String token){
         File file = new File("src\\main\\resources\\HTML\\" + fileName);
         String html = "";
@@ -25,7 +25,7 @@ public class HtmlContent {
             e.printStackTrace();
         }
         html = html.replaceAll("setname",username);
-        html = html.replaceAll("link",link);
+        html = html.replaceAll("link",link + token);
         return html;
     }
     public static String readHtmlRegistration(String username, String token){

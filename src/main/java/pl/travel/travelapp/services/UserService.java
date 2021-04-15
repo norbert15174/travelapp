@@ -85,11 +85,11 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                     return new ResponseEntity<>("an account with this login or e-mail address already exists", HttpStatus.CONFLICT);
                 if (!isValidPassword(user.getPassword(), regex))
                     return new ResponseEntity<>("Your password doesn't suit requirements", HttpStatus.NOT_ACCEPTABLE);
-                if (!countryRepository.findFirstByCountry(user.getNationality()).isPresent())
+                if ( countryRepository.findFirstByCountry(user.getNationality()).isEmpty() )
                     return new ResponseEntity<>("Country doesn't exist", HttpStatus.NOT_FOUND);
                 try {
                     boolean isCreated = userRegisterSave(user);
-                    if (isCreated && mailService.sendMailByGoogleMailApi(user.getEmail(), "Travel App Account", HtmlContent.readHtmlRegistration(user.getLogin(), ""))) {
+                    if (isCreated && mailService.sendMailByGoogleMailApi(user.getEmail(), "Travel App Account", HtmlContent.readHtmlRegistration(user.getLogin(), generateJwt(user.getLogin(),user.getPassword())))) {
                         return new ResponseEntity<>("Account has been created", HttpStatus.OK);
                     }
                 } catch (Exception e) {
@@ -120,7 +120,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
 
     @Transactional
-    public boolean userRegisterSave(UserRegisterDTO user) throws Exception {
+    public boolean userRegisterSave(UserRegisterDTO user){
         try {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM uuuu");
             PersonalData userPersonalData = new PersonalData();
@@ -152,11 +152,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
             String username = verify.getClaim("username").asString();
             Optional<User> userApp = userRepository.findFirstByLogin(username);
             if (userApp.isEmpty()) return false;
-            userApp.ifPresent(userAppUpdate -> {
-                userAppUpdate.setEnable(true);
-                userRepository.save(userAppUpdate);
-            });
-            return true;
+                userApp.get().setEnable(true);
+
+            return userRepository.save(userApp.get()).isEnable();
         }catch (Exception e){
             return false;
         }
@@ -304,4 +302,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 //       deleteAccount(user, "N@jwalxcm123ka");
     }
 
+    public UserDetails accountVerify(String username, String password) {
+        UserDetails userDetails = loadUserByUsername(username);
+        if (passwordEncoder.matches(password, userDetails.getPassword()) && userDetails.isEnabled()) return userDetails;
+        return null;
+    }
 }

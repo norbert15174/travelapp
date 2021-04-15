@@ -31,12 +31,18 @@ public class PersonalData {
     private Country Nationality;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PersonalDescription personalDescription;
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<LinkFriends> friends = new ArrayList<>();
     //private List<Group> groups = new ArrayList();
     //private List<Comment> comments = new ArrayList();
     //private List<Album> albums = new ArrayList();
 
+    public boolean addFriend(LinkFriends linkFriends){
+        return friends.add(linkFriends);
+    }
+    public boolean deleteFriend(LinkFriends linkFriends){
+        return friends.remove(linkFriends);
+    }
 
     @Override
     public String toString() {
