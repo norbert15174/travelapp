@@ -2,8 +2,6 @@ package pl.travel.travelapp.services;
 
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,17 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
 import pl.travel.travelapp.builders.FriendsBuilder;
 import pl.travel.travelapp.builders.FriendsRequestBuilder;
-import pl.travel.travelapp.builders.LinkFriendsBuilder;
 import pl.travel.travelapp.interfaces.FriendsRequestInterface;
 import pl.travel.travelapp.mappers.FriendsRequestObjectMapperClass;
 import pl.travel.travelapp.models.*;
 import pl.travel.travelapp.repositories.FriendsRepository;
 import pl.travel.travelapp.repositories.FriendsRequestRepository;
-import pl.travel.travelapp.repositories.LinkFriendsRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
 
 import java.security.Principal;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,16 +26,15 @@ public class FriendsRequestService implements FriendsRequestInterface {
 
     private FriendsRequestRepository friendsRequestRepository;
     private PersonalService personalService;
-    private FriendsRepository friendsRepository;
-    private LinkFriendsRepository linkFriendsRepository;
     private PersonalDataRepository personalDataRepository;
+    private FriendsRepository friendsRepository;
     @Autowired
-    public FriendsRequestService(FriendsRequestRepository friendsRequestRepository, PersonalService personalService,FriendsRepository friendsRepository,LinkFriendsRepository linkFriendsRepository,PersonalDataRepository personalDataRepository) {
+    public FriendsRequestService(FriendsRequestRepository friendsRequestRepository, PersonalService personalService, PersonalDataRepository personalDataRepository,FriendsRepository friendsRepository) {
         this.friendsRequestRepository = friendsRequestRepository;
         this.personalService = personalService;
-        this.friendsRepository = friendsRepository;
-        this.linkFriendsRepository = linkFriendsRepository;
         this.personalDataRepository = personalDataRepository;
+        this.friendsRequestRepository = friendsRequestRepository;
+        this.friendsRepository = friendsRepository;
     }
 
 
@@ -108,19 +103,12 @@ public class FriendsRequestService implements FriendsRequestInterface {
         if(friendsRequest.isPresent()){
             FriendsRequest friends = friendsRequest.get();
             if(friends.getReceiver() != user.getId()) return new ResponseEntity <>(HttpStatus.FORBIDDEN);
-            //GroupLeader is PersonalData leader id
-            Friends linkedFriends = new FriendsBuilder()
-                    .setMessages(new FriendMessages())
+
+            Friends friendsToSave = new FriendsBuilder()
+                    .setFirstUser(user)
+                    .setSecondUser(friends.getSender())
                     .createFriends();
-            friendsRepository.save(linkedFriends);
-            LinkFriends friendFirst = new LinkFriendsBuilder().setFriend(linkedFriends).setUser(user).createLinkFriends();
-            LinkFriends friendSecond = new LinkFriendsBuilder().setFriend(linkedFriends).setUser(friends.getSender()).createLinkFriends();
-            user.addFriend(friendFirst);
-            friends.getSender().addFriend(friendSecond);
-            personalDataRepository.save(user);
-            personalDataRepository.save(friends.getSender());
-            linkFriendsRepository.save(friendFirst);
-            linkFriendsRepository.save(friendSecond);
+            friendsRepository.save(friendsToSave);
             friends.setFriends(true);
             friendsRequestRepository.save(friends);
             return new ResponseEntity <>(HttpStatus.OK);

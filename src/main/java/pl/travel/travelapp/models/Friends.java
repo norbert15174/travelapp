@@ -1,30 +1,32 @@
 package pl.travel.travelapp.models;
 
-import com.google.j2objc.annotations.ObjectiveCName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Entity
 @Setter
 @Getter
 @NoArgsConstructor
-@Entity
 public class Friends {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany(mappedBy = "friend", cascade = CascadeType.REMOVE)
-    private List<LinkFriends> friends;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private FriendMessages messages;
-    private long groupLeader = -1;
-    private String name;
+    @OneToOne(fetch = FetchType.LAZY)
+    private PersonalData firstUser;
+    @OneToOne(fetch = FetchType.LAZY)
+    private PersonalData secondUser;
+    @OneToMany(mappedBy = "friends", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List <FriendMessages> messages;
 
-    public Friends(long id , List <LinkFriends> friends , FriendMessages messages , long groupLeader) {
+    public Friends(long id , PersonalData firstUser , PersonalData secondUser , List <FriendMessages> messages) {
         this.id = id;
-        this.friends = friends;
+        this.firstUser = firstUser;
+        this.secondUser = secondUser;
         this.messages = messages;
-        this.groupLeader = groupLeader;
     }
 }

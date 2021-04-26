@@ -21,8 +21,10 @@ public class FriendMessages {
     @NotNull
     private String text;
     private LocalDate date = LocalDate.now();
-    @OneToOne(mappedBy = "messages")
-    private Friends friend;
     @NotNull
     private String sender;
+    private String photoUrl;
+    private long senderId;
+    @ManyToOne
+    private Friends friends;
 }

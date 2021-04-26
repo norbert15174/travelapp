@@ -31,7 +31,7 @@ public class FriendsController {
         return friendsRequestService.deleteRequest(principal,id);
     }
 
-    @GetMapping
+    @GetMapping("/requests")
     public ResponseEntity<List <UserFriendRequestDTO>> getAllUserFriendRequests(Principal principal){
         return friendsRequestService.findRequestsByPrincipal(principal);
     }
@@ -40,6 +40,11 @@ public class FriendsController {
     public ResponseEntity acceptUserToFriendsList(@RequestParam long id,Principal principal){
         return friendsRequestService.acceptToFriendsList(principal,id);
     }
+    @GetMapping
+    public ResponseEntity getFriends(Principal principal){
+        return friendsService.getUserFriends(principal);
+    }
+
 
 
 }
