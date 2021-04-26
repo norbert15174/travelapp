@@ -48,10 +48,16 @@ public class FriendsRequestService implements FriendsRequestInterface {
     @Transactional
     public ResponseEntity<FriendsRequest> addUserToFriendsWaitingList(Principal principal,long id) {
         PersonalData user = getPersonalInformation(principal);
-        if(friendsRequestRepository.findFirstByReceiver(id,user.getId()).isPresent()) return new ResponseEntity<>(HttpStatus.CONFLICT);
+        if(user.getId() == id) return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        if(!personalDataRepository.findById(id).isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(!friendsRequestRepository.findFirstByReceiver(id,user.getId()).isEmpty()) return new ResponseEntity<>(HttpStatus.CONFLICT);
         try {
-            FriendsRequest friendsRequest = new FriendsRequestBuilder().setReceiver(id).setSender(user).createFriendsRequest();
-            return new ResponseEntity<>(friendsRequestRepository.save(friendsRequest),HttpStatus.OK);
+            friendsRequestRepository
+                    .save(new FriendsRequestBuilder()
+                            .setReceiver(id)
+                            .setSender(user)
+                            .createFriendsRequest());
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
@@ -103,7 +109,9 @@ public class FriendsRequestService implements FriendsRequestInterface {
             FriendsRequest friends = friendsRequest.get();
             if(friends.getReceiver() != user.getId()) return new ResponseEntity <>(HttpStatus.FORBIDDEN);
             //GroupLeader is PersonalData leader id
-            Friends linkedFriends = new FriendsBuilder().setMessages(new FriendMessages()).setGroupLeader(friends.getSender().getId()).createFriends();
+            Friends linkedFriends = new FriendsBuilder()
+                    .setMessages(new FriendMessages())
+                    .createFriends();
             friendsRepository.save(linkedFriends);
             LinkFriends friendFirst = new LinkFriendsBuilder().setFriend(linkedFriends).setUser(user).createLinkFriends();
             LinkFriends friendSecond = new LinkFriendsBuilder().setFriend(linkedFriends).setUser(friends.getSender()).createLinkFriends();
@@ -113,6 +121,8 @@ public class FriendsRequestService implements FriendsRequestInterface {
             personalDataRepository.save(friends.getSender());
             linkFriendsRepository.save(friendFirst);
             linkFriendsRepository.save(friendSecond);
+            friends.setFriends(true);
+            friendsRequestRepository.save(friends);
             return new ResponseEntity <>(HttpStatus.OK);
         }else {
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);

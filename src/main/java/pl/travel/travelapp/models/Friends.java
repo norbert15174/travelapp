@@ -18,7 +18,8 @@ public class Friends {
     private List<LinkFriends> friends;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private FriendMessages messages;
-    private long groupLeader;
+    private long groupLeader = -1;
+    private String name;
 
     public Friends(long id , List <LinkFriends> friends , FriendMessages messages , long groupLeader) {
         this.id = id;

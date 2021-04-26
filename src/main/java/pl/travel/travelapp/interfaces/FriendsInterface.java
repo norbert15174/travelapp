@@ -9,7 +9,7 @@ import java.util.List;
 public interface FriendsInterface {
 
     //Creating group of friends
-    ResponseEntity<Friends> linkUsersAsFriendsGroup(List <Float> id);
+    ResponseEntity<Friends> linkUsersAsFriendsGroup(List <Long> id, Principal principal);
 
     //Delete friend
     ResponseEntity deleteFriend(Principal principal, long id);

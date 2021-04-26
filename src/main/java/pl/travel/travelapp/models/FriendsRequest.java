@@ -14,6 +14,7 @@ public class FriendsRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private boolean isFriends = false;
     @OneToOne(fetch = FetchType.LAZY)
     private PersonalData sender;
     private long receiver;
