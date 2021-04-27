@@ -27,4 +27,5 @@ public class FriendMessages {
     private long senderId;
     @ManyToOne
     private Friends friends;
+    private MessageStatus messageStatus;
 }

@@ -13,6 +13,7 @@ import pl.travel.travelapp.interfaces.FriendsInterface;
 import pl.travel.travelapp.interfaces.FriendsMessageInterface;
 import pl.travel.travelapp.mappers.FriendsObjectMapperClass;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
+import pl.travel.travelapp.models.FriendMessages;
 import pl.travel.travelapp.models.Friends;
 import pl.travel.travelapp.models.PersonalData;
 import pl.travel.travelapp.repositories.FriendMessagesRepository;
@@ -21,6 +22,7 @@ import pl.travel.travelapp.repositories.FriendsRepository;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -38,7 +40,18 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
 
     @Override
     public ResponseEntity deleteFromFriendList(Principal principal , long id) {
-        return null;
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <Friends> friends = friendsRepository.findFriendById(id);
+        if(friends.isPresent()){
+            if(friends.get().getFirstUser().getId() == id || friends.get().getSecondUser().getId() == id)
+                friendsRepository.deleteById(id);
+            else
+                return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }else{
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
     @Override
@@ -64,7 +77,12 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
 
     @Override
     public ResponseEntity deleteMessage(Principal principal , long messageId) {
-        return null;
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        FriendMessages message = friendMessagesRepository.findById(messageId).orElse(null);
+        if(message == null) new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(message.getSenderId() != user.getId()) return new ResponseEntity(HttpStatus.FORBIDDEN);
+        friendMessagesRepository.deleteById(messageId);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 //    @EventListener(ApplicationReadyEvent.class)
 //    public void test(){
