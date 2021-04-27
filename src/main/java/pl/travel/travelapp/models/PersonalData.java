@@ -31,7 +31,8 @@ public class PersonalData {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PersonalDescription personalDescription;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE},
+                fetch = FetchType.LAZY)
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")

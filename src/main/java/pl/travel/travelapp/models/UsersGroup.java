@@ -31,8 +31,7 @@ public class UsersGroup {
 
     //private List<GroupAlbums> groupAlbumsList;
     //private List<GroupMessages> messages;
-
-
+    
 
     public void addMember(PersonalData member) {
         members.add(member);
