@@ -14,11 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.travel.travelapp.DTO.TextMessageDTO;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class WebSocketTextController {
 
+
+    private SimpMessagingTemplate template;
     @Autowired
-    SimpMessagingTemplate template;
+    public WebSocketTextController(SimpMessagingTemplate template) {
+        this.template = template;
+    }
 
     @PostMapping("/send")
     public ResponseEntity <Void> sendMessage(@RequestBody TextMessageDTO textMessageDTO) {
