@@ -39,7 +39,7 @@ public class PersonalData {
     )
     private Set <UsersGroup> groups = new HashSet <>();
     //private List<Comment> comments = new ArrayList();
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<IndividualAlbum> albums = new ArrayList();
 
     public void addGroup(UsersGroup group) {
