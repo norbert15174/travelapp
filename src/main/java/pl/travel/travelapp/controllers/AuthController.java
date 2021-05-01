@@ -12,7 +12,7 @@ import pl.travel.travelapp.services.UserService;
 import java.security.Principal;
 import java.util.Map;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

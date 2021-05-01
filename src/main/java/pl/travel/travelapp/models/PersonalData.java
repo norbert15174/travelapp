@@ -39,7 +39,8 @@ public class PersonalData {
     )
     private Set <UsersGroup> groups = new HashSet <>();
     //private List<Comment> comments = new ArrayList();
-    //private List<Album> albums = new ArrayList();
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<IndividualAlbum> albums = new ArrayList();
 
     public void addGroup(UsersGroup group) {
         groups.add(group);
@@ -49,6 +50,16 @@ public class PersonalData {
     public void removeGroup(UsersGroup group) {
         groups.remove(group);
         group.getMembers().remove(this);
+    }
+
+    public void addAlbum(IndividualAlbum album) {
+        albums.add(album);
+        album.setOwner(this);
+    }
+
+    public void removeAlbum(IndividualAlbum album) {
+        albums.remove(album);
+        album.setOwner(null);
     }
 
 
