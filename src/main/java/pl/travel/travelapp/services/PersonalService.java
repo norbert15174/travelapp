@@ -59,7 +59,16 @@ public class PersonalService {
             System.err.println("User doesn't exist");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
+    public ResponseEntity<PersonalDataDTO> getUserProfileInformation(long id) {
+        try {
+            PersonalData userData = personalDataRepository.findPersonalDataByUserId(id);
+            return new ResponseEntity<>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData), HttpStatus.OK);
+        } catch (NullPointerException e) {
+            System.err.println("User doesn't exist");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Transactional
@@ -146,34 +155,6 @@ public class PersonalService {
         return new ResponseEntity(HttpStatus.NOT_MODIFIED);
     }
 
-
-    @SneakyThrows
-    @EventListener(ApplicationReadyEvent.class)
-    public void test(){
-//        String username = "norbert1517";
-//        PersonalData user = userRepository.findPersonalDataByUser(username).getPersonalData();
-//        System.out.println(user);
-
-//        PersonalDataDTO personalDataDTO = new PersonalDataDTO();
-//        personalDataDTO.setBackgroundPicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-//        personalDataDTO.setSurName("Faron");
-//        personalDataDTO.setProfilePicture("https://storage.googleapis.com/telephoners/20210216_225118.jpg");
-//        personalDataDTO.setPhoneNumber(511422350);
-//        personalDataDTO.setNationality(countryRepository.findFirstByCountry("Poland").get());
-//        personalDataDTO.setFirstName("Norbert");
-//        personalDataDTO.setBirthday(LocalDate.now());
-//        PersonalDescription personalDescription = new PersonalDescription();
-//        personalDescription.setAbout("vblaldsaldlas");
-//        personalDescription.setInterest("sadsadsadsadsadas");
-//        List<Country> countryList = new ArrayList<>();
-//        countryList.add(countryRepository.findFirstByCountry("Poland").get());
-//        countryList.add(countryRepository.findFirstByCountry("Spain").get());
-//        personalDescription.setVisitedCountries(countryList);
-//        personalDataDTO.setPersonalDescription(personalDescription);
-//        updatePersonalInformation(userRepository.findByLogin("norbert15174"),personalDataDTO);
-//        System.out.println(getPersonalInformation("norbert1517"));
-
-    }
 
 
 

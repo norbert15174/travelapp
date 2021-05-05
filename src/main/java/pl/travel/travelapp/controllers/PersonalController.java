@@ -26,6 +26,23 @@ public class PersonalController {
         return personalService.setPersonalDataProfilePicture(file,user);
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<PersonalDataDTO> updateProfile(PersonalDataDTO personalDataDTO,Principal principal){
+        return personalService.updatePersonalInformation(principal,personalDataDTO);
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<PersonalDataDTO> getProfileInformation(Principal principal){
+        return personalService.getUserProfile(principal);
+    }
+    @PostMapping("/background")
+    public ResponseEntity<PersonalDataDTO> setUserBackgroundPicture(@RequestParam("file")  MultipartFile file, Principal user){
+        return personalService.setPersonalDataBackgroundPicture(file,user);
+    }
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<PersonalDataDTO> getProfileInformation(@PathVariable("id") long id,Principal principal){
+        return personalService.getUserProfileInformation(id);
+    }
+
 
 
 }

@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -16,9 +18,14 @@ public class IndividualAlbum {
     private long id;
     private String name;
     private String description;
-    //private Comments comments;
-    //private Coordinates coordinate;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Coordinates coordinate;
     @ManyToOne(fetch = FetchType.LAZY)
     private PersonalData owner;
+    private boolean isPublic = false;
+    @OneToMany(mappedBy = "individualAlbum", fetch = FetchType.LAZY)
+    private List<SharedAlbum> sharedAlbum = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<AlbumPhotos> photos = new ArrayList<>();
 
 }
