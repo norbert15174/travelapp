@@ -18,14 +18,15 @@ public class IndividualAlbum {
     private long id;
     private String name;
     private String description;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Coordinates coordinate;
     @ManyToOne(fetch = FetchType.LAZY)
     private PersonalData owner;
     private boolean isPublic = false;
-    @OneToMany(mappedBy = "individualAlbum", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "individualAlbum",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<SharedAlbum> sharedAlbum = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name = "photoId")
     private List<AlbumPhotos> photos = new ArrayList<>();
 
 }

@@ -1,8 +1,15 @@
 package pl.travel.travelapp.models;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
+@Setter
+@Getter
+@NoArgsConstructor
 public class SharedAlbum {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

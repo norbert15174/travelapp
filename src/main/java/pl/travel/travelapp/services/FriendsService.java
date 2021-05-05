@@ -84,9 +84,4 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         friendMessagesRepository.deleteById(messageId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
-//    @EventListener(ApplicationReadyEvent.class)
-//    public void test(){
-//        System.out.println(friendsRepository.findFriends(2L).get(0).getSecondUser().getId());
-//        //System.out.println(friendsRepository.findAll());
-//    }
 }
