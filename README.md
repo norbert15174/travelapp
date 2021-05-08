@@ -1,4 +1,4 @@
-# travelapp
+# Travelify
 Głównym celem pracy jest stworzenie aplikacji internetowej, która umożliwi integrację osób o zainteresowaniach podróżniczych. Pozwoli ona na utworzenie profilu osobowego, w którym będą przechowywane wspomnienia z odbytych podróży w formie albumów. Profil ten będzie także zawierać podstawowe informacje o użytkowniku, co sprawi, że inni podróżnicy o podobnych zainteresowaniach będą mogli nawiązać komunikację w celu zawarcia znajomości - będzie ona realizowana przy użyciu komunikatora tekstowego. Dodatkowym aspektem pracy jest umożliwienie użytkownikowi udostępniania albumów publicznie oraz tworzenia ich wspólnie ze znajomymi. 
 
 #	Proces tworzenia aplikacji
