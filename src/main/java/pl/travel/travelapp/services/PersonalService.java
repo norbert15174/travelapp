@@ -114,6 +114,10 @@ public class PersonalService {
             return userRepository.findPersonalDataByUser(username).getPersonalData();
     }
 
+    @Transactional
+    public PersonalData getPersonalInformationWithAlbums(String username) {
+        return personalDataRepository.findPersonalDataWithAlbumsByUserId(getPersonalInformation(username).getId());
+    }
 
     @Transactional
     public ResponseEntity<PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file, Principal user) {

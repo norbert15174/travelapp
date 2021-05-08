@@ -277,31 +277,6 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     }
 
 
-    //          Class to test
-    @EventListener(ApplicationReadyEvent.class)
-    public void test() {
-
-
-
-//        UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
-//        userRegisterDTO.setEmail("faronnorbertkrk@gmail.com");
-//        userRegisterDTO.setBirthDay(LocalDate.now());
-//        userRegisterDTO.setFirstName("Norbert");
-//        userRegisterDTO.setLogin("norbert1517");
-//        userRegisterDTO.setSurName("Faron");
-//        userRegisterDTO.setPassword("N@jwalxcm123ka");
-//        userRegisterDTO.setNationality("Poland");
-//        userRegister(userRegisterDTO);
-//
-//        UserLoginDTO userLoginDTO = login((new UserLoginDTO("norbert1517","N@jwalxcm123ka"," "," "))).getBody();
-//        Map<String,String> fields = new HashMap<>();
-//        fields.put("password","N@jlcxz12add");
-//        fields.put("token",userLoginDTO.getToken());
-//        System.out.println(changePassword(fields));
-//        forgetPassword("faronnorbertkrk@gmail.com");
-//       deleteAccount(user, "N@jwalxcm123ka");
-    }
-
     public UserDetails accountVerify(String username, String password) {
         UserDetails userDetails = loadUserByUsername(username);
         if (passwordEncoder.matches(password, userDetails.getPassword()) && userDetails.isEnabled()) return userDetails;

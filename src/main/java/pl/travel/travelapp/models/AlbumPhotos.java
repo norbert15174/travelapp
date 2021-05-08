@@ -19,6 +19,8 @@ public class AlbumPhotos {
     private long photoId;
     private String photoUrl;
     private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private IndividualAlbum individualAlbum;
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
     private List <Comments> comments = new ArrayList <>();
