@@ -3,6 +3,8 @@ package pl.travel.travelapp.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import pl.travel.travelapp.builders.PersonalInformationDTOBuilder;
 import pl.travel.travelapp.interfaces.CoordinateInterface;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.SharedAlbumInterface;
+import pl.travel.travelapp.mappers.PersonalDataAlbumsToAlbumsDTOMapperClass;
 import pl.travel.travelapp.models.Coordinates;
 import pl.travel.travelapp.models.Country;
 import pl.travel.travelapp.models.IndividualAlbum;
@@ -82,7 +85,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
                 .createIndividualAlbumDTO(), HttpStatus.OK);
     }
 
-
+    @EventListener(ApplicationReadyEvent.class)
     public void test(){
         IndividualAlbumDTO individualAlbumDTO = new IndividualAlbumDTO();
         Coordinates coordinates = new Coordinates();
@@ -91,8 +94,8 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         coordinates.setPlace("Poland");
         individualAlbumDTO.setCoordinate(coordinates);
         individualAlbumDTO.setDescription("asd");
-        individualAlbumDTO.setName("albuym");
-        individualAlbumDTO.setPublic(true);
+        individualAlbumDTO.setName("albuymdsa");
+        individualAlbumDTO.setPublic(false);
 
     }
 
@@ -102,13 +105,17 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Override
-    public ResponseEntity <IndividualAlbumDTO> findAlbum(Principal principal , long id) {
+    public ResponseEntity <IndividualAlbum> findAlbum(Principal principal , long id) {
+
         return null;
     }
 
+
     @Override
     public ResponseEntity <List <IndividualAlbumDTO>> findAllUserAlbums(Principal principal) {
-        return null;
+        PersonalData user = personalService.getPersonalInformationWithAlbums(principal.getName());
+        if(user.getAlbums().isEmpty()) return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(PersonalDataAlbumsToAlbumsDTOMapperClass.mapPersonalDataToAlbumsDTO(user),HttpStatus.OK);
     }
 
     @Override
@@ -117,13 +124,19 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Override
-    public ResponseEntity <IndividualAlbumDTO> findAlbumByName(String name) {
-        return null;
+    public ResponseEntity <List <IndividualAlbumDTO>> findAlbumsByName(String name, int page) {
+        List<IndividualAlbum> individualAlbums = individualAlbumRepository.findUserAlbumsByAlbumName(name, PageRequest.of(page,5));
+        if(individualAlbums.isEmpty()) return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(PersonalDataAlbumsToAlbumsDTOMapperClass.mapPersonalDataToAlbumsDTO(individualAlbums),HttpStatus.OK);
     }
 
+
     @Override
-    public ResponseEntity <List <IndividualAlbumDTO>> findAlbumsByUserName(long id) {
-        return null;
+    @Transactional
+    public ResponseEntity <List <IndividualAlbumDTO>> findAlbumsByUserId(long id) {
+        List<IndividualAlbum> individualAlbums = individualAlbumRepository.findUserPublicAlbumsByUserId(id);
+        if(individualAlbums.isEmpty()) return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(PersonalDataAlbumsToAlbumsDTOMapperClass.mapPersonalDataToAlbumsDTO(individualAlbums),HttpStatus.OK);
     }
 
     @Override

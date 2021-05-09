@@ -27,7 +27,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/auth/**");
+        web.ignoring()
+                .antMatchers("/auth/**")
+                .antMatchers("/albums/user/{id}")
+                .antMatchers("/albums/name");
     }
 
     @Override
@@ -38,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and().authorizeRequests()
                 .antMatchers("/user/picture").authenticated()
                 .antMatchers("/friends/*").authenticated()
-                .antMatchers("/Albums/*").authenticated()
+                .antMatchers("/albums/*").authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class);
 
