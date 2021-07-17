@@ -17,6 +17,6 @@ public class Coordinates {
     private double lang;
     private double lat;
     private String place;
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE,CascadeType.DETACH})
     private Country country;
 }

@@ -30,7 +30,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers("/auth/**")
                 .antMatchers("/albums/user/{id}")
-                .antMatchers("/albums/name");
+                .antMatchers("/albums/name")
+                .antMatchers("/v2/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**");
     }
 
     @Override
@@ -39,9 +45,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.cors().and().authorizeRequests().antMatchers("/**").permitAll();
 
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and().authorizeRequests()
-                .antMatchers("/user/picture").authenticated()
+                .antMatchers("/user/picture").hasAnyRole("ADMIN")
+                .antMatchers("/photos/*").authenticated()
                 .antMatchers("/friends/*").authenticated()
                 .antMatchers("/albums/*").authenticated()
+                .antMatchers("/resources").authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class);
 

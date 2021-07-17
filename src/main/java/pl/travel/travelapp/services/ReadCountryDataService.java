@@ -24,15 +24,15 @@ public class ReadCountryDataService {
     }
 
     //@EventListener(ApplicationReadyEvent.class)
-    public List<Country> readFileMethodPerson() {
-        List<Country> countries = new ArrayList<>();
+    public List <Country> readFileMethodPerson() {
+        List <Country> countries = new ArrayList <>();
         File file = new File("src\\main\\resources\\CountriesAndFlags\\Country_Flags.csv");
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNext()) {
                 countries.add(splitDataCountries(scanner.nextLine()));
             }
-        } catch (FileNotFoundException e) {
+        } catch ( FileNotFoundException e ) {
             e.printStackTrace();
         }
 
@@ -42,7 +42,7 @@ public class ReadCountryDataService {
 
     private Country splitDataCountries(String nextLine) {
         String[] data = nextLine.split(",");
-        return new Country(data[0], data[2]);
+        return new Country(data[0] , data[2]);
     }
 
 }

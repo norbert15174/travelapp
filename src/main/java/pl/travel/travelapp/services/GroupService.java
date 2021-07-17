@@ -14,6 +14,7 @@ import pl.travel.travelapp.repositories.PersonalDataRepository;
 public class GroupService {
     private PersonalDataRepository personalDataRepository;
     private GroupRepository groupRepository;
+
     @Autowired
     public GroupService(PersonalDataRepository personalDataRepository , GroupRepository groupRepository) {
         this.personalDataRepository = personalDataRepository;

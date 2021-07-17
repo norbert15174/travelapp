@@ -18,48 +18,49 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+
     @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> userRegister(@RequestBody UserRegisterDTO user){
+    public ResponseEntity <String> userRegister(@RequestBody UserRegisterDTO user) {
         return userService.userRegister(user);
     }
 
     @GetMapping("/register")
-    public RedirectView setUserEnable(@RequestParam("token") String token){
-        System.out.println(token);
-        if(userService.enableUserAccount(token)){
+    public RedirectView setUserEnable(@RequestParam("token") String token) {
+        if ( userService.enableUserAccount(token) ) {
             return new RedirectView("https://www.baeldung.com/spring-redirect-and-forward");
         }
         return new RedirectView("https://www.facebook.com");
     }
 
     @GetMapping("/password")
-    public ResponseEntity forgetPassword(@RequestParam String email){
-        if(userService.forgetPassword(email)) return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity forgetPassword(@RequestParam String email) {
+        if ( userService.forgetPassword(email) ) return new ResponseEntity(HttpStatus.OK);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/password")
-    public ResponseEntity changePassword(@RequestBody Map<String, String> fields){
+    public ResponseEntity changePassword(@RequestBody Map <String, String> fields) {
         return userService.changePassword(fields);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginDTO> login(@RequestBody UserLoginDTO user){
+    public ResponseEntity <UserLoginDTO> login(@RequestBody UserLoginDTO user) {
         return userService.login(user);
     }
 
     @GetMapping("/delete")
-    public ResponseEntity deleteAccountSendMessage(Principal user){
+    public ResponseEntity deleteAccountSendMessage(Principal user) {
         return userService.deleteAccountMessage(user);
     }
+
     @DeleteMapping("/delete")
-    public ResponseEntity deleteAccountSendMessage(@RequestBody Map<String, String> fields,Principal user){
-        return userService.deleteAccount(user,fields);
+    public ResponseEntity deleteAccountSendMessage(@RequestBody Map <String, String> fields , Principal user) {
+        return userService.deleteAccount(user , fields);
     }
 
 }

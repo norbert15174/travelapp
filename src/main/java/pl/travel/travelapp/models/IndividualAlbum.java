@@ -27,4 +27,21 @@ public class IndividualAlbum {
     private List<SharedAlbum> sharedAlbum = new ArrayList<>();
     @OneToMany(mappedBy = "individualAlbum",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<AlbumPhotos> photos = new ArrayList<>();
+
+    public void addNewUserToAlbumShare(SharedAlbum sharedAlbum){
+        this.sharedAlbum.add(sharedAlbum);
+    }
+
+    public void deleteUserFromAlbumShare(SharedAlbum sharedAlbum){
+        this.sharedAlbum.remove(sharedAlbum);
+    }
+
+    public void addNewPhoto(AlbumPhotos albumPhotos){
+        this.photos.add(albumPhotos);
+    }
+
+    public void deletePhoto(AlbumPhotos albumPhotos){
+        this.photos.remove(albumPhotos);
+    }
+
 }

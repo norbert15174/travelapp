@@ -1,8 +1,11 @@
 package pl.travel.travelapp.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,7 +24,12 @@ public class AlbumPhotos {
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
     private IndividualAlbum individualAlbum;
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "commentId")
     private List <Comments> comments = new ArrayList <>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "taggedId")
+    private List <TaggedUser> taggedList = new ArrayList <>();
 }

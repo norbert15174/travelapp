@@ -20,19 +20,26 @@ public class IndividualAlbumController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<IndividualAlbumDTO> addNewAlbum(@RequestBody IndividualAlbumDTO album, Principal principal){
-        return individualAlbumService.addNewAlbum(principal,album);
+    public ResponseEntity <IndividualAlbumDTO> addNewAlbum(@RequestBody IndividualAlbumDTO album , Principal principal) {
+        return individualAlbumService.addNewAlbum(principal , album);
     }
+    @DeleteMapping
+    public ResponseEntity deleteAlbum(@RequestParam long id , Principal principal) {
+        return individualAlbumService.deleteAlbum(principal , id);
+    }
+
     @GetMapping
-    public ResponseEntity<List <IndividualAlbumDTO>> findUserAlbums(Principal principal){
+    public ResponseEntity <List <IndividualAlbumDTO>> findUserAlbums(Principal principal) {
         return individualAlbumService.findAllUserAlbums(principal);
     }
+
     @GetMapping("/user/{id}")
-    public ResponseEntity<List <IndividualAlbumDTO>> findUserAlbums(@PathVariable("id") long id){
+    public ResponseEntity <List <IndividualAlbumDTO>> findUserAlbums(@PathVariable("id") long id) {
         return individualAlbumService.findAlbumsByUserId(id);
     }
+
     @GetMapping("/name")
-    public ResponseEntity<List <IndividualAlbumDTO>> findAlbumByName(@RequestParam String album, @RequestParam(defaultValue = "0") int page){
-        return individualAlbumService.findAlbumsByName(album,page);
+    public ResponseEntity <List <IndividualAlbumDTO>> findAlbumByName(@RequestParam String album , @RequestParam(defaultValue = "0") int page) {
+        return individualAlbumService.findAlbumsByName(album , page);
     }
 }

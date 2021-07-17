@@ -55,8 +55,8 @@ public class JwtFilter extends OncePerRequestFilter {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512("x!A%D*G-KaPdSgVkYp3s6v8y/B?E(H+MbQeThWmZq4t7w!z$C&F)J@NcRfUjXn2r")).build();
             DecodedJWT verify = jwtVerifier.verify(authorization.substring(7));
             String username = verify.getClaim("username").asString();
-            String password = verify.getClaim("password").asString();
-            UserDetails userDetails = userService.accountVerify(username, password);
+            String pin = verify.getClaim("PIN").asString();
+            UserDetails userDetails = userService.accountVerifyToken(username, Long.parseLong(pin));
 
             if (userDetails == null) throw new UnAuthException();
 

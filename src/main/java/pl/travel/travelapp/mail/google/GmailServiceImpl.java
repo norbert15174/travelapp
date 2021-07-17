@@ -36,32 +36,32 @@ public final class GmailServiceImpl implements GmailService {
     }
 
     @Override
-    public boolean sendMessage(String recipientAddress, String subject, String body) throws MessagingException,
+    public boolean sendMessage(String recipientAddress , String subject , String body) throws MessagingException,
             IOException {
         Message message = createMessageWithEmail(
-                createEmail(recipientAddress, gmailCredentials.getUserEmail(), subject, body));
+                createEmail(recipientAddress , gmailCredentials.getUserEmail() , subject , body));
 
         return createGmail().users()
                 .messages()
-                .send(gmailCredentials.getUserEmail(), message)
+                .send(gmailCredentials.getUserEmail() , message)
                 .execute()
                 .getLabelIds().contains("SENT");
     }
 
     private Gmail createGmail() {
         Credential credential = authorize();
-        return new Gmail.Builder(httpTransport, JSON_FACTORY, credential)
+        return new Gmail.Builder(httpTransport , JSON_FACTORY , credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
 
-    private MimeMessage createEmail(String to, String from, String subject, String bodyText) throws MessagingException {
-        MimeMessage email = new MimeMessage(Session.getDefaultInstance(new Properties(), null));
+    private MimeMessage createEmail(String to , String from , String subject , String bodyText) throws MessagingException {
+        MimeMessage email = new MimeMessage(Session.getDefaultInstance(new Properties() , null));
         email.setFrom(new InternetAddress(from));
-        email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
+        email.addRecipient(javax.mail.Message.RecipientType.TO , new InternetAddress(to));
         email.setSubject(subject);
-       // email.setText(bodyText);
-        email.setContent(bodyText,"text/html; charset=utf-8");
+        // email.setText(bodyText);
+        email.setContent(bodyText , "text/html; charset=utf-8");
         return email;
     }
 
@@ -77,7 +77,7 @@ public final class GmailServiceImpl implements GmailService {
         return new GoogleCredential.Builder()
                 .setTransport(httpTransport)
                 .setJsonFactory(JSON_FACTORY)
-                .setClientSecrets(gmailCredentials.getClientId(), gmailCredentials.getClientSecret())
+                .setClientSecrets(gmailCredentials.getClientId() , gmailCredentials.getClientSecret())
                 .build()
                 .setAccessToken(gmailCredentials.getAccessToken())
                 .setRefreshToken(gmailCredentials.getRefreshToken());

@@ -73,6 +73,10 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         Algorithm algorithm = Algorithm.HMAC512(key);
         return JWT.create().withClaim("username", username).withClaim("password", password).sign(algorithm);
     }
+    private String generateJwt(String username, Long PIN) {
+        Algorithm algorithm = Algorithm.HMAC512(key);
+        return JWT.create().withClaim("username", username).withClaim("PIN", String.valueOf(PIN)).sign(algorithm);
+    }
 
 
     //Checking the data and returning the registration result
@@ -122,7 +126,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Transactional
     public boolean userRegisterSave(UserRegisterDTO user){
         try {
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM uuuu");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             PersonalData userPersonalData = new PersonalData();
             User userToSave = new User();
             userToSave.setEmail(user.getEmail().toLowerCase());
@@ -215,9 +219,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Override
     public ResponseEntity<UserLoginDTO> login(UserLoginDTO user) {
         try {
-            UserDetails loggedUser = loadUserByUsername(user.getLogin());
+            User loggedUser = loadUserByUsernameAll(user.getLogin());
             if (passwordEncoder.matches(user.getPassword(), loggedUser.getPassword())) {
-                String token = generateJwt(user.getLogin(), user.getPassword());
+                String token = generateJwt(user.getLogin(), loggedUser.getPIN());
                 user.setToken(token);
                 user.setRole(String.valueOf(loggedUser.getAuthorities()));
                 user.setPassword(" ");
@@ -269,6 +273,11 @@ public class UserService implements UserDetailsService, UserServiceInterface {
         return userRepository.findByLogin(s);
     }
 
+
+    public User loadUserByUsernameAll(String s) throws UsernameNotFoundException {
+        return userRepository.findByLogin(s);
+    }
+
     //Checking if the password meets the requirements
     private static boolean isValidPassword(String password, String regex) {
         Pattern pattern = Pattern.compile(regex);
@@ -280,6 +289,11 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public UserDetails accountVerify(String username, String password) {
         UserDetails userDetails = loadUserByUsername(username);
         if (passwordEncoder.matches(password, userDetails.getPassword()) && userDetails.isEnabled()) return userDetails;
+        return null;
+    }
+    public UserDetails accountVerifyToken(String username, long PIN) {
+        User userDetails = loadUserByUsernameAll(username);
+        if (PIN == userDetails.getPIN() && userDetails.isEnabled()) return loadUserByUsername(username);
         return null;
     }
 }

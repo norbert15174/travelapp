@@ -1,21 +1,10 @@
 package pl.travel.travelapp.services;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import pl.travel.travelapp.builders.FriendsRequestBuilder;
-import pl.travel.travelapp.models.FriendsRequest;
-import pl.travel.travelapp.models.PersonalData;
-import pl.travel.travelapp.models.User;
 import pl.travel.travelapp.repositories.*;
 
-import java.security.Principal;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest
@@ -28,7 +17,7 @@ class FriendsRequestServiceTest {
     private CountryRepository countryRepository = mock(CountryRepository.class);
     private UserRepository userRepository = mock(UserRepository.class);
     private FriendsRequestRepository friendsRequestRepository = mock(FriendsRequestRepository.class);
-    private PersonalService personalService = new PersonalService(personalDataRepository,personalDescriptionRepository,countryRepository,userRepository);
+//    private PersonalService personalService = new PersonalService(personalDataRepository,personalDescriptionRepository,countryRepository,userRepository , individualAlbumRepository);
    // private FriendsRequestService friendsRequestService = new FriendsRequestService(friendsRequestRepository,personalService);
 
 //    @Test

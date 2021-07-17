@@ -15,6 +15,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Random;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,11 +33,11 @@ public class User implements UserDetails {
     private String password;
     private Role role = Role.ROLE_ADMIN;
     private boolean isEnable = false;
+    private long PIN = (new Random().nextInt(899999999)+100000000);
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private PersonalData personalData;
     @Email
     private String email;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority(role.toString()));
@@ -49,6 +51,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.login;
+    }
+
+    public long getPIN() {
+        return PIN;
     }
 
     @Override

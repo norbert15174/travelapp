@@ -22,29 +22,31 @@ public class FriendsController {
         this.friendsRequestService = friendsRequestService;
         this.friendsService = friendsService;
     }
+
     @PostMapping
-    public ResponseEntity sendFriendRequest(@RequestParam long id, Principal principal){
-        return friendsRequestService.addUserToFriendsWaitingList(principal,id);
+    public ResponseEntity sendFriendRequest(@RequestParam long id , Principal principal) {
+        return friendsRequestService.addUserToFriendsWaitingList(principal , id);
     }
+
     @DeleteMapping
-    public ResponseEntity deleteFriendRequest(@RequestParam long id, Principal principal){
-        return friendsRequestService.deleteRequest(principal,id);
+    public ResponseEntity deleteFriendRequest(@RequestParam long id , Principal principal) {
+        return friendsRequestService.deleteRequest(principal , id);
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List <UserFriendRequestDTO>> getAllUserFriendRequests(Principal principal){
+    public ResponseEntity <List <UserFriendRequestDTO>> getAllUserFriendRequests(Principal principal) {
         return friendsRequestService.findRequestsByPrincipal(principal);
     }
 
     @PutMapping
-    public ResponseEntity acceptUserToFriendsList(@RequestParam long id,Principal principal){
-        return friendsRequestService.acceptToFriendsList(principal,id);
-    }
-    @GetMapping
-    public ResponseEntity getFriends(Principal principal){
-        return friendsService.getUserFriends(principal);
+    public ResponseEntity acceptUserToFriendsList(@RequestParam long id , Principal principal) {
+        return friendsRequestService.acceptToFriendsList(principal , id);
     }
 
+    @GetMapping
+    public ResponseEntity getFriends(Principal principal) {
+        return friendsService.getUserFriends(principal);
+    }
 
 
 }

@@ -20,8 +20,8 @@ public class UsersGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToMany(mappedBy = "groups",cascade = {
-            CascadeType.PERSIST,
+    @ManyToMany(mappedBy = "groups", cascade = {
+            CascadeType.PERSIST ,
             CascadeType.MERGE
     }, fetch = FetchType.LAZY)
     private Set <PersonalData> members = new HashSet <>();
@@ -31,7 +31,7 @@ public class UsersGroup {
 
     //private List<GroupAlbums> groupAlbumsList;
     //private List<GroupMessages> messages;
-    
+
 
     public void addMember(PersonalData member) {
         members.add(member);

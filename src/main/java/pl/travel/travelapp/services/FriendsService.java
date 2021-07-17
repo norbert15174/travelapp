@@ -31,6 +31,7 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     private FriendsRepository friendsRepository;
     private FriendMessagesRepository friendMessagesRepository;
     private PersonalService personalService;
+
     @Autowired
     public FriendsService(FriendsRepository friendsRepository , FriendMessagesRepository friendMessagesRepository , PersonalService personalService) {
         this.friendsRepository = friendsRepository;
@@ -42,12 +43,12 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     public ResponseEntity deleteFromFriendList(Principal principal , long id) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         Optional <Friends> friends = friendsRepository.findFriendById(id);
-        if(friends.isPresent()){
-            if(friends.get().getFirstUser().getId() == id || friends.get().getSecondUser().getId() == id)
+        if ( friends.isPresent() ) {
+            if ( friends.get().getFirstUser().getId() == id || friends.get().getSecondUser().getId() == id )
                 friendsRepository.deleteById(id);
             else
                 return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }else{
+        } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
@@ -58,16 +59,16 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     public ResponseEntity getUserFriends(Principal principal) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         List <Friends> friends = friendsRepository.findFriends(user.getId());
-        List<FriendsDTO> friendsDTOS = new ArrayList <>();
+        List <FriendsDTO> friendsDTOS = new ArrayList <>();
         friends.forEach(friend ->
                 {
-                    if(friend.getSecondUser().getId() != user.getId())
+                    if ( friend.getSecondUser().getId() != user.getId() )
                         friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getSecondUser()));
                     else
                         friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser()));
                 }
         );
-        return new ResponseEntity(friendsDTOS,HttpStatus.OK);
+        return new ResponseEntity(friendsDTOS , HttpStatus.OK);
     }
 
     @Override
@@ -79,8 +80,8 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     public ResponseEntity deleteMessage(Principal principal , long messageId) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         FriendMessages message = friendMessagesRepository.findById(messageId).orElse(null);
-        if(message == null) new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(message.getSenderId() != user.getId()) return new ResponseEntity(HttpStatus.FORBIDDEN);
+        if ( message == null ) new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+        if ( message.getSenderId() != user.getId() ) return new ResponseEntity(HttpStatus.FORBIDDEN);
         friendMessagesRepository.deleteById(messageId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }

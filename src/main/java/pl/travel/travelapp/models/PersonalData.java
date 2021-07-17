@@ -25,7 +25,8 @@ public class PersonalData {
     private long phoneNumber;
     private String profilePicture;
     private String backgroundPicture;
-    private LocalDate BirthDate;
+    
+    private LocalDate birthDate;
     @OneToOne(fetch = FetchType.EAGER)
     private Country Nationality;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
