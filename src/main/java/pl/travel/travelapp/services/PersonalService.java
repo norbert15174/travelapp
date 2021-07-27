@@ -1,7 +1,10 @@
 package pl.travel.travelapp.services;
 
 
-import com.google.cloud.storage.*;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,7 @@ import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
+import pl.travel.travelapp.models.Country;
 import pl.travel.travelapp.models.IndividualAlbum;
 import pl.travel.travelapp.models.PersonalData;
 import pl.travel.travelapp.models.PersonalDescription;
@@ -50,7 +54,7 @@ public class PersonalService {
         try {
             PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
             List <IndividualAlbum> individualAlbum = individualAlbumRepository.findUserAlbumsByUserId(userData.getId());
-            return new ResponseEntity(new PersonalDataDtoWithIndividualAlbumsDTO(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData), IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbum)) , HttpStatus.OK);
+            return new ResponseEntity(new PersonalDataDtoWithIndividualAlbumsDTO(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData) , IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbum)) , HttpStatus.OK);
         } catch ( NullPointerException e ) {
             System.err.println("User doesn't exist");
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);
@@ -70,7 +74,8 @@ public class PersonalService {
     @Transactional
     public ResponseEntity <PersonalDataDTO> updatePersonalInformation(Principal user , PersonalDataDTO userUpdate) {
         try {
-            PersonalData userProfile = fillPersonalInformation(getPersonalInformation(user.getName()) , userUpdate);
+            PersonalData userProfile = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+            userProfile = fillPersonalInformation(getPersonalInformation(user.getName()) , userUpdate);
             try {
                 personalDataRepository.save(userProfile);
                 return new ResponseEntity <>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userProfile) , HttpStatus.OK);
@@ -86,29 +91,34 @@ public class PersonalService {
     }
 
     private PersonalData fillPersonalInformation(PersonalData userProfile , PersonalDataDTO userUpdate) {
-        userProfile.setNationality(userUpdate.getNationality());
-        userProfile.setPhoneNumber(userUpdate.getPhoneNumber());
-        userProfile.setBirthDate(userUpdate.getBirthday());
-        userProfile.setSurName(userUpdate.getSurName());
-        userProfile.setFirstName(userUpdate.getFirstName());
-        userProfile.setProfilePicture(userUpdate.getProfilePicture());
-        userProfile.setBackgroundPicture(userUpdate.getBackgroundPicture());
+        if ( userUpdate.getNationality() != null ) userProfile.setNationality(userUpdate.getNationality());
+        if ( userUpdate.getPhoneNumber() != 0 ) userProfile.setPhoneNumber(userUpdate.getPhoneNumber());
+        if ( userUpdate.getBirthday() != null ) userProfile.setBirthDate(userUpdate.getBirthday());
+        if ( userUpdate.getSurName() != null ) userProfile.setSurName(userUpdate.getSurName());
+        if ( userUpdate.getFirstName() != null ) userProfile.setFirstName(userUpdate.getFirstName());
+        if ( userUpdate.getProfilePicture() != null ) userProfile.setProfilePicture(userUpdate.getProfilePicture());
+        if ( userUpdate.getBackgroundPicture() != null ) userProfile.setBackgroundPicture(userUpdate.getBackgroundPicture());
         PersonalDescription personalDescription = userProfile.getPersonalDescription();
-        personalDescription.setVisitedCountries(userUpdate.getPersonalDescription().getVisitedCountries());
-        personalDescription.setInterest(userUpdate.getPersonalDescription().getInterest());
-        personalDescription.setAbout(userUpdate.getPersonalDescription().getAbout());
-        userProfile.setPersonalDescription(personalDescription);
+        if ( userUpdate.getPersonalDescription() != null ) {
+            if ( userUpdate.getPersonalDescription().getVisitedCountries() != null )
+                personalDescription.setVisitedCountries(userUpdate.getPersonalDescription().getVisitedCountries());
+            if ( userUpdate.getPersonalDescription().getInterest() != null )
+                personalDescription.setInterest(userUpdate.getPersonalDescription().getInterest());
+            if ( userUpdate.getPersonalDescription().getAbout() != null )
+                personalDescription.setAbout(userUpdate.getPersonalDescription().getAbout());
+            userProfile.setPersonalDescription(personalDescription);
+        }
         return userProfile;
     }
 
 
     //return personal information (PersonalData and PersonalDescription as field)
-    @Transactional
+    @Transactional(readOnly = true)
     public PersonalData getPersonalInformation(String username) {
         return userRepository.findPersonalDataByUser(username).getPersonalData();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PersonalData getPersonalInformationWithAlbums(String username) {
         return personalDataRepository.findPersonalDataWithAlbumsByUserId(getPersonalInformation(username).getId());
     }
@@ -153,6 +163,9 @@ public class PersonalService {
         return new ResponseEntity(HttpStatus.NOT_MODIFIED);
     }
 
+    public ResponseEntity <List<Country>> getCountries(){
+        return new ResponseEntity <>(countryRepository.findAll(),HttpStatus.OK);
+    }
 
 
 }

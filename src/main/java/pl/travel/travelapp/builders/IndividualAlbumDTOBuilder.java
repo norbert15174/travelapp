@@ -4,6 +4,9 @@ import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.models.Coordinates;
 import pl.travel.travelapp.models.IndividualAlbum;
+import pl.travel.travelapp.models.SharedAlbum;
+
+import java.util.List;
 
 public class IndividualAlbumDTOBuilder {
     private long id;
@@ -13,6 +16,7 @@ public class IndividualAlbumDTOBuilder {
     private Coordinates coordinate;
     private PersonalInformationDTO personalInformationDTO;
     private boolean isPublic;
+    private List <SharedAlbum> sharedAlbumList;
 
     public IndividualAlbumDTOBuilder setId(long id) {
         this.id = id;
@@ -48,7 +52,12 @@ public class IndividualAlbumDTOBuilder {
         isPublic = aPublic;
         return this;
     }
+    public IndividualAlbumDTOBuilder setSharedAlbum(List<SharedAlbum> sharedAlbum) {
+        sharedAlbumList = sharedAlbum;
+        return this;
+    }
+
     public IndividualAlbumDTO createIndividualAlbumDTO(){
-        return new IndividualAlbumDTO(id,name,description,mainPhoto,coordinate,personalInformationDTO,isPublic);
+        return new IndividualAlbumDTO(id,name,description,mainPhoto,coordinate,personalInformationDTO,isPublic,sharedAlbumList);
     }
 }

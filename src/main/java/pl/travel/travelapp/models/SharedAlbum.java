@@ -3,6 +3,7 @@ package pl.travel.travelapp.models;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.travel.travelapp.models.enums.SharedAlbumStatus;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ public class SharedAlbum {
     private String name;
     private String surName;
     private String photo;
+    private SharedAlbumStatus status;
     @ManyToOne
     private IndividualAlbum individualAlbum;
 }

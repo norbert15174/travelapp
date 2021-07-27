@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.travel.travelapp.models.enums.MessageStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

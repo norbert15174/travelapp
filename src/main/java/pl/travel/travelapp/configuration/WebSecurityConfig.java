@@ -31,6 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**")
                 .antMatchers("/albums/user/{id}")
                 .antMatchers("/albums/name")
+                .antMatchers("/data/**")
                 .antMatchers("/v2/api-docs",
                 "/configuration/ui",
                 "/swagger-resources/**",

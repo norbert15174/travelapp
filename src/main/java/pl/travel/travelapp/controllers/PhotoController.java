@@ -10,6 +10,7 @@ import pl.travel.travelapp.interfaces.PhotoInterface;
 import pl.travel.travelapp.models.IndividualAlbum;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @CrossOrigin(value = "*")
@@ -26,5 +27,10 @@ public class PhotoController {
     @PostMapping("/{id}")
     public ResponseEntity <AlbumDTO> addNewPhotoToAlbum(Principal principal , @RequestParam("file") MultipartFile file , @PathVariable("id") long id , @RequestParam("description") String description) {
         return photoService.addNewPhotoToAlbum(principal , file , id, description);
+    }
+
+    @PostMapping("/multiple/{id}")
+    public ResponseEntity <AlbumDTO> addNewPhotosToAlbum(Principal principal , @RequestParam("files") MultipartFile[] files , @PathVariable("id") long id) {
+        return photoService.addPhotosToAlbum(principal , files , id);
     }
 }

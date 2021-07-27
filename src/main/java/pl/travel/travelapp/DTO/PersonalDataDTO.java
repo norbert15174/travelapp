@@ -20,7 +20,6 @@ public class PersonalDataDTO {
     private long id;
     private String firstName;
     private String surName;
-    @Size(min = 9)
     private long phoneNumber;
     private String profilePicture;
     private String backgroundPicture;

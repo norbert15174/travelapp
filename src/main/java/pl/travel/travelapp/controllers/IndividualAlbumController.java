@@ -2,7 +2,9 @@ package pl.travel.travelapp.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
+import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.models.IndividualAlbum;
 import pl.travel.travelapp.services.IndividualAlbumService;
 
@@ -42,4 +44,10 @@ public class IndividualAlbumController {
     public ResponseEntity <List <IndividualAlbumDTO>> findAlbumByName(@RequestParam String album , @RequestParam(defaultValue = "0") int page) {
         return individualAlbumService.findAlbumsByName(album , page);
     }
+
+    @PostMapping("/mainphoto/{id}")
+    public ResponseEntity <IndividualAlbumDTO> setMainPhoto(Principal principal , @RequestParam("file") MultipartFile file , @PathVariable("id") long id) {
+        return individualAlbumService.setMainPhotoToIndividualAlbum(principal , file , id);
+    }
+
 }

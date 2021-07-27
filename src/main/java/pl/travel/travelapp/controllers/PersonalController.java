@@ -29,9 +29,8 @@ public class PersonalController {
     }
 
 
-
     @PutMapping("/profile")
-    public ResponseEntity <PersonalDataDTO> updateProfile(PersonalDataDTO personalDataDTO , Principal principal) {
+    public ResponseEntity <PersonalDataDTO> updateProfile(@RequestBody PersonalDataDTO personalDataDTO , Principal principal) {
         return personalService.updatePersonalInformation(principal , personalDataDTO);
     }
 

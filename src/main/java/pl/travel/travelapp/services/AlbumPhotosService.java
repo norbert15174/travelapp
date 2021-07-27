@@ -27,6 +27,8 @@ public class AlbumPhotosService implements PhotoInterface {
     private AlbumPhotosRepository albumPhotosRepository;
     private IndividualAlbumInterface individualAlbumService;
 
+
+
     Storage storage = StorageOptions.getDefaultInstance().getService();
     @Value("${bucket-name}")
     private String bucket;
@@ -53,7 +55,9 @@ public class AlbumPhotosService implements PhotoInterface {
                 storage.create(blobInfo , file.getBytes());
                 AlbumPhotos albumPhotos = new AlbumPhotos();
                 albumPhotos.setPhotoUrl(url + path);
-                albumPhotos.setDescription(description);
+                if(description != null){
+                    albumPhotos.setDescription(description);
+                }
                 albumPhotos.setIndividualAlbum(individualAlbum);
                 individualAlbum.addNewPhoto(albumPhotos);
                 individualAlbumService.saveAlbum(individualAlbum);
@@ -65,6 +69,14 @@ public class AlbumPhotosService implements PhotoInterface {
             }
         }
         return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+    }
+
+    @Override
+    public ResponseEntity <AlbumDTO> addPhotosToAlbum(Principal principal, MultipartFile[] files, long id){
+        for(MultipartFile file : files){
+            addNewPhotoToAlbum(principal,file,id,null);
+        }
+        return new ResponseEntity (new AlbumDTO().build(individualAlbumService.findIndividualAlbumByIdOnlyOwner(principal,id).getBody()), HttpStatus.OK);
     }
 
     @Override

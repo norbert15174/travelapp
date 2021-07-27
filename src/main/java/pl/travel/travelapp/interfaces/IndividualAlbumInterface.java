@@ -12,6 +12,9 @@ public interface IndividualAlbumInterface {
     ResponseEntity<IndividualAlbumDTO> addNewAlbum(Principal principal, IndividualAlbumDTO individualAlbumDTO);
     ResponseEntity deleteAlbum(Principal principal, long id);
     ResponseEntity<IndividualAlbum> findAlbum(Principal principal , long id);
+
+    ResponseEntity <IndividualAlbum> findIndividualAlbumByIdOnlyOwner(Principal principal , long id);
+
     ResponseEntity<List<IndividualAlbumDTO>> findAllUserAlbums(Principal principal);
     ResponseEntity <List <BasicIndividualAlbumDTO>> findAlbumsByUser(long id);
     ResponseEntity<List<IndividualAlbumDTO>> findAlbumsByName(String name, int page);

@@ -30,6 +30,7 @@ public class IndividualAlbum {
 
     public void addNewUserToAlbumShare(SharedAlbum sharedAlbum){
         this.sharedAlbum.add(sharedAlbum);
+        sharedAlbum.setIndividualAlbum(this);
     }
 
     public void deleteUserFromAlbumShare(SharedAlbum sharedAlbum){
