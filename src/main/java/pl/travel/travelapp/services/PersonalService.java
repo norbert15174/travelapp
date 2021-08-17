@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PersonalService {
@@ -174,5 +175,9 @@ public class PersonalService {
         return new ResponseEntity <>(countryRepository.findAll(),HttpStatus.OK);
     }
 
+    @Transactional
+    public List <PersonalData> findAllById(List<Long> ids){
+        return personalDataRepository.findAllById(ids);
+    }
 
 }

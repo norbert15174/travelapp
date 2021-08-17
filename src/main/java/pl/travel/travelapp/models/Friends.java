@@ -29,4 +29,13 @@ public class Friends {
         this.secondUser = secondUser;
         this.messages = messages;
     }
+
+    public void addMessage(FriendMessages messages){
+        this.messages.add(messages);
+    }
+
+    public void deleteMessage(FriendMessages messages){
+        this.messages.remove(messages);
+    }
+
 }

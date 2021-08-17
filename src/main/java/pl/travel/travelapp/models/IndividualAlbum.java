@@ -29,6 +29,8 @@ public class IndividualAlbum {
     private List<AlbumPhotos> photos = new ArrayList<>();
 
     public void addNewUserToAlbumShare(SharedAlbum sharedAlbum){
+        boolean isExist = this.sharedAlbum.stream().anyMatch(shared -> sharedAlbum.getUserId() == shared.getUserId());
+        if(isExist) return;
         this.sharedAlbum.add(sharedAlbum);
         sharedAlbum.setIndividualAlbum(this);
     }

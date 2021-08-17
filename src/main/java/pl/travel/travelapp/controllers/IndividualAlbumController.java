@@ -3,6 +3,7 @@ package pl.travel.travelapp.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.services.IndividualAlbumService;
@@ -51,8 +52,24 @@ public class IndividualAlbumController {
     }
 
     @GetMapping("/full/{id}")
-    public ResponseEntity <List <IndividualAlbumFullInformationBuilder>> findFullUserAlbum(@PathVariable("id") long id, Principal principal) {
-        return individualAlbumService.findFullAlbumsByUserId(id,principal);
+    public ResponseEntity <List <IndividualAlbumFullInformationBuilder>> findFullUserAlbum(@PathVariable("id") long id , Principal principal) {
+        return individualAlbumService.findFullAlbumsByUserId(id , principal);
     }
+
+    @GetMapping("/shared")
+    public ResponseEntity <List <BasicIndividualAlbumDTO>> getAvailableAlbums(Principal principal) {
+        return individualAlbumService.getAvailableAlbums(principal);
+    }
+
+    @DeleteMapping("/shared")
+    public ResponseEntity deleteSharedAlbum(Principal principal , @RequestBody List <Long> sharedIds) {
+        return individualAlbumService.deleteShared(principal , sharedIds);
+    }
+
+    @PostMapping("/shared/{id}")
+    public ResponseEntity addSharedAlbum(Principal principal , @RequestBody List <Long> sharedIds , @PathVariable("id") Long id) {
+        return individualAlbumService.addShared(principal , sharedIds , id);
+    }
+
 
 }
