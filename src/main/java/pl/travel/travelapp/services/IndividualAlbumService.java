@@ -13,26 +13,26 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
-import pl.travel.travelapp.DTO.albums.AlbumDTO;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.builders.IndividualAlbumBuilder;
 import pl.travel.travelapp.builders.IndividualAlbumDTOBuilder;
+import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.builders.PersonalInformationDTOBuilder;
 import pl.travel.travelapp.interfaces.CoordinateInterface;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.SharedAlbumInterface;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataAlbumsToAlbumsDTOMapperClass;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.Coordinates;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.models.*;
 import pl.travel.travelapp.models.enums.SharedAlbumStatus;
 import pl.travel.travelapp.repositories.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class IndividualAlbumService implements IndividualAlbumInterface, CoordinateInterface, SharedAlbumInterface {
@@ -76,7 +76,10 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         PersonalData user = personalService.getPersonalInformationWithAlbums(principal.getName());
         if ( !checkIfIndividualAlbumDTOisCorrect(individualAlbumDTO) )
             return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
-        Coordinates coordinates = coordinatesRepository.save(individualAlbumDTO.getCoordinate());
+        Country country = countryRepository.findById(individualAlbumDTO.getCoordinate().getCountry().getId()).get();
+        Coordinates coord = individualAlbumDTO.getCoordinate();
+        coord.setCountry(country);
+        Coordinates coordinates = coordinatesRepository.save(coord);
         IndividualAlbum individualAlbum = new IndividualAlbumBuilder()
                 .setPublic(individualAlbumDTO.isPublic())
                 .setCoordinate(coordinates)
@@ -85,8 +88,11 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
                 .createIndividualAlbum();
         if(individualAlbumDTO.getSharedAlbumList() != null){
             individualAlbumDTO.getSharedAlbumList().forEach(sharedAlbum -> {
-                sharedAlbum.setStatus(SharedAlbumStatus.NEW);
-                individualAlbum.addNewUserToAlbumShare(sharedAlbum);
+                Optional<PersonalData> personalData = personalService.getPersonalInformation(sharedAlbum.getUserId());
+                if(personalData.isPresent()){
+                    SharedAlbum shared = new SharedAlbum(personalData.get());
+                    individualAlbum.addNewUserToAlbumShare(shared);
+                }
             });
         }
         user.addAlbum(individualAlbum);
@@ -170,6 +176,34 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         List <IndividualAlbum> individualAlbums = individualAlbumRepository.findUserPublicAlbumsByUserId(id);
         if ( individualAlbums.isEmpty() ) return new ResponseEntity(HttpStatus.NO_CONTENT);
         return new ResponseEntity <>(PersonalDataAlbumsToAlbumsDTOMapperClass.mapPersonalDataToAlbumsDTO(individualAlbums) , HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity <List <IndividualAlbumFullInformationBuilder>> findFullAlbumsByUserId(long id , Principal principal) {
+        PersonalData personalData = personalService.getPersonalInformation(principal.getName());
+        List <IndividualAlbum> individualAlbums = individualAlbumRepository.findFullUserPublicAlbumsByUserId(id);
+        if ( individualAlbums.isEmpty() ) return new ResponseEntity(HttpStatus.NO_CONTENT);
+        Set <IndividualAlbumFullInformationBuilder> albums = new HashSet <>();
+        for (IndividualAlbum album : individualAlbums) {
+            if ( personalData.getId() != album.getOwner().getId() ) {
+                return new ResponseEntity(HttpStatus.FORBIDDEN);
+            }
+            albums.add(
+                    IndividualAlbumFullInformationBuilder.builder()
+                            .name(album.getName())
+                            .coordinate(album.getCoordinate())
+                            .id(album.getId())
+                            .description(album.getDescription())
+                            .personalInformationDTO(new PersonalInformationDTO(album.getOwner().getId() , album.getOwner().getFirstName() , album.getOwner().getSurName() , album.getOwner().getProfilePicture()))
+                            .mainPhoto(album.getMainPhoto())
+                            .sharedAlbumList(album.getSharedAlbum())
+                            .isPublic(album.isPublic())
+                            .photos(album.getPhotos())
+                            .build()
+            );
+        }
+        return new ResponseEntity(albums , HttpStatus.OK);
     }
 
     @Transactional

@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Setter
@@ -23,5 +24,15 @@ public class Comments {
     private String surName;
     private String photo;
     private String text;
-    private LocalDateTime time;
+    private String time;
+
+    public Comments(String text, PersonalData personalData) {
+        this.name = personalData.getFirstName();
+        this.surName = personalData.getSurName();
+        this.photo = personalData.getProfilePicture();
+        this.text = text;
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime time = LocalDateTime.now();
+        this.time = time.format(dateTimeFormatter);
+    }
 }

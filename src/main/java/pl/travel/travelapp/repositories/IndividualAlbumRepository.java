@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface IndividualAlbumRepository extends JpaRepository<IndividualAlbum,Long> {
     @Query("select a from IndividualAlbum a left join fetch a.owner o where o.id =:id and a.isPublic = true")
     List <IndividualAlbum> findUserPublicAlbumsByUserId(long id);
+    @Query("select a from IndividualAlbum a left join fetch a.owner o left join fetch a.photos p where o.id =:id")
+    List <IndividualAlbum> findFullUserPublicAlbumsByUserId(long id);
     @Query("select a from IndividualAlbum a left join fetch a.owner o where a.name=:name and a.isPublic = true")
     List <IndividualAlbum> findUserAlbumsByAlbumName(String name, Pageable pageable);
     @Query("select a from IndividualAlbum  a left join fetch a.owner o left join fetch a.sharedAlbum s where a.id =:id and (a.owner.id =:userId or s.userId =:userId or a.isPublic = true)")

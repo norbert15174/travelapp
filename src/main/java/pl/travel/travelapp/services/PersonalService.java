@@ -25,6 +25,7 @@ import pl.travel.travelapp.repositories.*;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonalService {
@@ -91,7 +92,7 @@ public class PersonalService {
     }
 
     private PersonalData fillPersonalInformation(PersonalData userProfile , PersonalDataDTO userUpdate) {
-        if ( userUpdate.getNationality() != null ) userProfile.setNationality(userUpdate.getNationality());
+        if ( userUpdate.getNationality() != null ) userProfile.setNationality(countryRepository.findById(userUpdate.getNationality().getId()).get());
         if ( userUpdate.getPhoneNumber() != 0 ) userProfile.setPhoneNumber(userUpdate.getPhoneNumber());
         if ( userUpdate.getBirthday() != null ) userProfile.setBirthDate(userUpdate.getBirthday());
         if ( userUpdate.getSurName() != null ) userProfile.setSurName(userUpdate.getSurName());
@@ -100,8 +101,9 @@ public class PersonalService {
         if ( userUpdate.getBackgroundPicture() != null ) userProfile.setBackgroundPicture(userUpdate.getBackgroundPicture());
         PersonalDescription personalDescription = userProfile.getPersonalDescription();
         if ( userUpdate.getPersonalDescription() != null ) {
-            if ( userUpdate.getPersonalDescription().getVisitedCountries() != null )
+            if ( userUpdate.getPersonalDescription().getVisitedCountries() != null ){
                 personalDescription.setVisitedCountries(userUpdate.getPersonalDescription().getVisitedCountries());
+            }
             if ( userUpdate.getPersonalDescription().getInterest() != null )
                 personalDescription.setInterest(userUpdate.getPersonalDescription().getInterest());
             if ( userUpdate.getPersonalDescription().getAbout() != null )
@@ -116,6 +118,11 @@ public class PersonalService {
     @Transactional(readOnly = true)
     public PersonalData getPersonalInformation(String username) {
         return userRepository.findPersonalDataByUser(username).getPersonalData();
+    }
+
+    @Transactional
+    public Optional <PersonalData> getPersonalInformation(Long id) {
+        return personalDataRepository.findById(id);
     }
 
     @Transactional(readOnly = true)

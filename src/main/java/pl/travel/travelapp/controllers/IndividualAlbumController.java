@@ -4,8 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
-import pl.travel.travelapp.DTO.albums.AlbumDTO;
-import pl.travel.travelapp.models.IndividualAlbum;
+import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.services.IndividualAlbumService;
 
 import java.security.Principal;
@@ -25,6 +24,7 @@ public class IndividualAlbumController {
     public ResponseEntity <IndividualAlbumDTO> addNewAlbum(@RequestBody IndividualAlbumDTO album , Principal principal) {
         return individualAlbumService.addNewAlbum(principal , album);
     }
+
     @DeleteMapping
     public ResponseEntity deleteAlbum(@RequestParam long id , Principal principal) {
         return individualAlbumService.deleteAlbum(principal , id);
@@ -48,6 +48,11 @@ public class IndividualAlbumController {
     @PostMapping("/mainphoto/{id}")
     public ResponseEntity <IndividualAlbumDTO> setMainPhoto(Principal principal , @RequestParam("file") MultipartFile file , @PathVariable("id") long id) {
         return individualAlbumService.setMainPhotoToIndividualAlbum(principal , file , id);
+    }
+
+    @GetMapping("/full/{id}")
+    public ResponseEntity <List <IndividualAlbumFullInformationBuilder>> findFullUserAlbum(@PathVariable("id") long id, Principal principal) {
+        return individualAlbumService.findFullAlbumsByUserId(id,principal);
     }
 
 }

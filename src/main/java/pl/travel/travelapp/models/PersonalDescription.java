@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -20,6 +21,6 @@ public class PersonalDescription {
     private String interest;
     @Size(max = 500)
     private String about;
-    @OneToMany
-    private List<Country> visitedCountries;
+    private String visitedCountries;
+
 }
