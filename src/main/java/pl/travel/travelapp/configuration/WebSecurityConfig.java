@@ -47,6 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and().authorizeRequests()
                 .antMatchers("/user/picture").hasAnyRole("ADMIN")
+                .antMatchers("/user/*").authenticated()
                 .antMatchers("/photos/*").authenticated()
                 .antMatchers("/friends/*").authenticated()
                 .antMatchers("/albums/*").authenticated()

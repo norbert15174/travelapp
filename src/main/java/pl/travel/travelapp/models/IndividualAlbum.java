@@ -1,6 +1,8 @@
 package pl.travel.travelapp.models;
 
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class IndividualAlbum {
     private PersonalData owner;
     private boolean isPublic = false;
     @OneToMany(mappedBy = "individualAlbum",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<SharedAlbum> sharedAlbum = new ArrayList<>();
     @OneToMany(mappedBy = "individualAlbum",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<AlbumPhotos> photos = new ArrayList<>();

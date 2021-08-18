@@ -92,7 +92,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
             individualAlbumDTO.getSharedAlbumList().forEach(sharedAlbum -> {
                 Optional <PersonalData> personalData = personalService.getPersonalInformation(sharedAlbum.getUserId());
                 if ( personalData.isPresent() ) {
-                    SharedAlbum shared = new SharedAlbum(personalData.get());
+                    SharedAlbum shared = new SharedAlbum().build(personalData.get());
                     individualAlbum.addNewUserToAlbumShare(shared);
                 }
             });
@@ -302,7 +302,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         IndividualAlbum album = individualAlbumRepository.findById(albumId).get();
         if ( user.getId() != album.getOwner().getId() ) return new ResponseEntity(HttpStatus.FORBIDDEN);
         users.forEach(person -> {
-                    SharedAlbum sharedAlbum = new SharedAlbum(person);
+                    SharedAlbum sharedAlbum = new SharedAlbum().build(person);
                     album.addNewUserToAlbumShare(sharedAlbum);
                     individualAlbumRepository.save(album);
                 }

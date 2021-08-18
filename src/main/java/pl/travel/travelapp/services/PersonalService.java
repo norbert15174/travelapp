@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
@@ -24,9 +25,11 @@ import pl.travel.travelapp.repositories.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonalService {
@@ -162,7 +165,7 @@ public class PersonalService {
             if ( userData.getBackgroundPicture() != null ) {
                 storage.delete(BlobId.of("telephoners" , userData.getBackgroundPicture().split(bucket + "/")[1]));
             }
-            userData.setProfilePicture(url + path);
+            userData.setBackgroundPicture(url + path);
             personalDataRepository.save(userData);
             return new ResponseEntity <>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataByUserId(userData.getId())) , HttpStatus.OK);
         } catch ( IOException e ) {
@@ -180,4 +183,22 @@ public class PersonalService {
         return personalDataRepository.findAllById(ids);
     }
 
+    @Transactional
+    public ResponseEntity<PersonalDataDtoWithIndividualAlbumsDTO> getUserProfileInformationWithAlbums(Principal principal , long id) {
+        PersonalData user = userRepository.findPersonalDataByUser(principal.getName()).getPersonalData();
+        Optional<PersonalData> userData = personalDataRepository.findPersonalDataByUserIdWithSharedAndOwnedAlbums(id, user.getId());
+        if(userData.isPresent()){
+            PersonalDataDTO personalDataDTO = PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData.get());
+            List<IndividualAlbum> albums = userData.get().getAlbums().stream().filter(album -> album.isPublic() || album.getOwner().getId() == user.getId() || album.getSharedAlbum().stream().anyMatch(al -> al.getUserId() == user.getId())).collect(Collectors.toList());
+            List<BasicIndividualAlbumDTO> individualAlbumDTOS = IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(albums);
+            return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO,individualAlbumDTOS),HttpStatus.OK);
+        }else{
+            userData = personalDataRepository.findPersonalDataOptionalById(id);
+            if(userData.isPresent()){
+                PersonalDataDTO personalDataDTO = PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData.get());
+                return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO,new ArrayList <>()), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+    }
 }

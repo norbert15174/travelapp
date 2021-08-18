@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
+import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.services.PersonalService;
 
 import java.security.Principal;
@@ -49,5 +50,8 @@ public class PersonalController {
         return personalService.getUserProfileInformation(id);
     }
 
-
+    @GetMapping("/profile/full/{id}")
+    public ResponseEntity<PersonalDataDtoWithIndividualAlbumsDTO> getProfileInformationWithAlbums(@PathVariable("id") long id , Principal principal){
+        return personalService.getUserProfileInformationWithAlbums(principal, id);
+    }
 }
