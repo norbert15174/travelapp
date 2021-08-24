@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
 import pl.travel.travelapp.models.Country;
@@ -28,7 +29,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,16 +96,18 @@ public class PersonalService {
     }
 
     private PersonalData fillPersonalInformation(PersonalData userProfile , PersonalDataDTO userUpdate) {
-        if ( userUpdate.getNationality() != null ) userProfile.setNationality(countryRepository.findById(userUpdate.getNationality().getId()).get());
+        if ( userUpdate.getNationality() != null )
+            userProfile.setNationality(countryRepository.findById(userUpdate.getNationality().getId()).get());
         if ( userUpdate.getPhoneNumber() != 0 ) userProfile.setPhoneNumber(userUpdate.getPhoneNumber());
         if ( userUpdate.getBirthday() != null ) userProfile.setBirthDate(userUpdate.getBirthday());
         if ( userUpdate.getSurName() != null ) userProfile.setSurName(userUpdate.getSurName());
         if ( userUpdate.getFirstName() != null ) userProfile.setFirstName(userUpdate.getFirstName());
         if ( userUpdate.getProfilePicture() != null ) userProfile.setProfilePicture(userUpdate.getProfilePicture());
-        if ( userUpdate.getBackgroundPicture() != null ) userProfile.setBackgroundPicture(userUpdate.getBackgroundPicture());
+        if ( userUpdate.getBackgroundPicture() != null )
+            userProfile.setBackgroundPicture(userUpdate.getBackgroundPicture());
         PersonalDescription personalDescription = userProfile.getPersonalDescription();
         if ( userUpdate.getPersonalDescription() != null ) {
-            if ( userUpdate.getPersonalDescription().getVisitedCountries() != null ){
+            if ( userUpdate.getPersonalDescription().getVisitedCountries() != null ) {
                 personalDescription.setVisitedCountries(userUpdate.getPersonalDescription().getVisitedCountries());
             }
             if ( userUpdate.getPersonalDescription().getInterest() != null )
@@ -174,31 +176,36 @@ public class PersonalService {
         return new ResponseEntity(HttpStatus.NOT_MODIFIED);
     }
 
-    public ResponseEntity <List<Country>> getCountries(){
-        return new ResponseEntity <>(countryRepository.findAll(),HttpStatus.OK);
+    public ResponseEntity <List <Country>> getCountries() {
+        return new ResponseEntity <>(countryRepository.findAll() , HttpStatus.OK);
     }
 
     @Transactional
-    public List <PersonalData> findAllById(List<Long> ids){
+    public List <PersonalData> findAllById(List <Long> ids) {
         return personalDataRepository.findAllById(ids);
     }
 
     @Transactional
-    public ResponseEntity<PersonalDataDtoWithIndividualAlbumsDTO> getUserProfileInformationWithAlbums(Principal principal , long id) {
+    public ResponseEntity <PersonalDataDtoWithIndividualAlbumsDTO> getUserProfileInformationWithAlbums(Principal principal , long id) {
         PersonalData user = userRepository.findPersonalDataByUser(principal.getName()).getPersonalData();
-        Optional<PersonalData> userData = personalDataRepository.findPersonalDataByUserIdWithSharedAndOwnedAlbums(id, user.getId());
-        if(userData.isPresent()){
+        Optional <PersonalData> userData = personalDataRepository.findPersonalDataByUserIdWithSharedAndOwnedAlbums(id , user.getId());
+        if ( userData.isPresent() ) {
             PersonalDataDTO personalDataDTO = PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData.get());
-            List<IndividualAlbum> albums = userData.get().getAlbums().stream().filter(album -> album.isPublic() || album.getOwner().getId() == user.getId() || album.getSharedAlbum().stream().anyMatch(al -> al.getUserId() == user.getId())).collect(Collectors.toList());
-            List<BasicIndividualAlbumDTO> individualAlbumDTOS = IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(albums);
-            return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO,individualAlbumDTOS),HttpStatus.OK);
-        }else{
+            List <IndividualAlbum> albums = userData.get().getAlbums().stream().filter(album -> album.isPublic() || album.getOwner().getId() == user.getId() || album.getSharedAlbum().stream().anyMatch(al -> al.getUserId() == user.getId())).collect(Collectors.toList());
+            List <BasicIndividualAlbumDTO> individualAlbumDTOS = IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(albums);
+            return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO , individualAlbumDTOS) , HttpStatus.OK);
+        } else {
             userData = personalDataRepository.findPersonalDataOptionalById(id);
-            if(userData.isPresent()){
+            if ( userData.isPresent() ) {
                 PersonalDataDTO personalDataDTO = PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData.get());
-                return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO,new ArrayList <>()), HttpStatus.OK);
+                return new ResponseEntity <>(new PersonalDataDtoWithIndividualAlbumsDTO(personalDataDTO , new ArrayList <>()) , HttpStatus.OK);
             }
         }
         return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity <PersonalInformationDTO> getBasicUserInformation(Principal principal) {
+        PersonalData user = userRepository.findPersonalDataByUser(principal.getName()).getPersonalData();
+        return new ResponseEntity(new PersonalInformationDTO(user) , HttpStatus.OK);
     }
 }

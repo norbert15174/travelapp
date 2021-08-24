@@ -1,18 +1,14 @@
 package pl.travel.travelapp.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.travel.travelapp.DTO.FriendsDTO;
 import pl.travel.travelapp.DTO.MessageDTO;
-import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.interfaces.FriendsInterface;
 import pl.travel.travelapp.interfaces.FriendsMessageInterface;
 import pl.travel.travelapp.mappers.FriendsObjectMapperClass;
-import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
 import pl.travel.travelapp.models.FriendMessages;
 import pl.travel.travelapp.models.Friends;
 import pl.travel.travelapp.models.PersonalData;
@@ -56,19 +52,16 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     }
 
     @Override
-    public ResponseEntity getUserFriends(Principal principal) {
+    public ResponseEntity <List <FriendsDTO>> getUserFriends(Principal principal) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         List <Friends> friends = friendsRepository.findFriends(user.getId());
-        List <FriendsDTO> friendsDTOS = new ArrayList <>();
-        friends.forEach(friend ->
-                {
-                    if ( friend.getSecondUser().getId() != user.getId() )
-                        friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getSecondUser()));
-                    else
-                        friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser()));
-                }
-        );
-        return new ResponseEntity(friendsDTOS , HttpStatus.OK);
+        return getUserFriends(friends , user.getId());
+    }
+
+    @Override
+    public ResponseEntity <List <FriendsDTO>> getUserFriendsById(long id) {
+        List <Friends> friends = friendsRepository.findFriends(id);
+        return getUserFriends(friends , id);
     }
 
     @Override
@@ -85,4 +78,18 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         friendMessagesRepository.deleteById(messageId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
+
+    private ResponseEntity <List <FriendsDTO>> getUserFriends(List <Friends> friends , long id) {
+        List <FriendsDTO> friendsDTOS = new ArrayList <>();
+        friends.forEach(friend ->
+                {
+                    if ( friend.getSecondUser().getId() != id )
+                        friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getSecondUser()));
+                    else
+                        friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser()));
+                }
+        );
+        return new ResponseEntity(friendsDTOS , HttpStatus.OK);
+    }
+
 }

@@ -30,12 +30,12 @@ public class UserRegisterDTO {
     @Email
     private String email;
     @NotNull
-    @Min(3)
+    @Min(2)
     @Max(18)
     private String firstName;
     @NotNull
-    @Min(3)
-    @Max(18)
+    @Min(2)
+    @Max(30)
     private String surName;
     private String birthDay;
     @NotNull

@@ -25,7 +25,7 @@ public class IndividualAlbumToBasicIndividualAlbumDTOMapper {
                 map().setDescription(source.getDescription());
                 map().setId(source.getId());
                 map().setMainPhoto(source.getMainPhoto());
-                map().setName(source.getMainPhoto());
+                map().setName(source.getName());
                 map().setPublic(source.isPublic());
             }
         });

@@ -2,8 +2,8 @@ package pl.travel.travelapp.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.travel.travelapp.DTO.FriendsDTO;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
-import pl.travel.travelapp.models.FriendsRequest;
 import pl.travel.travelapp.services.FriendsRequestService;
 import pl.travel.travelapp.services.FriendsService;
 
@@ -44,8 +44,13 @@ public class FriendsController {
     }
 
     @GetMapping
-    public ResponseEntity getFriends(Principal principal) {
+    public ResponseEntity <List <FriendsDTO>> getFriends(Principal principal) {
         return friendsService.getUserFriends(principal);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity <List <FriendsDTO>> getUserFriends(@PathVariable("id") long id) {
+        return friendsService.getUserFriendsById(id);
     }
 
 

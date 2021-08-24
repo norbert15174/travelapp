@@ -23,7 +23,7 @@ public class ReadCountryDataService {
         this.countryRepository = countryRepository;
     }
 
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public List <Country> readFileMethodPerson() {
         List <Country> countries = new ArrayList <>();
         File file = new File("src\\main\\resources\\CountriesAndFlags\\Country_Flags.csv");

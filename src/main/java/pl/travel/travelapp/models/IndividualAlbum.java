@@ -5,6 +5,8 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,9 @@ public class IndividualAlbum {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Size(max = 50)
     private String name;
+    @Size(max = 800)
     private String description;
     private String mainPhoto;
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

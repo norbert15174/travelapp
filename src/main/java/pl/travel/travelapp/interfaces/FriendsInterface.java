@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface FriendsInterface {
 
-    ResponseEntity deleteFromFriendList(Principal principal,long id);
-    ResponseEntity getUserFriends(Principal principal);
+    ResponseEntity deleteFromFriendList(Principal principal , long id);
 
+    ResponseEntity <List <FriendsDTO>> getUserFriends(Principal principal);
+
+    ResponseEntity <List <FriendsDTO>> getUserFriendsById(long id);
 }
