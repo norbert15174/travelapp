@@ -14,17 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.PhotoInterface;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.Comments;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.models.*;
 import pl.travel.travelapp.repositories.AlbumPhotosRepository;
 import pl.travel.travelapp.repositories.CommentsRepository;
+import pl.travel.travelapp.services.query.FriendsQueryService;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AlbumPhotosService implements PhotoInterface {
@@ -32,6 +33,7 @@ public class AlbumPhotosService implements PhotoInterface {
     private IndividualAlbumInterface individualAlbumService;
     private PersonalService personalService;
     private CommentsRepository commentsRepository;
+    private FriendsQueryService friendsQueryService;
 
 
     Storage storage = StorageOptions.getDefaultInstance().getService();
@@ -129,6 +131,33 @@ public class AlbumPhotosService implements PhotoInterface {
             }
         }
         return new ResponseEntity(HttpStatus.FORBIDDEN);
+    }
+
+    @Transactional
+    public ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal) {
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <AlbumPhotos> albumPhotoOpt = albumPhotosRepository.findById(photoId);
+        if ( !albumPhotoOpt.isPresent() ) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        AlbumPhotos albumPhoto = albumPhotoOpt.get();
+        if ( albumPhoto.getIndividualAlbum().getOwner().getId() != user.getId() ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        List <Friends> friends = friendsQueryService.findFriendsByUserId(user.getId());
+        Set <PersonalData> userToTag = new HashSet <>();
+        for (Friends f : friends) {
+            if ( f.getFirstUser().getId() == user.getId() ) {
+                userToTag.add(f.getSecondUser());
+            } else if ( f.getSecondUser().getId() == user.getId() ) {
+                userToTag.add(f.getFirstUser());
+            }
+        }
+        Set <Long> userSharedIds = albumPhoto.getIndividualAlbum().getSharedAlbum().stream().map(SharedAlbum::getId).collect(Collectors.toSet());
+        Set <PersonalData> userTagged = userToTag.stream().filter(tag -> userSharedIds.contains(tag.getId())).collect(Collectors.toSet());
+        albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userTagged));
+        albumPhotosRepository.save(albumPhoto);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private boolean checkIfUserCanAddComment(AlbumPhotos photoToSave , PersonalData user) {

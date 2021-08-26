@@ -9,7 +9,9 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -31,7 +33,7 @@ public class AlbumPhotos {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "photoId")
-    private List <TaggedUser> taggedList = new ArrayList <>();
+    private Set <TaggedUser> taggedList = new HashSet <>();
 
     public void deletePhotoFromAlbum(AlbumPhotos albumPhotos) {
         individualAlbum.deletePhoto(albumPhotos);
@@ -47,6 +49,10 @@ public class AlbumPhotos {
 
     public void addTaggedUser(TaggedUser taggedUser) {
         this.taggedList.add(taggedUser);
+    }
+
+    public void addTaggedUser(Set <TaggedUser> taggedUser) {
+        this.taggedList.addAll(taggedUser);
     }
 
     public void deleteTaggedUser(TaggedUser taggedUser) {

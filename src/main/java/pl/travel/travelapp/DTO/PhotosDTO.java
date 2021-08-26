@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.travel.travelapp.models.Comments;
-import pl.travel.travelapp.models.SharedAlbum;
 import pl.travel.travelapp.models.TaggedUser;
 
 import java.util.List;
+import java.util.Set;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -18,5 +19,5 @@ public class PhotosDTO {
     private String photoUrl;
     private String description;
     private List <Comments> photoComments;
-    private List<TaggedUser> taggedList;
+    private Set <TaggedUser> taggedList;
 }

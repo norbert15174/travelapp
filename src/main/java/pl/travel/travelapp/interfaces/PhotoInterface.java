@@ -8,6 +8,7 @@ import pl.travel.travelapp.models.Comments;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 public interface PhotoInterface {
     List <AlbumPhotos> findUserPhotos(long albumId , long page);
@@ -21,4 +22,6 @@ public interface PhotoInterface {
     ResponseEntity deleteUsersPhotos(List <Long> photoIds , Principal principal);
 
     ResponseEntity addCommentToPhoto(Principal principal , long photoId , Comments comment);
+
+    ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal);
 }

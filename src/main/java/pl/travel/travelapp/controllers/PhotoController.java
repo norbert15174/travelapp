@@ -11,6 +11,7 @@ import pl.travel.travelapp.models.Comments;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @CrossOrigin(value = "*")
@@ -43,4 +44,10 @@ public class PhotoController {
     public ResponseEntity addCommentToPhoto(Principal principal , @RequestBody Comments comments , @PathVariable(name = "id") Long id) {
         return photoService.addCommentToPhoto(principal , id , comments);
     }
+
+    @PutMapping("/add/tagged/{id}")
+    public ResponseEntity addTaggedUsersToPhoto(@RequestBody Set <Long> ids , @PathVariable("id") Long photoId , Principal principal) {
+        return photoService.addTaggedUsersToPhoto(ids , photoId , principal);
+    }
+
 }

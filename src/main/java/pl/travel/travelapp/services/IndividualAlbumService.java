@@ -118,6 +118,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
 
+    @Transactional
     @Override
     public ResponseEntity deleteAlbum(Principal principal , long id) {
         if ( id < 0 ) return new ResponseEntity("invalid id" , HttpStatus.BAD_REQUEST);
@@ -281,17 +282,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     @Transactional
     public ResponseEntity deleteShared(Principal principal , List <Long> sharedIds) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
-        sharedIds.forEach(id -> {
-                    Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
-                    if ( sharedAlbums.isPresent() ) {
-                        IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
-                        if ( album.getOwner().getId() == user.getId() ) {
-                            album.deleteUserFromAlbumShare(sharedAlbums.get());
-                            individualAlbumRepository.save(album);
-                        }
-                    }
-                }
-        );
+        deleteSharedUser(user , sharedIds);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -309,5 +300,36 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         );
         return new ResponseEntity(HttpStatus.CREATED);
     }
+
+    public Set <SharedAlbum> findAllUserSharedAlbumsByOwnerAndSharedUserId(long id , long ownerId) {
+        return sharedAlbumRepository.findAllUserSharedAlbumsBySharedUserId(id , ownerId);
+    }
+
+    public void deleteSharedUserDuringFriendDelete(List <Long> sharedIds) {
+        sharedIds.forEach(id -> {
+                    Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
+                    if ( sharedAlbums.isPresent() ) {
+                        IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
+                        album.deleteUserFromAlbumShare(sharedAlbums.get());
+                        individualAlbumRepository.save(album);
+                    }
+                }
+        );
+    }
+
+    private void deleteSharedUser(PersonalData user , List <Long> sharedIds) {
+        sharedIds.forEach(id -> {
+                    Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
+                    if ( sharedAlbums.isPresent() ) {
+                        IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
+                        if ( album.getOwner().getId() == user.getId() ) {
+                            album.deleteUserFromAlbumShare(sharedAlbums.get());
+                            individualAlbumRepository.save(album);
+                        }
+                    }
+                }
+        );
+    }
+
 
 }

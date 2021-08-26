@@ -53,5 +53,10 @@ public class FriendsController {
         return friendsService.getUserFriendsById(id);
     }
 
+    @DeleteMapping("/friend/{id}")
+    public ResponseEntity deleteFromFriendList(Principal principal , @RequestParam long id) {
+        return deleteFromFriendList(principal , id);
+    }
+
 
 }
