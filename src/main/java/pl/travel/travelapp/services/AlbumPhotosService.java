@@ -17,7 +17,10 @@ import pl.travel.travelapp.interfaces.PhotoInterface;
 import pl.travel.travelapp.models.*;
 import pl.travel.travelapp.repositories.AlbumPhotosRepository;
 import pl.travel.travelapp.repositories.CommentsRepository;
+import pl.travel.travelapp.services.delete.interfaces.IPhotoDeleteService;
 import pl.travel.travelapp.services.query.FriendsQueryService;
+import pl.travel.travelapp.services.query.interfaces.IPhotoQueryService;
+import pl.travel.travelapp.services.save.interfaces.IPhotoSaveService;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -29,11 +32,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class AlbumPhotosService implements PhotoInterface {
-    private AlbumPhotosRepository albumPhotosRepository;
     private IndividualAlbumInterface individualAlbumService;
     private PersonalService personalService;
-    private CommentsRepository commentsRepository;
     private FriendsQueryService friendsQueryService;
+    private final IPhotoQueryService photoQueryService;
+    private final IPhotoSaveService photoSaveService;
+    private final IPhotoDeleteService photoDeleteService;
 
 
     Storage storage = StorageOptions.getDefaultInstance().getService();
@@ -42,15 +46,14 @@ public class AlbumPhotosService implements PhotoInterface {
     @Value("${url-gcp-addr}")
     private String url;
 
-    @Autowired
-    public AlbumPhotosService(AlbumPhotosRepository albumPhotosRepository , IndividualAlbumInterface individualAlbumService , PersonalService personalService , CommentsRepository commentsRepository , FriendsQueryService friendsQueryService) {
-        this.albumPhotosRepository = albumPhotosRepository;
+    public AlbumPhotosService(IndividualAlbumInterface individualAlbumService , PersonalService personalService , FriendsQueryService friendsQueryService , IPhotoQueryService photoQueryService , IPhotoSaveService photoSaveService , IPhotoDeleteService photoDeleteService) {
         this.individualAlbumService = individualAlbumService;
         this.personalService = personalService;
-        this.commentsRepository = commentsRepository;
         this.friendsQueryService = friendsQueryService;
+        this.photoQueryService = photoQueryService;
+        this.photoSaveService = photoSaveService;
+        this.photoDeleteService = photoDeleteService;
     }
-
 
     @Transactional
     public ResponseEntity <AlbumDTO> addNewPhotoToAlbum(Principal principal , MultipartFile file , long id , String description) {
@@ -105,12 +108,12 @@ public class AlbumPhotosService implements PhotoInterface {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         if ( user == null ) return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         for (Long id : photoIds) {
-            Optional <AlbumPhotos> albumPhoto = albumPhotosRepository.findById(id);
+            Optional <AlbumPhotos> albumPhoto = photoQueryService.findById(id);
             if ( albumPhoto.isPresent() ) {
                 PersonalData userData = albumPhoto.get().getIndividualAlbum().getOwner();
                 if ( userData.getId() != user.getId() ) return new ResponseEntity(HttpStatus.FORBIDDEN);
                 albumPhoto.get().deletePhotoFromAlbum(albumPhoto.get());
-                albumPhotosRepository.delete(albumPhoto.get());
+                photoDeleteService.delete(albumPhoto.get());
                 BlobId blobId = BlobId.of(bucket , albumPhoto.get().getPhotoName());
                 storage.delete(blobId);
             }
@@ -121,14 +124,14 @@ public class AlbumPhotosService implements PhotoInterface {
     @Override
     @Transactional
     public ResponseEntity addCommentToPhoto(Principal principal , long photoId , Comments comment) {
-        Optional <AlbumPhotos> photo = albumPhotosRepository.findById(photoId);
+        Optional <AlbumPhotos> photo = photoQueryService.findById(photoId);
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         if ( photo.isPresent() ) {
             AlbumPhotos photoToSave = photo.get();
             if ( checkIfUserCanAddComment(photoToSave , user) ) {
                 Comments photoComment = new Comments(comment.getText() , user);
                 photoToSave.addComment(photoComment);
-                albumPhotosRepository.save(photoToSave);
+                photoSaveService.save(photoToSave);
                 return new ResponseEntity(HttpStatus.CREATED);
             }
         }
@@ -138,7 +141,7 @@ public class AlbumPhotosService implements PhotoInterface {
     @Transactional
     public ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
-        Optional <AlbumPhotos> albumPhotoOpt = albumPhotosRepository.findById(photoId);
+        Optional <AlbumPhotos> albumPhotoOpt = photoQueryService.findById(photoId);
         if ( !albumPhotoOpt.isPresent() ) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -158,7 +161,7 @@ public class AlbumPhotosService implements PhotoInterface {
         Set <Long> userSharedIds = albumPhoto.getIndividualAlbum().getSharedAlbum().stream().map(SharedAlbum::getUserId).collect(Collectors.toSet());
         Set <PersonalData> userTagged = userToTag.stream().filter(tag -> userSharedIds.contains(tag.getId())).collect(Collectors.toSet());
         albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userTagged));
-        albumPhotosRepository.save(albumPhoto);
+        photoSaveService.save(albumPhoto);
         return new ResponseEntity(HttpStatus.OK);
     }
 

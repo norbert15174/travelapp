@@ -44,8 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
 //        http.cors().and().authorizeRequests().antMatchers("/**").permitAll();
-
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and().authorizeRequests()
+//.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).
+        http.cors().and().authorizeRequests()
                 .antMatchers("/user/picture").hasAnyRole("ADMIN")
                 .antMatchers("/user/*").authenticated()
                 .antMatchers("/photos/*").authenticated()

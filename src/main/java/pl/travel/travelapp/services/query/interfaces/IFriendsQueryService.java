@@ -1,0 +1,16 @@
+package pl.travel.travelapp.services.query.interfaces;
+
+import pl.travel.travelapp.models.Friends;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface IFriendsQueryService {
+
+    List <Friends> findFriendsByUserId(Long id);
+
+    List <Friends> findByFriendId(Long id);
+
+    Optional <Friends> findFriendByFirstAndSecond(Long firstId , Long secondId);
+
+}
