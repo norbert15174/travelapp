@@ -14,6 +14,6 @@ public interface SharedAlbumRepository extends JpaRepository <SharedAlbum, Long>
     @Query("select sa from SharedAlbum sa where sa.userId =: id")
     List <SharedAlbum> findAvailableAlbums(@Param("id") long id);
 
-    @Query("select sa from SharedAlbum sa inner join fetch sa.individualAlbum ia inner join ia.owner o where sa.userId = :userId and o.id = :ownerId")
+    @Query("select sa from SharedAlbum sa inner join fetch sa.individualAlbum ia inner join ia.owner o where (sa.userId = :userId and o.id = :ownerId) or (sa.userId = :ownerId and o.id = :userId)")
     Set <SharedAlbum> findAllUserSharedAlbumsBySharedUserId(long userId , long ownerId);
 }

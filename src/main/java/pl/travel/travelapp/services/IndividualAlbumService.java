@@ -310,8 +310,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
                     Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
                     if ( sharedAlbums.isPresent() ) {
                         IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
-                        album.deleteUserFromAlbumShare(sharedAlbums.get());
-                        individualAlbumRepository.save(album);
+                        sharedAlbumRepository.deleteById(id);
                     }
                 }
         );
@@ -323,8 +322,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
                     if ( sharedAlbums.isPresent() ) {
                         IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
                         if ( album.getOwner().getId() == user.getId() ) {
-                            album.deleteUserFromAlbumShare(sharedAlbums.get());
-                            individualAlbumRepository.save(album);
+                            sharedAlbumRepository.deleteById(id);
                         }
                     }
                 }

@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/friends")
+@CrossOrigin(origins = "*")
 public class FriendsController {
 
 
@@ -53,9 +54,9 @@ public class FriendsController {
         return friendsService.getUserFriendsById(id);
     }
 
-    @DeleteMapping("/friend/{id}")
-    public ResponseEntity deleteFromFriendList(Principal principal , @RequestParam long id) {
-        return deleteFromFriendList(principal , id);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deleteFromFriendList(Principal principal , @PathVariable long id) {
+        return friendsService.deleteFromFriendList(principal , id);
     }
 
 

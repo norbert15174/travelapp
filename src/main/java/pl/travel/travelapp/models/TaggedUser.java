@@ -37,4 +37,20 @@ public class TaggedUser {
         return this;
     }
 
+    @Override
+    public int hashCode() {
+        return (int) userId * name.hashCode() * surName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (this.getClass() != o.getClass()) return false;
+        TaggedUser user = (TaggedUser) o;
+        return getUserId() == user.getUserId()
+                && (name.equals(user.getName())
+                && surName.equals(user.getSurName()));
+    }
+
 }

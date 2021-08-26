@@ -43,10 +43,12 @@ public class AlbumPhotosService implements PhotoInterface {
     private String url;
 
     @Autowired
-    public AlbumPhotosService(AlbumPhotosRepository albumPhotosRepository , IndividualAlbumInterface individualAlbumService , PersonalService personalService) {
+    public AlbumPhotosService(AlbumPhotosRepository albumPhotosRepository , IndividualAlbumInterface individualAlbumService , PersonalService personalService , CommentsRepository commentsRepository , FriendsQueryService friendsQueryService) {
         this.albumPhotosRepository = albumPhotosRepository;
         this.individualAlbumService = individualAlbumService;
         this.personalService = personalService;
+        this.commentsRepository = commentsRepository;
+        this.friendsQueryService = friendsQueryService;
     }
 
 
@@ -153,7 +155,7 @@ public class AlbumPhotosService implements PhotoInterface {
                 userToTag.add(f.getFirstUser());
             }
         }
-        Set <Long> userSharedIds = albumPhoto.getIndividualAlbum().getSharedAlbum().stream().map(SharedAlbum::getId).collect(Collectors.toSet());
+        Set <Long> userSharedIds = albumPhoto.getIndividualAlbum().getSharedAlbum().stream().map(SharedAlbum::getUserId).collect(Collectors.toSet());
         Set <PersonalData> userTagged = userToTag.stream().filter(tag -> userSharedIds.contains(tag.getId())).collect(Collectors.toSet());
         albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userTagged));
         albumPhotosRepository.save(albumPhoto);

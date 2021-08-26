@@ -48,10 +48,10 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         if ( friendsOpt.isPresent() ) {
             Friends friend = friendsOpt.get();
             Long friendToDeleteId = friend.getFirstUser().getId() == user.getId() ? friend.getSecondUser().getId() : friend.getFirstUser().getId();
-            List <Long> sharedAlbumIds = individualAlbumService.findAllUserSharedAlbumsByOwnerAndSharedUserId(user.getId() , id).stream().map(SharedAlbum::getId).collect(Collectors.toList());
+            List <Long> sharedAlbumIds = individualAlbumService.findAllUserSharedAlbumsByOwnerAndSharedUserId(id, user.getId()).stream().map(SharedAlbum::getId).collect(Collectors.toList());
             individualAlbumService.deleteSharedUserDuringFriendDelete(sharedAlbumIds);
             friendsRepository.deleteById(friend.getId());
-            return new ResponseEntity(HttpStatus.ACCEPTED);
+            return new ResponseEntity(HttpStatus.OK);
         } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }

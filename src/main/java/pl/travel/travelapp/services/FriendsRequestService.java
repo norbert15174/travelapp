@@ -11,13 +11,14 @@ import pl.travel.travelapp.builders.FriendsBuilder;
 import pl.travel.travelapp.builders.FriendsRequestBuilder;
 import pl.travel.travelapp.interfaces.FriendsRequestInterface;
 import pl.travel.travelapp.mappers.FriendsRequestObjectMapperClass;
-import pl.travel.travelapp.models.*;
+import pl.travel.travelapp.models.Friends;
+import pl.travel.travelapp.models.FriendsRequest;
+import pl.travel.travelapp.models.PersonalData;
 import pl.travel.travelapp.repositories.FriendsRepository;
 import pl.travel.travelapp.repositories.FriendsRequestRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,8 +46,9 @@ public class FriendsRequestService implements FriendsRequestInterface {
         PersonalData user = getPersonalInformation(principal);
         if ( user.getId() == id ) return new ResponseEntity <>(HttpStatus.FORBIDDEN);
         if ( !personalDataRepository.findById(id).isPresent() ) return new ResponseEntity <>(HttpStatus.NOT_FOUND);
-        if ( !friendsRequestRepository.findFirstByReceiver(id , user.getId()).isEmpty() )
+        if ( !friendsRequestRepository.findFirstByReceiver(id , user.getId()).isEmpty() || friendsRepository.findFriendByFirstAndSecond(id , user.getId()).isPresent() )
             return new ResponseEntity <>(HttpStatus.CONFLICT);
+
         try {
             friendsRequestRepository
                     .save(new FriendsRequestBuilder()
@@ -114,7 +116,7 @@ public class FriendsRequestService implements FriendsRequestInterface {
                     .createFriends();
             friendsRepository.save(friendsToSave);
             friends.setFriends(true);
-            friendsRequestRepository.save(friends);
+            friendsRequestRepository.deleteById(friends.getId());
             return new ResponseEntity <>(HttpStatus.OK);
         } else {
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);
