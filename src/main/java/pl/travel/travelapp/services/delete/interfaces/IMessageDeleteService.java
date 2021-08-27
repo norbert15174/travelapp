@@ -1,7 +1,6 @@
 package pl.travel.travelapp.services.delete.interfaces;
 
-import pl.travel.travelapp.models.FriendMessages;
-import pl.travel.travelapp.models.Friends;
+import pl.travel.travelapp.entites.FriendMessages;
 
 public interface IMessageDeleteService {
 

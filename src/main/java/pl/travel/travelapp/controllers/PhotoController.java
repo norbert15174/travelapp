@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.interfaces.PhotoInterface;
-import pl.travel.travelapp.models.Comments;
+import pl.travel.travelapp.entites.Comments;
 
 import java.security.Principal;
 import java.util.List;

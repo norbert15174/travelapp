@@ -3,8 +3,8 @@ package pl.travel.travelapp.interfaces;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.Comments;
+import pl.travel.travelapp.entites.AlbumPhotos;
+import pl.travel.travelapp.entites.Comments;
 
 import java.security.Principal;
 import java.util.List;

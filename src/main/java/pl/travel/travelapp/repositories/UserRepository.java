@@ -3,8 +3,7 @@ package pl.travel.travelapp.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import pl.travel.travelapp.models.PersonalData;
-import pl.travel.travelapp.models.User;
+import pl.travel.travelapp.entites.User;
 
 import java.util.Optional;
 

@@ -1,16 +1,13 @@
 package pl.travel.travelapp.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pl.travel.travelapp.services.UserService;
@@ -28,16 +25,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/auth/**")
+                .antMatchers(HttpMethod.POST,"/auth/*")
+                .antMatchers(HttpMethod.GET,"/auth/*")
+                .antMatchers(HttpMethod.DELETE,"/auth/*")
                 .antMatchers("/albums/user/{id}")
                 .antMatchers("/albums/name")
                 .antMatchers("/data/**")
-                .antMatchers("/v2/api-docs",
-                "/configuration/ui",
-                "/swagger-resources/**",
-                "/configuration/security",
-                "/swagger-ui.html",
-                "/webjars/**");
+                .antMatchers("/v2/api-docs" ,
+                        "/configuration/ui" ,
+                        "/swagger-resources/**" ,
+                        "/configuration/security" ,
+                        "/swagger-ui.html" ,
+                        "/webjars/**");
     }
 
     @Override
@@ -52,9 +51,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/friends/*").authenticated()
                 .antMatchers("/albums/*").authenticated()
                 .antMatchers("/resources").authenticated()
+                .antMatchers(HttpMethod.PUT,"/auth/password").authenticated()
                 .and()
-                .addFilterBefore(new JwtFilter(userService), UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(new JwtFilter(userService) , UsernamePasswordAuthenticationFilter.class);
 
         http.csrf().disable();
 
@@ -75,8 +74,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             }
         };
     }
-
-
 
 
 }

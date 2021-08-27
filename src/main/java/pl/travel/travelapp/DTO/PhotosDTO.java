@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.travel.travelapp.models.Comments;
-import pl.travel.travelapp.models.TaggedUser;
+import pl.travel.travelapp.entites.Comments;
+import pl.travel.travelapp.entites.TaggedUser;
 
 import java.util.List;
 import java.util.Set;

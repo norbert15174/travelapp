@@ -2,7 +2,7 @@ package pl.travel.travelapp.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
-import pl.travel.travelapp.models.FriendsRequest;
+import pl.travel.travelapp.entites.FriendsRequest;
 
 import java.security.Principal;
 import java.util.List;

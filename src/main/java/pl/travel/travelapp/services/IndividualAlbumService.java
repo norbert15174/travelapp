@@ -23,7 +23,7 @@ import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.SharedAlbumInterface;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataAlbumsToAlbumsDTOMapperClass;
-import pl.travel.travelapp.models.*;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.repositories.*;
 
 import java.io.IOException;

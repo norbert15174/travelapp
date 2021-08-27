@@ -1,9 +1,8 @@
 package pl.travel.travelapp.DTO;
 
 import lombok.*;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.Coordinates;
-import pl.travel.travelapp.models.SharedAlbum;
+import pl.travel.travelapp.entites.Coordinates;
+import pl.travel.travelapp.entites.SharedAlbum;
 
 import java.util.List;
 

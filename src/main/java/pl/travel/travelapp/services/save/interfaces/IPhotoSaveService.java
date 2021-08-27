@@ -1,6 +1,6 @@
 package pl.travel.travelapp.services.save.interfaces;
 
-import pl.travel.travelapp.models.AlbumPhotos;
+import pl.travel.travelapp.entites.AlbumPhotos;
 
 public interface IPhotoSaveService {
 

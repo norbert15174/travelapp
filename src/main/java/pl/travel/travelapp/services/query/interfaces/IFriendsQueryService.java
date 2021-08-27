@@ -1,6 +1,6 @@
 package pl.travel.travelapp.services.query.interfaces;
 
-import pl.travel.travelapp.models.Friends;
+import pl.travel.travelapp.entites.Friends;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,8 +1,8 @@
 package pl.travel.travelapp.builders;
 
-import pl.travel.travelapp.models.FriendMessages;
-import pl.travel.travelapp.models.Friends;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.entites.FriendMessages;
+import pl.travel.travelapp.entites.Friends;
+import pl.travel.travelapp.entites.PersonalData;
 
 import java.util.List;
 

@@ -2,9 +2,8 @@ package pl.travel.travelapp.builders;
 
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
-import pl.travel.travelapp.models.Coordinates;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.SharedAlbum;
+import pl.travel.travelapp.entites.Coordinates;
+import pl.travel.travelapp.entites.SharedAlbum;
 
 import java.util.List;
 

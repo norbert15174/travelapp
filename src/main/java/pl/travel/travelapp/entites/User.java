@@ -1,4 +1,4 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.travel.travelapp.models.enums.Role;
+import pl.travel.travelapp.entites.enums.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;

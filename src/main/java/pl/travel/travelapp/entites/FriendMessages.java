@@ -1,11 +1,11 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.travel.travelapp.models.enums.MessageStatus;
+import pl.travel.travelapp.entites.enums.MessageStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

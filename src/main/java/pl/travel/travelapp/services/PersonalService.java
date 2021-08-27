@@ -18,10 +18,10 @@ import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
-import pl.travel.travelapp.models.Country;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.PersonalData;
-import pl.travel.travelapp.models.PersonalDescription;
+import pl.travel.travelapp.entites.Country;
+import pl.travel.travelapp.entites.IndividualAlbum;
+import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.entites.PersonalDescription;
 import pl.travel.travelapp.repositories.*;
 
 import java.io.IOException;

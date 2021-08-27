@@ -1,11 +1,10 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,11 +1,11 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.travel.travelapp.models.enums.SharedAlbumStatus;
+import pl.travel.travelapp.entites.enums.SharedAlbumStatus;
 
 import javax.persistence.*;
 

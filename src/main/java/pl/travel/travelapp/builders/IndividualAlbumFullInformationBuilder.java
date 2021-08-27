@@ -1,15 +1,12 @@
 package pl.travel.travelapp.builders;
 
 import lombok.*;
-import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
-import pl.travel.travelapp.DTO.PhotosDTO;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.Coordinates;
-import pl.travel.travelapp.models.SharedAlbum;
+import pl.travel.travelapp.entites.AlbumPhotos;
+import pl.travel.travelapp.entites.Coordinates;
+import pl.travel.travelapp.entites.SharedAlbum;
 
 import java.util.List;
-import java.util.Set;
 
 @Setter
 @Getter

@@ -1,10 +1,8 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.*;

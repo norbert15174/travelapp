@@ -1,8 +1,7 @@
 package pl.travel.travelapp.builders;
 
-import pl.travel.travelapp.models.*;
+import pl.travel.travelapp.entites.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

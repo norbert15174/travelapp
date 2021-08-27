@@ -1,6 +1,5 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

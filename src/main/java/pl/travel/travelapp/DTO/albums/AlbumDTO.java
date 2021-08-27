@@ -5,10 +5,10 @@ import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.DTO.PhotosDTO;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
-import pl.travel.travelapp.models.AlbumPhotos;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.PersonalData;
-import pl.travel.travelapp.models.SharedAlbum;
+import pl.travel.travelapp.entites.AlbumPhotos;
+import pl.travel.travelapp.entites.IndividualAlbum;
+import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.entites.SharedAlbum;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 import lombok.*;
 

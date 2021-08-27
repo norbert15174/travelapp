@@ -2,7 +2,7 @@ package pl.travel.travelapp.services.delete;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.travel.travelapp.models.FriendMessages;
+import pl.travel.travelapp.entites.FriendMessages;
 import pl.travel.travelapp.repositories.FriendMessagesRepository;
 import pl.travel.travelapp.services.delete.interfaces.IMessageDeleteService;
 

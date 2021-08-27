@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import pl.travel.travelapp.DTO.UserLoginDTO;
 import pl.travel.travelapp.DTO.UserRegisterDTO;
+import pl.travel.travelapp.entites.models.PasswordChangeModel;
 import pl.travel.travelapp.services.UserService;
 
 import java.security.Principal;
@@ -43,9 +44,9 @@ public class AuthController {
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/password")
-    public ResponseEntity changePassword(@RequestBody Map <String, String> fields) {
-        return userService.changePassword(fields);
+    @PutMapping("/password")
+    public ResponseEntity changePassword(@RequestBody PasswordChangeModel passwords, Principal principal) {
+        return userService.changePassword(passwords, principal);
     }
 
     @PostMapping("/login")

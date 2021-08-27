@@ -1,8 +1,8 @@
 package pl.travel.travelapp.DTO;
 
 import lombok.*;
-import pl.travel.travelapp.models.Coordinates;
-import pl.travel.travelapp.models.IndividualAlbum;
+import pl.travel.travelapp.entites.Coordinates;
+import pl.travel.travelapp.entites.IndividualAlbum;
 
 @Setter
 @Getter

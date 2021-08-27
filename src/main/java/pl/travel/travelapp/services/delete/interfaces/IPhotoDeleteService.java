@@ -1,6 +1,6 @@
 package pl.travel.travelapp.services.delete.interfaces;
 
-import pl.travel.travelapp.models.AlbumPhotos;
+import pl.travel.travelapp.entites.AlbumPhotos;
 
 public interface IPhotoDeleteService {
 

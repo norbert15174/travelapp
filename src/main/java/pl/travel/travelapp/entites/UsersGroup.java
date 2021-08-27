@@ -1,4 +1,4 @@
-package pl.travel.travelapp.models;
+package pl.travel.travelapp.entites;
 
 
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Entity
 @Setter

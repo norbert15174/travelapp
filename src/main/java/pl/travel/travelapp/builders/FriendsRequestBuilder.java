@@ -1,7 +1,7 @@
 package pl.travel.travelapp.builders;
 
-import pl.travel.travelapp.models.FriendsRequest;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.entites.FriendsRequest;
+import pl.travel.travelapp.entites.PersonalData;
 
 public class FriendsRequestBuilder {
     private long id;

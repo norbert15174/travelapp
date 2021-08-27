@@ -1,4 +1,4 @@
-package pl.travel.travelapp.models.enums;
+package pl.travel.travelapp.entites.enums;
 
 public enum MessageStatus {
     DELIVERED,RECEIVED

@@ -3,7 +3,7 @@ package pl.travel.travelapp.mappers;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import pl.travel.travelapp.DTO.FriendsDTO;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.entites.PersonalData;
 
 import java.util.ArrayList;
 import java.util.List;

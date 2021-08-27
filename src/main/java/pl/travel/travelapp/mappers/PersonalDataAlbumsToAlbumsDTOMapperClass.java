@@ -3,11 +3,9 @@ package pl.travel.travelapp.mappers;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
-import pl.travel.travelapp.DTO.UserFriendRequestDTO;
 import pl.travel.travelapp.builders.PersonalInformationDTOBuilder;
-import pl.travel.travelapp.models.FriendsRequest;
-import pl.travel.travelapp.models.IndividualAlbum;
-import pl.travel.travelapp.models.PersonalData;
+import pl.travel.travelapp.entites.IndividualAlbum;
+import pl.travel.travelapp.entites.PersonalData;
 
 import java.util.ArrayList;
 import java.util.List;

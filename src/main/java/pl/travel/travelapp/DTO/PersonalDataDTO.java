@@ -4,12 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.travel.travelapp.models.Country;
-import pl.travel.travelapp.models.PersonalDescription;
+import pl.travel.travelapp.entites.Country;
+import pl.travel.travelapp.entites.PersonalDescription;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Setter

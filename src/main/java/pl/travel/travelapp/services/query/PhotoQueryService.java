@@ -2,7 +2,7 @@ package pl.travel.travelapp.services.query;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.travel.travelapp.models.AlbumPhotos;
+import pl.travel.travelapp.entites.AlbumPhotos;
 import pl.travel.travelapp.repositories.AlbumPhotosRepository;
 import pl.travel.travelapp.services.query.interfaces.IPhotoQueryService;
 

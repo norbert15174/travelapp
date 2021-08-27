@@ -20,12 +20,13 @@ import org.springframework.validation.Errors;
 import pl.travel.travelapp.DTO.UserLoginDTO;
 import pl.travel.travelapp.DTO.UserRegisterDTO;
 import pl.travel.travelapp.configuration.PasswordEncoderConfiguration;
+import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.entites.PersonalDescription;
+import pl.travel.travelapp.entites.User;
+import pl.travel.travelapp.entites.models.PasswordChangeModel;
 import pl.travel.travelapp.interfaces.UserServiceInterface;
 import pl.travel.travelapp.mail.google.MailService;
 import pl.travel.travelapp.mail.google.html.HtmlContent;
-import pl.travel.travelapp.models.PersonalData;
-import pl.travel.travelapp.models.PersonalDescription;
-import pl.travel.travelapp.models.User;
 import pl.travel.travelapp.repositories.CountryRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
 import pl.travel.travelapp.repositories.UserRepository;
@@ -37,8 +38,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // !!!!!!!!!    REMEMBER TO ADD TOKEN TO METHOD(CHANGE PASSWORD, ENABLE ACCOUNT) !!!!!!!!!!!!!!!!!!!
 
@@ -142,22 +141,17 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     @Transactional
-    public ResponseEntity <String> changePassword(Map <String, String> fields) {
-
+    public ResponseEntity <String> changePassword(PasswordChangeModel passwords , Principal principal) {
         try {
-            String password = fields.get("password");
-            String token = fields.get("token");
-
-
-            try {
-                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(key)).build();
-                DecodedJWT verify = jwtVerifier.verify(token);
-                String login = verify.getClaim("username").asString();
-                Optional <User> userApp = userRepository.findFirstByLogin(login);
-                if ( userApp.isPresent() ) {
-                    User userToSave = userApp.get();
-                    userToSave.setPassword(passwordEncoder.encode(password));
+            Optional <User> userApp = userRepository.findFirstByLogin(principal.getName());
+            if ( userApp.isPresent() ) {
+                User userToSave = userApp.get();
+                if ( passwordEncoder.matches(passwords.getOldPassword() , userToSave.getPassword()) ) {
+                    userToSave.setPassword(passwordEncoder.encode(passwords.getNewPassword()));
                     try {
+                        if ( !userValidator.validatePassword(passwords.getNewPassword()) ) {
+                            return new ResponseEntity <>("Password does not pass pattern test" , HttpStatus.NOT_ACCEPTABLE);
+                        }
                         userRepository.save(userToSave);
                         return new ResponseEntity <>("Password has been changed" , HttpStatus.OK);
                     } catch ( Exception e ) {
@@ -165,13 +159,12 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                         return new ResponseEntity("Password hasn't been changed" , HttpStatus.NOT_MODIFIED);
                     }
                 }
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
-            } catch ( UsernameNotFoundException e ) {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
-        } catch ( NullPointerException e ) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
+        } catch ( UsernameNotFoundException e ) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+
     }
 
     @Override
