@@ -129,7 +129,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512(key)).build();
             DecodedJWT verify = jwtVerifier.verify(token);
             String username = verify.getClaim("username").asString();
-            Optional <User> userApp = userRepository.findFirstByLogin(username);
+            Optional <User> userApp = userQueryService.findFirstByLogin(username);
             if ( userApp.isEmpty() ) return false;
             userApp.get().setEnable(true);
 
@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Transactional
     public ResponseEntity <String> changePassword(PasswordChangeModel passwords , Principal principal) {
         try {
-            Optional <User> userApp = userRepository.findFirstByLogin(principal.getName());
+            Optional <User> userApp = userQueryService.findFirstByLogin(principal.getName());
             if ( userApp.isPresent() ) {
                 User userToSave = userApp.get();
                 if ( passwordEncoder.matches(passwords.getOldPassword() , userToSave.getPassword()) ) {
@@ -171,7 +171,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     public boolean forgetPassword(String email) {
         try {
             if ( email.isBlank() ) return false;
-            Optional <User> user = userRepository.findFirstByEmail(email);
+            Optional <User> user = userQueryService.findFirstByEmail(email);
             if ( user.isPresent() ) {
                 mailService.sendMailByGoogleMailApi(email , "Travel App, new password" , HtmlContent.newPasswordHtml(user.get().getLogin() , ""));
                 return true;
@@ -201,7 +201,7 @@ public class UserService implements UserDetailsService, UserServiceInterface {
 
     @Override
     public ResponseEntity deleteAccountMessage(Principal user) {
-        User userToDelete = userRepository.findFirstByLogin(user.getName()).get();
+        User userToDelete = userQueryService.findFirstByLogin(user.getName()).get();
         mailService.sendMailByGoogleMailApi(userToDelete.getEmail() , "Delete account, Travel App" , HtmlContent.deleteAccountTemplate(user.getName() , ""));
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -209,10 +209,9 @@ public class UserService implements UserDetailsService, UserServiceInterface {
     @Override
     @Transactional
     public ResponseEntity <String> deleteAccount(Principal user , Map <String, String> fields) {
-        try {
             String password = fields.get("password");
-            if ( password.isBlank() ) throw new NullPointerException();
-            Optional <User> userApp = userRepository.findFirstByLogin(user.getName());
+            if ( password.isBlank() ) return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+            Optional <User> userApp = userQueryService.findFirstByLogin(user.getName());
             if ( userApp.isPresent() ) {
                 User userToDelete = userApp.get();
                 if ( passwordEncoder.matches(password , userToDelete.getPassword()) ) {
@@ -228,20 +227,17 @@ public class UserService implements UserDetailsService, UserServiceInterface {
                 }
 
             }
-        } catch ( NullPointerException e ) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
 
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return userRepository.findByLogin(s);
+        return userQueryService.findByLogin(s);
     }
 
     public User loadUserByUsernameAll(String s) throws UsernameNotFoundException {
-        return userRepository.findByLogin(s);
+        return userQueryService.findByLogin(s);
     }
 
     public UserDetails accountVerifyToken(String username , long PIN) {

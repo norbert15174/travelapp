@@ -8,12 +8,16 @@ import pl.travel.travelapp.entites.User;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository <User, Long> {
     User findByLogin(String s);
-    @Query("select u from User u where u.login = :s or u.email = :mail" )
-    Optional<User> checkIfExist(String s, String mail);
-    Optional<User> findFirstByLogin(String s);
-    Optional<User> findFirstByEmail(String mail);
+
+    @Query("select u from User u where u.login = :s or u.email = :mail")
+    Optional <User> checkIfExist(String s , String mail);
+
+    Optional <User> findFirstByLogin(String s);
+
+    Optional <User> findFirstByEmail(String mail);
+
     @Query("select u from User u left join fetch u.personalData p left join fetch p.Nationality left join fetch p.personalDescription pd where u.login = :username")
-    User findPersonalDataByUser(String username);
+    User findUserByUsernameAllInformation(String username);
 }

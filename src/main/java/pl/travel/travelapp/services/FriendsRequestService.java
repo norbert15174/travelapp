@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
 import pl.travel.travelapp.builders.FriendsBuilder;
 import pl.travel.travelapp.builders.FriendsRequestBuilder;
-import pl.travel.travelapp.interfaces.FriendsRequestInterface;
-import pl.travel.travelapp.mappers.FriendsRequestObjectMapperClass;
 import pl.travel.travelapp.entites.Friends;
 import pl.travel.travelapp.entites.FriendsRequest;
 import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.interfaces.FriendsRequestInterface;
+import pl.travel.travelapp.mappers.FriendsRequestObjectMapperClass;
 import pl.travel.travelapp.repositories.FriendsRepository;
 import pl.travel.travelapp.repositories.FriendsRequestRepository;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
@@ -122,7 +122,6 @@ public class FriendsRequestService implements FriendsRequestInterface {
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);
         }
     }
-
 
     @Override
     public boolean checkIfRequestIsCorrect(Principal principal , long id) {

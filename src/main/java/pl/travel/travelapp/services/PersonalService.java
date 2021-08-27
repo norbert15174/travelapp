@@ -23,6 +23,7 @@ import pl.travel.travelapp.entites.IndividualAlbum;
 import pl.travel.travelapp.entites.PersonalData;
 import pl.travel.travelapp.entites.PersonalDescription;
 import pl.travel.travelapp.repositories.*;
+import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -45,19 +46,21 @@ public class PersonalService {
     private CountryRepository countryRepository;
     private UserRepository userRepository;
     private IndividualAlbumRepository individualAlbumRepository;
+    private IPersonalQueryService personalQueryService;
 
     @Autowired
-    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository) {
+    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository , IPersonalQueryService personalQueryService) {
         this.personalDataRepository = personalDataRepository;
         this.personalDescriptionRepository = personalDescriptionRepository;
         this.countryRepository = countryRepository;
         this.userRepository = userRepository;
         this.individualAlbumRepository = individualAlbumRepository;
+        this.personalQueryService = personalQueryService;
     }
 
     public ResponseEntity <PersonalDataDTO> getUserProfile(Principal user) {
         try {
-            PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+            PersonalData userData = personalQueryService.getPersonalInformation(user.getName());
             List <IndividualAlbum> individualAlbum = individualAlbumRepository.findUserAlbumsByUserId(userData.getId());
             return new ResponseEntity(new PersonalDataDtoWithIndividualAlbumsDTO(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData) , IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbum)) , HttpStatus.OK);
         } catch ( NullPointerException e ) {
@@ -79,7 +82,7 @@ public class PersonalService {
     @Transactional
     public ResponseEntity <PersonalDataDTO> updatePersonalInformation(Principal user , PersonalDataDTO userUpdate) {
         try {
-            PersonalData userProfile = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+            PersonalData userProfile = personalQueryService.getPersonalInformation(user.getName());
             userProfile = fillPersonalInformation(getPersonalInformation(user.getName()) , userUpdate);
             try {
                 personalDataRepository.save(userProfile);
@@ -123,12 +126,12 @@ public class PersonalService {
     //return personal information (PersonalData and PersonalDescription as field)
     @Transactional(readOnly = true)
     public PersonalData getPersonalInformation(String username) {
-        return userRepository.findPersonalDataByUser(username).getPersonalData();
+        return personalQueryService.getPersonalInformation(username);
     }
 
     @Transactional
     public Optional <PersonalData> getPersonalInformation(Long id) {
-        return personalDataRepository.findById(id);
+        return personalQueryService.findById(id);
     }
 
     @Transactional(readOnly = true)
@@ -139,7 +142,7 @@ public class PersonalService {
     @Transactional
     public ResponseEntity <PersonalDataDTO> setPersonalDataProfilePicture(MultipartFile file , Principal user) {
         try {
-            PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+            PersonalData userData = personalQueryService.getPersonalInformation(user.getName());
             String path = "user/" + user.getName() + "/picture/" + file.getOriginalFilename();
             BlobId blobId = BlobId.of(bucket , path);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
@@ -158,7 +161,7 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity <PersonalDataDTO> setPersonalDataBackgroundPicture(MultipartFile file , Principal user) {
-        PersonalData userData = userRepository.findPersonalDataByUser(user.getName()).getPersonalData();
+        PersonalData userData = personalQueryService.getPersonalInformation(user.getName());
         String path = "user/" + user.getName() + "/background/" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket , path);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
@@ -187,7 +190,7 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity <PersonalDataDtoWithIndividualAlbumsDTO> getUserProfileInformationWithAlbums(Principal principal , long id) {
-        PersonalData user = userRepository.findPersonalDataByUser(principal.getName()).getPersonalData();
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         Optional <PersonalData> userData = personalDataRepository.findPersonalDataByUserIdWithSharedAndOwnedAlbums(id , user.getId());
         if ( userData.isPresent() ) {
             PersonalDataDTO personalDataDTO = PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData.get());
@@ -205,7 +208,7 @@ public class PersonalService {
     }
 
     public ResponseEntity <PersonalInformationDTO> getBasicUserInformation(Principal principal) {
-        PersonalData user = userRepository.findPersonalDataByUser(principal.getName()).getPersonalData();
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         return new ResponseEntity(new PersonalInformationDTO(user) , HttpStatus.OK);
     }
 }

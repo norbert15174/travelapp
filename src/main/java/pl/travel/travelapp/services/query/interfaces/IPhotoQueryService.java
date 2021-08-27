@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface IPhotoQueryService {
 
     Optional <AlbumPhotos> findById(Long id);
+
 }

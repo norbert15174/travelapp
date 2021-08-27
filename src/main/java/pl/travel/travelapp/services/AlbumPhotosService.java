@@ -11,11 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.PhotoInterface;
-import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.services.delete.interfaces.IPhotoDeleteService;
 import pl.travel.travelapp.services.query.FriendsQueryService;
+import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
 import pl.travel.travelapp.services.query.interfaces.IPhotoQueryService;
 import pl.travel.travelapp.services.save.interfaces.IPhotoSaveService;
 
@@ -30,11 +31,11 @@ import java.util.stream.Collectors;
 @Service
 public class AlbumPhotosService implements PhotoInterface {
     private IndividualAlbumInterface individualAlbumService;
-    private PersonalService personalService;
     private FriendsQueryService friendsQueryService;
     private final IPhotoQueryService photoQueryService;
     private final IPhotoSaveService photoSaveService;
     private final IPhotoDeleteService photoDeleteService;
+    private IPersonalQueryService personalQueryService;
 
 
     Storage storage = StorageOptions.getDefaultInstance().getService();
@@ -43,13 +44,13 @@ public class AlbumPhotosService implements PhotoInterface {
     @Value("${url-gcp-addr}")
     private String url;
 
-    public AlbumPhotosService(IndividualAlbumInterface individualAlbumService , PersonalService personalService , FriendsQueryService friendsQueryService , IPhotoQueryService photoQueryService , IPhotoSaveService photoSaveService , IPhotoDeleteService photoDeleteService) {
+    public AlbumPhotosService(IndividualAlbumInterface individualAlbumService , FriendsQueryService friendsQueryService , IPhotoQueryService photoQueryService , IPhotoSaveService photoSaveService , IPhotoDeleteService photoDeleteService , IPersonalQueryService personalQueryService) {
         this.individualAlbumService = individualAlbumService;
-        this.personalService = personalService;
         this.friendsQueryService = friendsQueryService;
         this.photoQueryService = photoQueryService;
         this.photoSaveService = photoSaveService;
         this.photoDeleteService = photoDeleteService;
+        this.personalQueryService = personalQueryService;
     }
 
     @Transactional
@@ -102,7 +103,7 @@ public class AlbumPhotosService implements PhotoInterface {
     @Override
     @Transactional
     public ResponseEntity deleteUsersPhotos(List <Long> photoIds , Principal principal) {
-        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         if ( user == null ) return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         for (Long id : photoIds) {
             Optional <AlbumPhotos> albumPhoto = photoQueryService.findById(id);
@@ -122,7 +123,7 @@ public class AlbumPhotosService implements PhotoInterface {
     @Transactional
     public ResponseEntity addCommentToPhoto(Principal principal , long photoId , Comments comment) {
         Optional <AlbumPhotos> photo = photoQueryService.findById(photoId);
-        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         if ( photo.isPresent() ) {
             AlbumPhotos photoToSave = photo.get();
             if ( checkIfUserCanAddComment(photoToSave , user) ) {
@@ -137,7 +138,7 @@ public class AlbumPhotosService implements PhotoInterface {
 
     @Transactional
     public ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal) {
-        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         Optional <AlbumPhotos> albumPhotoOpt = photoQueryService.findById(photoId);
         if ( !albumPhotoOpt.isPresent() ) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
