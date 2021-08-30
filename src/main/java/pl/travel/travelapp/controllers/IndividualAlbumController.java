@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
+import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.services.IndividualAlbumService;
 
@@ -57,7 +58,7 @@ public class IndividualAlbumController {
     }
 
     @GetMapping("/shared")
-    public ResponseEntity <List <BasicIndividualAlbumDTO>> getAvailableAlbums(Principal principal) {
+    public ResponseEntity <List <AlbumDTO>> getAvailableAlbums(Principal principal) {
         return individualAlbumService.getAvailableAlbums(principal);
     }
 
@@ -69,6 +70,11 @@ public class IndividualAlbumController {
     @PostMapping("/shared/{id}")
     public ResponseEntity addSharedAlbum(Principal principal , @RequestBody List <Long> sharedIds , @PathVariable("id") Long id) {
         return individualAlbumService.addShared(principal , sharedIds , id);
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity <AlbumDTO> getAvailableAlbums(Principal principal , @PathVariable("id") Long id) {
+        return individualAlbumService.getAlbumFullInformation(principal , id);
     }
 
 

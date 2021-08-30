@@ -13,18 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
-import pl.travel.travelapp.DTO.PersonalInformationDTO;
+import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumBuilder;
-import pl.travel.travelapp.builders.IndividualAlbumDTOBuilder;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
-import pl.travel.travelapp.builders.PersonalInformationDTOBuilder;
 import pl.travel.travelapp.entites.*;
+import pl.travel.travelapp.exceptions.AccessForbiddenException;
+import pl.travel.travelapp.exceptions.ObjectNotFoundException;
 import pl.travel.travelapp.interfaces.CoordinateInterface;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.interfaces.SharedAlbumInterface;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataAlbumsToAlbumsDTOMapperClass;
 import pl.travel.travelapp.repositories.*;
+import pl.travel.travelapp.services.query.interfaces.IIndividualAlbumQueryService;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     private CountryRepository countryRepository;
     private SharedAlbumRepository sharedAlbumRepository;
     private IPersonalQueryService personalQueryService;
+    private IIndividualAlbumQueryService individualAlbumQueryService;
 
     public IndividualAlbumService(IndividualAlbumRepository individualAlbumRepository , CommentsRepository commentsRepository , CoordinatesRepository coordinatesRepository , AlbumPhotosRepository albumPhotosRepository , CountryRepository countryRepository , SharedAlbumRepository sharedAlbumRepository , IPersonalQueryService personalQueryService) {
         this.individualAlbumRepository = individualAlbumRepository;
@@ -101,21 +103,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         user.addAlbum(individualAlbum);
         individualAlbum.setOwner(user);
         IndividualAlbum userAlbum = individualAlbumRepository.save(individualAlbum);
-        return new ResponseEntity <>(new IndividualAlbumDTOBuilder()
-                .setCoordinate(userAlbum.getCoordinate())
-                .setDescription(userAlbum.getDescription())
-                .setName(userAlbum.getName())
-                .setMainPhoto(userAlbum.getMainPhoto())
-                .setPersonalInformationDTO(new PersonalInformationDTOBuilder()
-                        .setId(user.getId())
-                        .setName(user.getFirstName())
-                        .setSurName(user.getSurName())
-                        .setPhoto(user.getProfilePicture())
-                        .createPersonalInformationDTO())
-                .setPublic(userAlbum.isPublic())
-                .setId(userAlbum.getId())
-                .setSharedAlbum(userAlbum.getSharedAlbum())
-                .createIndividualAlbumDTO() , HttpStatus.OK);
+        return new ResponseEntity <>(userAlbum.buildIndividualAlbumDTO() , HttpStatus.OK);
     }
 
 
@@ -193,19 +181,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
             if ( personalData.getId() != album.getOwner().getId() ) {
                 return new ResponseEntity(HttpStatus.FORBIDDEN);
             }
-            albums.add(
-                    IndividualAlbumFullInformationBuilder.builder()
-                            .name(album.getName())
-                            .coordinate(album.getCoordinate())
-                            .id(album.getId())
-                            .description(album.getDescription())
-                            .personalInformationDTO(new PersonalInformationDTO(album.getOwner().getId() , album.getOwner().getFirstName() , album.getOwner().getSurName() , album.getOwner().getProfilePicture()))
-                            .mainPhoto(album.getMainPhoto())
-                            .sharedAlbumList(album.getSharedAlbum())
-                            .isPublic(album.isPublic())
-                            .photos(album.getPhotos())
-                            .build()
-            );
+            albums.add(album.buildIndividualAlbumFullInformation());
         }
         return new ResponseEntity(albums , HttpStatus.OK);
     }
@@ -251,21 +227,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
                 storage.create(blobInfo , file.getBytes());
                 individualAlbum.setMainPhoto(url + path);
                 IndividualAlbum userAlbum = saveAlbum(individualAlbum);
-                return new ResponseEntity <>(new IndividualAlbumDTOBuilder()
-                        .setCoordinate(userAlbum.getCoordinate())
-                        .setDescription(userAlbum.getDescription())
-                        .setName(userAlbum.getName())
-                        .setMainPhoto(userAlbum.getMainPhoto())
-                        .setPersonalInformationDTO(new PersonalInformationDTOBuilder()
-                                .setId(userAlbum.getOwner().getId())
-                                .setName(userAlbum.getOwner().getFirstName())
-                                .setSurName(userAlbum.getOwner().getSurName())
-                                .setPhoto(userAlbum.getOwner().getProfilePicture())
-                                .createPersonalInformationDTO())
-                        .setPublic(userAlbum.isPublic())
-                        .setId(userAlbum.getId())
-                        .setSharedAlbum(userAlbum.getSharedAlbum())
-                        .createIndividualAlbumDTO() , HttpStatus.OK);
+                return new ResponseEntity <>(userAlbum.buildIndividualAlbumDTO() , HttpStatus.OK);
             } catch ( IOException e ) {
                 e.printStackTrace();
                 return new ResponseEntity <>(HttpStatus.NOT_MODIFIED);
@@ -275,10 +237,23 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Transactional
-    public ResponseEntity <List <BasicIndividualAlbumDTO>> getAvailableAlbums(Principal principal) {
+    public ResponseEntity <List <AlbumDTO>> getAvailableAlbums(Principal principal) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         List <SharedAlbum> sharedAlbum = sharedAlbumRepository.findAvailableAlbums(user.getId());
-        return new ResponseEntity(sharedAlbum.stream().map(shared -> new BasicIndividualAlbumDTO(shared.getIndividualAlbum())).sorted().collect(Collectors.toList()) , HttpStatus.OK);
+        return new ResponseEntity(sharedAlbum.stream().map(shared -> new AlbumDTO().build(shared.getIndividualAlbum())).sorted().collect(Collectors.toList()) , HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity <AlbumDTO> getAlbumFullInformation(Principal principal , Long albumId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        try {
+            AlbumDTO album = individualAlbumQueryService.getFullAlbumInformation(user , albumId);
+            return new ResponseEntity(album , HttpStatus.OK);
+        } catch ( ObjectNotFoundException e ) {
+            return new ResponseEntity(e.getMessage() , HttpStatus.NOT_FOUND);
+        } catch ( AccessForbiddenException e ) {
+            return new ResponseEntity(e.getMessage() , HttpStatus.FORBIDDEN);
+        }
     }
 
     @Transactional
@@ -308,27 +283,25 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     public void deleteSharedUserDuringFriendDelete(List <Long> sharedIds) {
-        sharedIds.forEach(id -> {
-                    Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
-                    if ( sharedAlbums.isPresent() ) {
-                        IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
-                        sharedAlbumRepository.deleteById(id);
-                    }
-                }
-        );
+        for (Long id : sharedIds) {
+            Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
+            if ( sharedAlbums.isPresent() ) {
+                IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
+                sharedAlbumRepository.deleteById(id);
+            }
+        }
     }
 
     private void deleteSharedUser(PersonalData user , List <Long> sharedIds) {
-        sharedIds.forEach(id -> {
-                    Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
-                    if ( sharedAlbums.isPresent() ) {
-                        IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
-                        if ( album.getOwner().getId() == user.getId() ) {
-                            sharedAlbumRepository.deleteById(id);
-                        }
-                    }
+        for (Long id : sharedIds) {
+            Optional <SharedAlbum> sharedAlbums = sharedAlbumRepository.findById(id);
+            if ( sharedAlbums.isPresent() ) {
+                IndividualAlbum album = sharedAlbums.get().getIndividualAlbum();
+                if ( album.getOwner().getId() == user.getId() ) {
+                    sharedAlbumRepository.deleteById(id);
                 }
-        );
+            }
+        }
     }
 
 

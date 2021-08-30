@@ -23,4 +23,5 @@ public class IndividualAlbumFullInformationBuilder {
     private boolean isPublic;
     private List <SharedAlbum> sharedAlbumList;
     private List <AlbumPhotos> photos;
+
 }

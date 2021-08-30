@@ -17,7 +17,7 @@ public class PersonalDescription {
     private long id;
     @Size(max = 8000)
     private String interest;
-    @Size(max = 500)
+    @Size(max = 800)
     private String about;
     private String visitedCountries;
 

@@ -15,7 +15,7 @@ import java.util.*;
 public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Size(min = 4 , max = 20)
     private String firstName;
     @Size(min = 4 , max = 20)

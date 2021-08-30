@@ -9,7 +9,7 @@ public interface IPersonalQueryService {
 
     PersonalData getPersonalInformation(String username);
 
-    Optional<PersonalData> findById(Long id);
+    Optional <PersonalData> findById(Long id);
 
     List <PersonalData> findAllById(List <Long> ids);
 
