@@ -3,7 +3,6 @@ package pl.travel.travelapp.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
@@ -72,7 +71,7 @@ public class IndividualAlbumController {
         return individualAlbumService.addShared(principal , sharedIds , id);
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public ResponseEntity <AlbumDTO> getAvailableAlbums(Principal principal , @PathVariable("id") Long id) {
         return individualAlbumService.getAlbumFullInformation(principal , id);
     }

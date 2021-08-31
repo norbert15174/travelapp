@@ -16,12 +16,9 @@ import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
-import pl.travel.travelapp.entites.Country;
-import pl.travel.travelapp.entites.IndividualAlbum;
-import pl.travel.travelapp.entites.PersonalData;
-import pl.travel.travelapp.entites.PersonalDescription;
 import pl.travel.travelapp.repositories.*;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
 
@@ -30,6 +27,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,26 +45,27 @@ public class PersonalService {
     private UserRepository userRepository;
     private IndividualAlbumRepository individualAlbumRepository;
     private IPersonalQueryService personalQueryService;
+    private SharedAlbumRepository sharedAlbumRepository;
+    private TaggedPhotoRepository taggedPhotoRepository;
+    private CommentsRepository commentsRepository;
 
     @Autowired
-    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository , IPersonalQueryService personalQueryService) {
+    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository , IPersonalQueryService personalQueryService , SharedAlbumRepository sharedAlbumRepository , TaggedPhotoRepository taggedPhotoRepository , CommentsRepository commentsRepository) {
         this.personalDataRepository = personalDataRepository;
         this.personalDescriptionRepository = personalDescriptionRepository;
         this.countryRepository = countryRepository;
         this.userRepository = userRepository;
         this.individualAlbumRepository = individualAlbumRepository;
         this.personalQueryService = personalQueryService;
+        this.sharedAlbumRepository = sharedAlbumRepository;
+        this.taggedPhotoRepository = taggedPhotoRepository;
+        this.commentsRepository = commentsRepository;
     }
 
     public ResponseEntity <PersonalDataDTO> getUserProfile(Principal user) {
-        try {
-            PersonalData userData = personalQueryService.getPersonalInformation(user.getName());
-            List <IndividualAlbum> individualAlbum = individualAlbumRepository.findUserAlbumsByUserId(userData.getId());
-            return new ResponseEntity(new PersonalDataDtoWithIndividualAlbumsDTO(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData) , IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbum)) , HttpStatus.OK);
-        } catch ( NullPointerException e ) {
-            System.err.println("User doesn't exist");
-            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
-        }
+        PersonalData userData = personalQueryService.getPersonalInformation(user.getName());
+        List <IndividualAlbum> individualAlbum = individualAlbumRepository.findUserAlbumsByUserId(userData.getId());
+        return new ResponseEntity(new PersonalDataDtoWithIndividualAlbumsDTO(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userData) , IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbum)) , HttpStatus.OK);
     }
 
     public ResponseEntity <PersonalDataDTO> getUserProfileInformation(long id) {
@@ -81,21 +80,16 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity <PersonalDataDTO> updatePersonalInformation(Principal user , PersonalDataDTO userUpdate) {
-        try {
-            PersonalData userProfile = personalQueryService.getPersonalInformation(user.getName());
-            userProfile = fillPersonalInformation(getPersonalInformation(user.getName()) , userUpdate);
-            try {
-                personalDataRepository.save(userProfile);
-                return new ResponseEntity <>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userProfile) , HttpStatus.OK);
-            } catch ( Exception e ) {
-                System.err.println(e.getMessage());
-                return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
-            }
-        } catch ( NullPointerException e ) {
-            System.err.println("User doesn't exist");
-            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
-        }
 
+        try {
+            PersonalData userProfile = fillPersonalInformation(personalQueryService.getPersonalInformation(user.getName()) , userUpdate);
+            personalDataRepository.save(userProfile);
+            setCorrectDataInTaggedAndSharedUser(userProfile);
+            return new ResponseEntity <>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(userProfile) , HttpStatus.OK);
+        } catch ( Exception e ) {
+            System.err.println(e.getMessage());
+            return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     private PersonalData fillPersonalInformation(PersonalData userProfile , PersonalDataDTO userUpdate) {
@@ -151,7 +145,8 @@ public class PersonalService {
                 storage.delete(BlobId.of("telephoners" , userData.getProfilePicture().split(bucket + "/")[1]));
             }
             userData.setProfilePicture(url + path);
-            personalDataRepository.save(userData);
+            PersonalData savedUser = personalDataRepository.save(userData);
+            setCorrectDataInTaggedAndSharedUser(savedUser);
             return new ResponseEntity <>(PersonalDataObjectMapperClass.mapPersonalDataToPersonalDataDTO(personalDataRepository.findPersonalDataByUserId(userData.getId())) , HttpStatus.OK);
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -211,4 +206,35 @@ public class PersonalService {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         return new ResponseEntity(new PersonalInformationDTO(user) , HttpStatus.OK);
     }
+
+    private void setCorrectDataInTaggedAndSharedUser(PersonalData userProfile) {
+        Set <TaggedUser> taggedUsers = taggedPhotoRepository.findUserTagByUserId(userProfile.getId());
+        List <SharedAlbum> sharedUsers = sharedAlbumRepository.findAvailableAlbums(userProfile.getId());
+        Set <Comments> comments = commentsRepository.findCommentsByUserId(userProfile.getId());
+        taggedUsers.forEach(tag -> setAndUpdateTaggedUser(tag , userProfile));
+        sharedUsers.forEach(shared -> setAndUpdateSharedUser(shared , userProfile));
+        comments.forEach(comment -> setAndUpdateComments(comment , userProfile));
+    }
+
+    private void setAndUpdateComments(Comments comments , PersonalData personalData) {
+        comments.setName(personalData.getFirstName());
+        comments.setSurName(personalData.getSurName());
+        comments.setPhoto(personalData.getProfilePicture());
+        commentsRepository.save(comments);
+    }
+
+    private void setAndUpdateTaggedUser(TaggedUser taggedUser , PersonalData personalData) {
+        taggedUser.setName(personalData.getFirstName());
+        taggedUser.setSurName(personalData.getSurName());
+        taggedUser.setPhoto(personalData.getProfilePicture());
+        taggedPhotoRepository.save(taggedUser);
+    }
+
+    private void setAndUpdateSharedUser(SharedAlbum sharedAlbum , PersonalData personalData) {
+        sharedAlbum.setName(personalData.getFirstName());
+        sharedAlbum.setSurName(personalData.getSurName());
+        sharedAlbum.setPhoto(personalData.getProfilePicture());
+        sharedAlbumRepository.save(sharedAlbum);
+    }
+
 }

@@ -33,7 +33,7 @@ public class IndividualAlbum {
     private String mainPhoto;
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Coordinates coordinate;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private PersonalData owner;
     private boolean isPublic = false;
     @OneToMany(mappedBy = "individualAlbum", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

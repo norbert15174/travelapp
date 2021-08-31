@@ -28,7 +28,7 @@ public class IndividualAlbumQueryService implements IIndividualAlbumQueryService
     @Override
     public AlbumDTO getFullAlbumInformation(PersonalData user , Long albumId) throws ObjectNotFoundException, AccessForbiddenException {
         Optional <IndividualAlbum> individualAlbum = individualAlbumRepository.findById(albumId);
-        if ( individualAlbum.isEmpty() ) throw new ObjectNotFoundException();
+        if ( !individualAlbum.isPresent() ) throw new ObjectNotFoundException();
         IndividualAlbum album = individualAlbum.get();
         if ( album.getOwner().getId().equals(user.getId()) || album.getSharedAlbum().stream().anyMatch(shared -> user.getId().equals(shared.getUserId())) ) {
             return new AlbumDTO().build(album);

@@ -18,14 +18,15 @@ import java.time.format.DateTimeFormatter;
 public class Comments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long commentId;
+    private Long commentId;
     private String name;
     private String surName;
     private String photo;
     private String text;
     private String time;
+    private Long userId;
 
-    public Comments(String text, PersonalData personalData) {
+    public Comments(String text , PersonalData personalData) {
         this.name = personalData.getFirstName();
         this.surName = personalData.getSurName();
         this.photo = personalData.getProfilePicture();
@@ -33,5 +34,6 @@ public class Comments {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime time = LocalDateTime.now();
         this.time = time.format(dateTimeFormatter);
+        this.userId = personalData.getId();
     }
 }

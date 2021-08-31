@@ -51,7 +51,6 @@ public class PersonalData {
 
     public void addAlbum(IndividualAlbum album) {
         albums.add(album);
-        album.setOwner(this);
     }
 
     public void removeAlbum(IndividualAlbum album) {
