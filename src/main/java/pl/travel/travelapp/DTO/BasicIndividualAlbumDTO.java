@@ -10,7 +10,7 @@ import pl.travel.travelapp.entites.IndividualAlbum;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasicIndividualAlbumDTO {
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private String mainPhoto;

@@ -30,7 +30,7 @@ public class IndividualAlbumQueryService implements IIndividualAlbumQueryService
         Optional <IndividualAlbum> individualAlbum = individualAlbumRepository.findById(albumId);
         if ( !individualAlbum.isPresent() ) throw new ObjectNotFoundException();
         IndividualAlbum album = individualAlbum.get();
-        if ( album.getOwner().getId().equals(user.getId()) || album.getSharedAlbum().stream().anyMatch(shared -> user.getId().equals(shared.getUserId())) ) {
+        if ( album.getOwner().getId().equals(user.getId()) || album.getSharedAlbum().stream().anyMatch(shared -> user.getId().equals(shared.getUserId())) || album.isPublic() ) {
             return new AlbumDTO().build(album);
         }
         throw new AccessForbiddenException();

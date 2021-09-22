@@ -3,8 +3,10 @@ package pl.travel.travelapp.interfaces;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
+import pl.travel.travelapp.DTO.photos.PhotoDTO;
 import pl.travel.travelapp.entites.AlbumPhotos;
 import pl.travel.travelapp.entites.Comments;
+import pl.travel.travelapp.entites.TaggedUser;
 
 import java.security.Principal;
 import java.util.List;
@@ -21,7 +23,13 @@ public interface PhotoInterface {
 
     ResponseEntity deleteUsersPhotos(List <Long> photoIds , Principal principal);
 
-    ResponseEntity addCommentToPhoto(Principal principal , long photoId , Comments comment);
+    ResponseEntity <List <Comments>> addCommentToPhoto(Principal principal , long photoId , Comments comment);
 
     ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal);
+
+    ResponseEntity <PhotoDTO> modifyPhotoDescription(Long id , Principal principal , PhotoDTO photoDTO);
+
+    ResponseEntity <List <Comments>> findCommentsByPhotoId(Long id , Principal principal);
+
+    ResponseEntity <List <TaggedUser>> findTaggedUsersByPhotoId(Long id , Principal principal);
 }

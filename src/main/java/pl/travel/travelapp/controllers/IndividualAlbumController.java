@@ -3,9 +3,11 @@ package pl.travel.travelapp.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.BasicIndividualAlbumDTO;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
+import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.services.IndividualAlbumService;
 
 import java.security.Principal;
@@ -13,9 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/albums")
+@CrossOrigin(origins = "*")
 public class IndividualAlbumController {
 
-    private IndividualAlbumService individualAlbumService;
+    private IndividualAlbumInterface individualAlbumService;
 
     public IndividualAlbumController(IndividualAlbumService individualAlbumService) {
         this.individualAlbumService = individualAlbumService;
@@ -74,6 +77,11 @@ public class IndividualAlbumController {
     @GetMapping("/{id}")
     public ResponseEntity <AlbumDTO> getAvailableAlbums(Principal principal , @PathVariable("id") Long id) {
         return individualAlbumService.getAlbumFullInformation(principal , id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity <BasicIndividualAlbumDTO> modifyAlbum(Principal principal ,@RequestBody BasicIndividualAlbumDTO basicIndividualAlbumDTO, @PathVariable(name = "id") Long id){
+        return individualAlbumService.modifyAlbum(principal,basicIndividualAlbumDTO,id);
     }
 
 

@@ -189,26 +189,38 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
 
     @Transactional
     @Override
-    public ResponseEntity <BasicIndividualAlbumDTO> modifyAlbum(Principal principal , BasicIndividualAlbumDTO basicIndividualAlbumDTO) {
+    public ResponseEntity <BasicIndividualAlbumDTO> modifyAlbum(Principal principal , BasicIndividualAlbumDTO basicIndividualAlbumDTO , Long id) {
         PersonalData personalData = personalQueryService.getPersonalInformation(principal.getName());
-        Optional <IndividualAlbum> individualAlbum = individualAlbumRepository.findIndividualAlbumByOwner(basicIndividualAlbumDTO.getId() , personalData.getId());
+        Optional <IndividualAlbum> individualAlbum = individualAlbumRepository.findIndividualAlbumByOwner(id , personalData.getId());
         if ( individualAlbum.isPresent() ) {
             IndividualAlbum album = individualAlbum.get();
-            if ( basicIndividualAlbumDTO.getCoordinate() != null )
-                album.setCoordinate(basicIndividualAlbumDTO.getCoordinate());
+            if ( basicIndividualAlbumDTO.getCoordinate() != null ) {
+                if ( basicIndividualAlbumDTO.getCoordinate().getCountry() != null ) {
+                    countryRepository.findFirstByCountry(basicIndividualAlbumDTO.getCoordinate().getCountry().getCountry());
+                    album.setCoordinate(basicIndividualAlbumDTO.getCoordinate());
+                } else {
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+            }
             if ( basicIndividualAlbumDTO.getDescription() != null )
                 album.setDescription(basicIndividualAlbumDTO.getDescription());
-            if ( basicIndividualAlbumDTO.getName() != null ) album.setName(basicIndividualAlbumDTO.getName());
+            if ( basicIndividualAlbumDTO.getName() != null )
+                album.setName(basicIndividualAlbumDTO.getName());
+            if ( album.isPublic() != basicIndividualAlbumDTO.isPublic() )
+                album.setPublic(basicIndividualAlbumDTO.isPublic());
             return new ResponseEntity(IndividualAlbumToBasicIndividualAlbumDTOMapper.mapindividualAlbumToBasicIndividualAlbumDTO(individualAlbumRepository.save(album)) , HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @Transactional(readOnly = true)
     @Override
     public IndividualAlbum findUserAlbum(Principal principal , long id) {
         Long userId = personalQueryService.getPersonalInformation(principal.getName()).getId();
-        return individualAlbumRepository.findIndividualAlbumByOwner(id , userId).get();
+        if ( individualAlbumRepository.findIndividualAlbumByOwner(id , userId).isPresent() )
+            return individualAlbumRepository.findIndividualAlbumByOwner(id , userId).get();
+        else
+            return null;
     }
 
     @Transactional
@@ -218,6 +230,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Transactional
+    @Override
     public ResponseEntity <IndividualAlbumDTO> setMainPhotoToIndividualAlbum(Principal principal , MultipartFile file , long id) {
         IndividualAlbum individualAlbum = findUserAlbum(principal , id);
         if ( individualAlbum != null ) {
@@ -238,13 +251,15 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Transactional
+    @Override
     public ResponseEntity <List <AlbumDTO>> getAvailableAlbums(Principal principal) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         List <SharedAlbum> sharedAlbum = sharedAlbumRepository.findAvailableAlbums(user.getId());
-        return new ResponseEntity(sharedAlbum.stream().map(shared -> new AlbumDTO().build(shared.getIndividualAlbum())).sorted().collect(Collectors.toList()) , HttpStatus.OK);
+        return new ResponseEntity(sharedAlbum.stream().map(shared -> new AlbumDTO().build(shared.getIndividualAlbum())).sorted(Comparator.comparing(k -> k.getAlbum().getId())).collect(Collectors.toList()) , HttpStatus.OK);
     }
 
     @Transactional
+    @Override
     public ResponseEntity <AlbumDTO> getAlbumFullInformation(Principal principal , Long albumId) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         try {
@@ -258,6 +273,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Transactional
+    @Override
     public ResponseEntity deleteShared(Principal principal , List <Long> sharedIds) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         deleteSharedUser(user , sharedIds);
@@ -265,6 +281,7 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
     }
 
     @Transactional
+    @Override
     public ResponseEntity addShared(Principal principal , List <Long> sharedIds , Long albumId) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         List <PersonalData> users = personalQueryService.findAllById(sharedIds);
