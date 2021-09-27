@@ -196,7 +196,10 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
             IndividualAlbum album = individualAlbum.get();
             if ( basicIndividualAlbumDTO.getCoordinate() != null ) {
                 if ( basicIndividualAlbumDTO.getCoordinate().getCountry() != null ) {
-                    countryRepository.findFirstByCountry(basicIndividualAlbumDTO.getCoordinate().getCountry().getCountry());
+                    Optional <Country> country = countryRepository.findFirstByCountry(basicIndividualAlbumDTO.getCoordinate().getCountry().getCountry());
+                    if ( country.isPresent() ) {
+                        album.getCoordinate().setCountry(country.get());
+                    }
                     album.setCoordinate(basicIndividualAlbumDTO.getCoordinate());
                 } else {
                     return new ResponseEntity(HttpStatus.BAD_REQUEST);

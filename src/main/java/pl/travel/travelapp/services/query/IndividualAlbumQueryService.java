@@ -54,7 +54,7 @@ public class IndividualAlbumQueryService implements IIndividualAlbumQueryService
     }
 
     @Override
-    public Optional<AlbumDTO> getAlbumById(Long id) {
+    public Optional <AlbumDTO> getAlbumById(Long id) {
         return individualAlbumRepository.findAlbumById(id);
     }
 
