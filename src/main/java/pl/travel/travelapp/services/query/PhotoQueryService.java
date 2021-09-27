@@ -2,6 +2,7 @@ package pl.travel.travelapp.services.query;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.travel.travelapp.DTO.photos.PhotoDTO;
 import pl.travel.travelapp.entites.AlbumPhotos;
 import pl.travel.travelapp.entites.Comments;
 import pl.travel.travelapp.entites.PersonalData;
@@ -53,5 +54,10 @@ public class PhotoQueryService implements IPhotoQueryService {
         } else {
             return new HashSet <>();
         }
+    }
+
+    @Override
+    public Optional <PhotoDTO> getPhoto(Long userId , Long photoId) {
+        return albumPhotosRepository.getPhotoById(userId,photoId);
     }
 }

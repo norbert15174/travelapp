@@ -14,4 +14,5 @@ import java.util.List;
 public class PersonalDataDtoWithIndividualAlbumsDTO {
     private PersonalDataDTO personalDataDTO;
     private List <BasicIndividualAlbumDTO> individualAlbumDTO;
+
 }

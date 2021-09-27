@@ -27,12 +27,12 @@ public class AlbumDTO {
     Set <SharedUserAlbumDTO> shared;
     Set <PhotosDTO> photosDTOS;
 
+    public AlbumDTO(IndividualAlbum individualAlbum) {
+        setAlbumDtoParameters(individualAlbum);
+    }
 
     public AlbumDTO build(IndividualAlbum individualAlbum) {
-        this.album = buildBasicInvividualAlbumDTO(individualAlbum);
-        this.owner = buildPersonalInformationDTO(individualAlbum);
-        this.shared = buildSharedAlbum(individualAlbum.getSharedAlbum());
-        this.photosDTOS = buildPhotos(individualAlbum.getPhotos());
+        setAlbumDtoParameters(individualAlbum);
         return this;
     }
 
@@ -40,6 +40,13 @@ public class AlbumDTO {
         this.album = buildBasicInvividualAlbumDTO(individualAlbum);
         this.owner = buildPersonalInformationDTO(individualAlbum);
         return this;
+    }
+
+    private void setAlbumDtoParameters(IndividualAlbum individualAlbum) {
+        this.album = buildBasicInvividualAlbumDTO(individualAlbum);
+        this.owner = buildPersonalInformationDTO(individualAlbum);
+        this.shared = buildSharedAlbum(individualAlbum.getSharedAlbum());
+        this.photosDTOS = buildPhotos(individualAlbum.getPhotos());
     }
 
     private BasicIndividualAlbumDTO buildBasicInvividualAlbumDTO(IndividualAlbum individualAlbum) {

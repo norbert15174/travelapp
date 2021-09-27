@@ -1,5 +1,6 @@
 package pl.travel.travelapp.services.query.interfaces;
 
+import pl.travel.travelapp.DTO.photos.PhotoDTO;
 import pl.travel.travelapp.entites.AlbumPhotos;
 import pl.travel.travelapp.entites.Comments;
 import pl.travel.travelapp.entites.PersonalData;
@@ -18,4 +19,6 @@ public interface IPhotoQueryService {
     List <Comments> findCommentsByPhotoId(Long id , Long userId);
 
     Set <TaggedUser> findTaggedUsersByPhotoId(Long id , Long userId);
+
+    Optional <PhotoDTO> getPhoto(Long userId , Long photoId);
 }

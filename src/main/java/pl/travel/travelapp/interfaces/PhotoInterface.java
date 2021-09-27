@@ -1,6 +1,7 @@
 package pl.travel.travelapp.interfaces;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.DTO.photos.PhotoDTO;
@@ -27,9 +28,14 @@ public interface PhotoInterface {
 
     ResponseEntity addTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal);
 
+    @Transactional
+    ResponseEntity <Set <TaggedUser>> deleteTaggedUsersToPhoto(Set <Long> ids , Long photoId , Principal principal);
+
     ResponseEntity <PhotoDTO> modifyPhotoDescription(Long id , Principal principal , PhotoDTO photoDTO);
 
     ResponseEntity <List <Comments>> findCommentsByPhotoId(Long id , Principal principal);
 
     ResponseEntity <List <TaggedUser>> findTaggedUsersByPhotoId(Long id , Principal principal);
+
+    ResponseEntity<PhotoDTO> getPhoto(Principal principal , Long id);
 }

@@ -59,5 +59,8 @@ public class AlbumPhotos {
         this.taggedList.remove(taggedUser);
     }
 
+    public void deleteTaggedUser(Set <TaggedUser> taggedUser) {
+        this.taggedList.remove(taggedUser);
+    }
 
 }

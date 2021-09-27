@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.travel.travelapp.DTO.FriendsDTO;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
 import pl.travel.travelapp.builders.FriendsBuilder;
 import pl.travel.travelapp.builders.FriendsRequestBuilder;
@@ -29,14 +30,16 @@ public class FriendsRequestService implements FriendsRequestInterface {
     private PersonalService personalService;
     private PersonalDataRepository personalDataRepository;
     private FriendsRepository friendsRepository;
+    private final FriendsService friendsService;
 
     @Autowired
-    public FriendsRequestService(FriendsRequestRepository friendsRequestRepository , PersonalService personalService , PersonalDataRepository personalDataRepository , FriendsRepository friendsRepository) {
+    public FriendsRequestService(FriendsRequestRepository friendsRequestRepository , PersonalService personalService , PersonalDataRepository personalDataRepository , FriendsRepository friendsRepository , FriendsService friendsService) {
         this.friendsRequestRepository = friendsRequestRepository;
         this.personalService = personalService;
         this.personalDataRepository = personalDataRepository;
         this.friendsRequestRepository = friendsRequestRepository;
         this.friendsRepository = friendsRepository;
+        this.friendsService = friendsService;
     }
 
 
@@ -90,6 +93,7 @@ public class FriendsRequestService implements FriendsRequestInterface {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity <List <UserFriendRequestDTO>> findRequestsByPrincipal(Principal principal) {
         try {
@@ -102,8 +106,29 @@ public class FriendsRequestService implements FriendsRequestInterface {
         }
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List <FriendsRequest> findRequestsByPrincipalList(Principal principal) {
+            PersonalData user = getPersonalInformation(principal);
+            Optional <List <FriendsRequest>> userFriendRequest = friendsRequestRepository.findAllUserInvitations(user.getId());
+            return userFriendRequest.get();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity <List <UserFriendRequestDTO>> getUserRequestSent(Principal principal) {
+        try {
+            PersonalData user = getPersonalInformation(principal);
+            Optional <List <FriendsRequest>> userFriendRequest = friendsRequestRepository.findUserRequestSent(user.getId());
+            if ( userFriendRequest.isEmpty() ) return new ResponseEntity <>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity <>(FriendsRequestObjectMapperClass.mapPersonalDataToPersonalDataDTO(userFriendRequest.get()) , HttpStatus.OK);
+        } catch ( NullPointerException | MappingException e ) {
+            return new ResponseEntity <>(HttpStatus.REQUEST_TIMEOUT);
+        }
+    }
+
     @Transactional
-    public ResponseEntity <Friends> acceptToFriendsList(Principal principal , long id) {
+    public ResponseEntity <List <FriendsDTO>> acceptToFriendsList(Principal principal , long id) {
         PersonalData user = getPersonalInformation(principal);
         Optional <FriendsRequest> friendsRequest = friendsRequestRepository.findFriendsRequest(id);
         if ( friendsRequest.isPresent() ) {
@@ -117,7 +142,7 @@ public class FriendsRequestService implements FriendsRequestInterface {
             friendsRepository.save(friendsToSave);
             friends.setFriends(true);
             friendsRequestRepository.deleteById(friends.getId());
-            return new ResponseEntity <>(HttpStatus.OK);
+            return friendsService.getUserFriends(principal);
         } else {
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);
         }

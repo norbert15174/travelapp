@@ -39,8 +39,13 @@ public class FriendsController {
         return friendsRequestService.findRequestsByPrincipal(principal);
     }
 
+    @GetMapping("/requests/sent")
+    public ResponseEntity <List <UserFriendRequestDTO>> getUserRequestSent(Principal principal) {
+        return friendsRequestService.getUserRequestSent(principal);
+    }
+
     @PutMapping
-    public ResponseEntity acceptUserToFriendsList(@RequestParam long id , Principal principal) {
+    public ResponseEntity <List <FriendsDTO>> acceptUserToFriendsList(@RequestParam long id , Principal principal) {
         return friendsRequestService.acceptToFriendsList(principal , id);
     }
 

@@ -1,13 +1,15 @@
 package pl.travel.travelapp.entites;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,11 @@ public class TaggedUser {
     private String name;
     private String surName;
     private String photo;
+    @Column(columnDefinition = "TIMESTAMP")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("date")
+    private LocalDateTime dateTime;
 
 
     public Set <TaggedUser> buildTaggedUsers(Set <PersonalData> users) {
@@ -34,6 +41,7 @@ public class TaggedUser {
         this.name = user.getFirstName();
         this.surName = user.getSurName();
         this.photo = user.getProfilePicture();
+        this.dateTime = LocalDateTime.now();
         return this;
     }
 

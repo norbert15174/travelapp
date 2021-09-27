@@ -28,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/auth/*")
                 .antMatchers(HttpMethod.GET,"/auth/*")
                 .antMatchers(HttpMethod.DELETE,"/auth/*")
+                .antMatchers("/public/*")
                 .antMatchers("/albums/user/{id}")
                 .antMatchers("/albums/name")
                 .antMatchers("/data/**")
@@ -52,6 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/albums/*").authenticated()
                 .antMatchers("/resources").authenticated()
                 .antMatchers(HttpMethod.PUT,"/auth/password").authenticated()
+                .antMatchers("/news/*").authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(userService) , UsernamePasswordAuthenticationFilter.class);
 

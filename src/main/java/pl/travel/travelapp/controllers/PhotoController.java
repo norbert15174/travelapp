@@ -48,7 +48,7 @@ public class PhotoController {
     }
 
     @PutMapping("/add/tagged/{id}")
-    public ResponseEntity<Set<TaggedUser>> addTaggedUsersToPhoto(@RequestBody Set <Long> ids , @PathVariable("id") Long photoId , Principal principal) {
+    public ResponseEntity <Set <TaggedUser>> addTaggedUsersToPhoto(@RequestBody Set <Long> ids , @PathVariable("id") Long photoId , Principal principal) {
         return photoService.addTaggedUsersToPhoto(ids , photoId , principal);
     }
 
@@ -67,4 +67,13 @@ public class PhotoController {
         return photoService.findTaggedUsersByPhotoId(id , principal);
     }
 
+    @DeleteMapping("/tagged/{id}")
+    public ResponseEntity <Set <TaggedUser>> getTaggedUsers(@PathVariable(name = "id") Long id , @RequestBody Set <Long> ids , Principal principal) {
+        return photoService.deleteTaggedUsersToPhoto(ids , id , principal);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity <PhotoDTO> getPhoto(Principal principal, @PathVariable(name = "id") Long id) {
+        return photoService.getPhoto(principal , id);
+    }
 }

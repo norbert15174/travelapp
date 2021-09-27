@@ -26,6 +26,8 @@ public class FriendsRequestObjectMapperClass {
                 map().setUserId(source.getReceiver());
                 map().setPhoto(source.getSender().getProfilePicture());
                 map().setId(source.getId());
+                map().setSenderId(source.getSender().getId());
+                map().setDateTime(source.getDateTime());
             }
         });
         return modelMapper;

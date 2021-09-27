@@ -37,18 +37,17 @@ public interface IndividualAlbumInterface {
 
     IndividualAlbum saveAlbum(IndividualAlbum individualAlbum);
 
-    @Transactional
     ResponseEntity <IndividualAlbumDTO> setMainPhotoToIndividualAlbum(Principal principal , MultipartFile file , long id);
 
-    @Transactional
     ResponseEntity <List <AlbumDTO>> getAvailableAlbums(Principal principal);
 
-    @Transactional
     ResponseEntity <AlbumDTO> getAlbumFullInformation(Principal principal , Long albumId);
 
-    @Transactional
     ResponseEntity deleteShared(Principal principal , List <Long> sharedIds);
 
-    @Transactional
     ResponseEntity addShared(Principal principal , List <Long> sharedIds , Long albumId);
+
+    ResponseEntity<List<IndividualAlbumDTO>> getPublicAlbumsMainWeb();
+
+    ResponseEntity<AlbumDTO> getPublicAlbumById(Long id);
 }

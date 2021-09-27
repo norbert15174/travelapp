@@ -258,6 +258,10 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         return new ResponseEntity(sharedAlbum.stream().map(shared -> new AlbumDTO().build(shared.getIndividualAlbum())).sorted(Comparator.comparing(k -> k.getAlbum().getId())).collect(Collectors.toList()) , HttpStatus.OK);
     }
 
+    public List <SharedAlbum> getSharedByUserId(Long userId) {
+        return sharedAlbumRepository.findAvailableAlbumsPage(userId , PageRequest.of(0 , 10));
+    }
+
     @Transactional
     @Override
     public ResponseEntity <AlbumDTO> getAlbumFullInformation(Principal principal , Long albumId) {
@@ -299,6 +303,20 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+    @Override
+    public ResponseEntity <List <IndividualAlbumDTO>> getPublicAlbumsMainWeb() {
+        return new ResponseEntity <>(individualAlbumQueryService.getPublicAlbums() , HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity <AlbumDTO> getPublicAlbumById(Long id) {
+        Optional <AlbumDTO> album = individualAlbumQueryService.getAlbumById(id);
+        if ( !album.isPresent() ) {
+            return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(album.get() , HttpStatus.OK);
     }
 
     public Set <SharedAlbum> findAllUserSharedAlbumsByOwnerAndSharedUserId(long id , long ownerId) {
