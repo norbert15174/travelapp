@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class TaggedUser {
 
     @Override
     public int hashCode() {
-        return (int) userId * name.hashCode() * surName.hashCode();
+        return Objects.hash(getTaggedId());
     }
 
     @Override
@@ -56,9 +57,7 @@ public class TaggedUser {
         if (o == null) return false;
         if (this.getClass() != o.getClass()) return false;
         TaggedUser user = (TaggedUser) o;
-        return getUserId() == user.getUserId()
-                && (name.equals(user.getName())
-                && surName.equals(user.getSurName()));
+        return getTaggedId() == user.getTaggedId();
     }
 
 }

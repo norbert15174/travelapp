@@ -25,10 +25,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers(HttpMethod.POST,"/auth/*")
-                .antMatchers(HttpMethod.GET,"/auth/*")
-                .antMatchers(HttpMethod.DELETE,"/auth/*")
-                .antMatchers("/public/*")
+                .antMatchers(HttpMethod.POST,"/auth/**")
+                .antMatchers(HttpMethod.GET,"/auth/**")
+                .antMatchers(HttpMethod.DELETE,"/auth/**")
+                .antMatchers("/public/**")
                 .antMatchers("/albums/user/{id}")
                 .antMatchers("/albums/name")
                 .antMatchers("/data/**")

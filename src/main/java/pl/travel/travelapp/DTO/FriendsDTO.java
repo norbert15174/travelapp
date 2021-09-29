@@ -12,4 +12,5 @@ public class FriendsDTO {
     private String name;
     private String lastName;
     private String profilePicture;
+    private Long friendId;
 }

@@ -50,7 +50,7 @@ public class IndividualAlbumQueryService implements IIndividualAlbumQueryService
     @Transactional(readOnly = true)
     @Override
     public List <IndividualAlbumDTO> getPublicAlbums() {
-        return individualAlbumRepository.findPublicAlbums(PageRequest.of(0 , 10));
+        return individualAlbumRepository.findPublicAlbums(PageRequest.of(0 , 20));
     }
 
     @Override

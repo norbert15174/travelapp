@@ -7,17 +7,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.FriendsDTO;
 import pl.travel.travelapp.DTO.MessageDTO;
-import pl.travel.travelapp.interfaces.FriendsInterface;
-import pl.travel.travelapp.interfaces.FriendsMessageInterface;
-import pl.travel.travelapp.mappers.FriendsObjectMapperClass;
 import pl.travel.travelapp.entites.FriendMessages;
 import pl.travel.travelapp.entites.Friends;
 import pl.travel.travelapp.entites.PersonalData;
 import pl.travel.travelapp.entites.SharedAlbum;
+import pl.travel.travelapp.interfaces.FriendsInterface;
+import pl.travel.travelapp.interfaces.FriendsMessageInterface;
+import pl.travel.travelapp.mappers.FriendsObjectMapperClass;
 import pl.travel.travelapp.services.delete.interfaces.IFriendsDeleteService;
 import pl.travel.travelapp.services.delete.interfaces.IMessageDeleteService;
 import pl.travel.travelapp.services.query.interfaces.IFriendsQueryService;
 import pl.travel.travelapp.services.query.interfaces.IMessageQueryService;
+import pl.travel.travelapp.services.save.interfaces.IMessageSaveService;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -35,15 +36,17 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     private final IFriendsDeleteService friendsDeleteService;
     private final IMessageDeleteService messageDeleteService;
     private final IMessageQueryService messageQueryService;
+    private final IMessageSaveService messageSaveService;
 
     @Autowired
-    public FriendsService(PersonalService personalService , IndividualAlbumService individualAlbumService , IFriendsQueryService friendsQueryService , IFriendsDeleteService friendsDeleteService , IMessageDeleteService messageDeleteService , IMessageQueryService messageQueryService) {
+    public FriendsService(PersonalService personalService , IndividualAlbumService individualAlbumService , IFriendsQueryService friendsQueryService , IFriendsDeleteService friendsDeleteService , IMessageDeleteService messageDeleteService , IMessageQueryService messageQueryService , IMessageSaveService messageSaveService) {
         this.personalService = personalService;
         this.individualAlbumService = individualAlbumService;
         this.friendsQueryService = friendsQueryService;
         this.friendsDeleteService = friendsDeleteService;
         this.messageDeleteService = messageDeleteService;
         this.messageQueryService = messageQueryService;
+        this.messageSaveService = messageSaveService;
     }
 
     @Override
@@ -67,18 +70,28 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     public ResponseEntity <List <FriendsDTO>> getUserFriends(Principal principal) {
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         List <Friends> friends = friendsQueryService.findFriendsByUserId(user.getId());
-        return getUserFriends(friends , user.getId());
+        Long friendsId = !friends.isEmpty() ? friends.get(0).getId() : -1;
+        return new ResponseEntity <>(getUserFriends(friends , user.getId() , friendsId) , HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity <List <FriendsDTO>> getUserFriendsById(long id) {
         List <Friends> friends = friendsQueryService.findFriendsByUserId(id);
-        return getUserFriends(friends , id);
+        List <FriendsDTO> friendsDTOS = getUserFriends(friends , id);
+        return new ResponseEntity <>(friendsDTOS , HttpStatus.OK);
     }
 
+    @Transactional
     @Override
-    public ResponseEntity <MessageDTO> sendMessage(Principal principal , long id , String message) {
-        return null;
+    public ResponseEntity <MessageDTO> sendMessage(Principal principal , long id , MessageDTO messageDTO) {
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <Friends> friend = friendsQueryService.findFriendsByUserIdAndFriendId(user.getId() , id);
+        if ( friend.isPresent() ) {
+            Friends friendToSave = friend.get();
+            FriendMessages message = new FriendMessages(user , friendToSave , messageDTO);
+            return new ResponseEntity <>(new MessageDTO(messageSaveService.save(message)) , HttpStatus.CREATED);
+        }
+        return new ResponseEntity <>(HttpStatus.FORBIDDEN);
     }
 
     @Override
@@ -86,12 +99,12 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         PersonalData user = personalService.getPersonalInformation(principal.getName());
         FriendMessages message = messageQueryService.findById(messageId);
         if ( message == null ) new ResponseEntity <>(HttpStatus.BAD_REQUEST);
-        if ( message.getSenderId() != user.getId() ) return new ResponseEntity(HttpStatus.FORBIDDEN);
+        if ( message.getSender().getId() != user.getId() ) return new ResponseEntity(HttpStatus.FORBIDDEN);
         messageDeleteService.deleteById(messageId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
-    private ResponseEntity <List <FriendsDTO>> getUserFriends(List <Friends> friends , long id) {
+    private List <FriendsDTO> getUserFriends(List <Friends> friends , long id) {
         List <FriendsDTO> friendsDTOS = new ArrayList <>();
         for (Friends friend : friends) {
             if ( friend.getSecondUser().getId() != id )
@@ -99,7 +112,34 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
             else
                 friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser()));
         }
-        return new ResponseEntity(friendsDTOS , HttpStatus.OK);
+        return friendsDTOS;
     }
 
+    private List <FriendsDTO> getUserFriends(List <Friends> friends , long id , Long friendId) {
+        List <FriendsDTO> friendsDTOS = new ArrayList <>();
+        for (Friends friend : friends) {
+            if ( friend.getSecondUser().getId() != id ) {
+                FriendsDTO friendsDTO = FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getSecondUser());
+                friendsDTO.setFriendId(friendId);
+                friendsDTOS.add(friendsDTO);
+            } else {
+                FriendsDTO friendsDTO = FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser());
+                friendsDTO.setFriendId(friendId);
+                friendsDTOS.add(friendsDTO);
+            }
+
+        }
+        return friendsDTOS;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity <List <MessageDTO>> getMessages(Principal principal , Long id , Integer page) {
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <Friends> friend = friendsQueryService.findFriendsByUserIdAndFriendId(user.getId() , id);
+        if ( !friend.isPresent() ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity <>(messageQueryService.getMessages(user.getId() , id , page) , HttpStatus.OK);
+    }
 }

@@ -37,5 +37,10 @@ public class FriendsQueryService implements IFriendsQueryService {
         return friendsRepository.findFriendByFirstAndSecond(firstId , secondId);
     }
 
+    @Override
+    public Optional <Friends> findFriendsByUserIdAndFriendId(Long userId , Long friendId) {
+        return friendsRepository.findFriendsByUserIdAndFriendId(userId, friendId);
+    }
+
 
 }

@@ -3,6 +3,7 @@ package pl.travel.travelapp.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.travel.travelapp.DTO.FriendsDTO;
+import pl.travel.travelapp.DTO.MessageDTO;
 import pl.travel.travelapp.DTO.UserFriendRequestDTO;
 import pl.travel.travelapp.services.FriendsRequestService;
 import pl.travel.travelapp.services.FriendsService;
@@ -62,6 +63,16 @@ public class FriendsController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteFromFriendList(Principal principal , @PathVariable long id) {
         return friendsService.deleteFromFriendList(principal , id);
+    }
+
+    @PostMapping("/message/{id}")
+    public ResponseEntity <MessageDTO> sendMessage(Principal principal , @PathVariable(name = "id") Long id , @RequestBody MessageDTO messageDTO) {
+        return friendsService.sendMessage(principal , id , messageDTO);
+    }
+
+    @GetMapping("/message/{id}")
+    public ResponseEntity <List <MessageDTO>> sendMessage(Principal principal , @PathVariable(name = "id") Long id , @RequestParam Integer page) {
+        return friendsService.getMessages(principal , id , page);
     }
 
 

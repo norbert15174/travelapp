@@ -1,5 +1,5 @@
 package pl.travel.travelapp.entites.enums;
 
 public enum MessageStatus {
-    DELIVERED,RECEIVED
+    DELIVERED, RECEIVED, NEW
 }

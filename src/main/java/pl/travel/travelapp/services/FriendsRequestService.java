@@ -68,7 +68,7 @@ public class FriendsRequestService implements FriendsRequestInterface {
     @Override
     public ResponseEntity deleteRequest(Principal principal , long id) {
         PersonalData user = getPersonalInformation(principal);
-        if ( friendsRequestRepository.findFirstByReceiver(id , user.getId()).isEmpty() )
+        if ( friendsRequestRepository.findFirstByUserAndRequestId(user.getId(),id).isEmpty() )
             return new ResponseEntity <>(HttpStatus.CONFLICT);
         try {
             Optional <FriendsRequest> friendsRequest = friendsRequestRepository.findById(id);

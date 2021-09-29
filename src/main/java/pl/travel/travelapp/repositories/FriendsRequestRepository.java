@@ -2,6 +2,7 @@ package pl.travel.travelapp.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.travel.travelapp.entites.FriendsRequest;
 
@@ -22,4 +23,6 @@ public interface FriendsRequestRepository extends JpaRepository <FriendsRequest,
     @Query("select f from FriendsRequest f left join fetch f.sender where f.id = :id")
     Optional <FriendsRequest> findFriendsRequest(Long id);
 
+    @Query("select f from FriendsRequest f left join fetch f.sender s where (f.receiver = :userId or s.id = :userId) and f.id = :requestId")
+    List <FriendsRequest> findFirstByUserAndRequestId(@Param("userId") Long userId , @Param("requestId") Long requestId);
 }

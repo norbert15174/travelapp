@@ -1,14 +1,19 @@
 package pl.travel.travelapp.entites;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.travel.travelapp.DTO.MessageDTO;
 import pl.travel.travelapp.entites.enums.MessageStatus;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -21,12 +26,21 @@ public class FriendMessages {
     private long id;
     @NotNull
     private String text;
-    private LocalDate date = LocalDate.now();
-    @NotNull
-    private String sender;
-    private String photoUrl;
-    private long senderId;
+    @Column(columnDefinition = "TIMESTAMP")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("date")
+    private LocalDateTime date = LocalDateTime.now();
+    @OneToOne
+    private PersonalData sender;
     @ManyToOne
     private Friends friends;
-    private MessageStatus messageStatus;
+    private MessageStatus messageStatus = MessageStatus.NEW;
+
+    public FriendMessages(PersonalData user , Friends friendToSave , MessageDTO messageDTO) {
+        this.friends = friendToSave;
+        this.sender = user;
+        this.text = messageDTO.getText();
+        this.date = LocalDateTime.now();
+    }
 }

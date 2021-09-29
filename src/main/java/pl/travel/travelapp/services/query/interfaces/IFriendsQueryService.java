@@ -13,4 +13,6 @@ public interface IFriendsQueryService {
 
     Optional <Friends> findFriendByFirstAndSecond(Long firstId , Long secondId);
 
+    Optional <Friends> findFriendsByUserIdAndFriendId(Long userId, Long friendId);
+
 }

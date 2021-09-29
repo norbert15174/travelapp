@@ -17,7 +17,6 @@ import pl.travel.travelapp.DTO.TextMessageDTO;
 @CrossOrigin(origins = "*")
 public class WebSocketTextController {
 
-
     private SimpMessagingTemplate template;
 
     @Autowired
@@ -31,14 +30,9 @@ public class WebSocketTextController {
         return new ResponseEntity <>(HttpStatus.OK);
     }
 
-    @MessageMapping("/sendMessage")
+    @MessageMapping("/messenger/chat/{id}")
+    @SendTo("/messenger/{id}")
     public void receiveMessage(@Payload TextMessageDTO textMessageDTO) {
         // receive message from client
-    }
-
-
-    @SendTo("/topic/message")
-    public TextMessageDTO broadcastMessage(@Payload TextMessageDTO textMessageDTO) {
-        return textMessageDTO;
     }
 }
