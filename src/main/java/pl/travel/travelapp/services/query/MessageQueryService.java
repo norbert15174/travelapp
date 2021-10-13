@@ -10,6 +10,7 @@ import pl.travel.travelapp.repositories.FriendMessagesRepository;
 import pl.travel.travelapp.services.query.interfaces.IMessageQueryService;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class MessageQueryService implements IMessageQueryService {
@@ -31,5 +32,11 @@ public class MessageQueryService implements IMessageQueryService {
     @Override
     public List <MessageDTO> getMessages(Long userId , Long friendId , Integer page) {
         return friendMessagesRepository.findMessages(userId, friendId, PageRequest.of(page, 20));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Set <FriendMessages> getUserNewMessages(Long userId , Long friendId) {
+        return friendMessagesRepository.findUserNewMessages(userId, friendId);
     }
 }

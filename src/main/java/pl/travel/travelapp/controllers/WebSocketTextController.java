@@ -3,36 +3,33 @@ package pl.travel.travelapp.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import pl.travel.travelapp.DTO.TextMessageDTO;
+import pl.travel.travelapp.entites.ChatMessage;
 
-@RestController
-@CrossOrigin(origins = "*")
+@Controller
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WebSocketTextController {
 
-    private SimpMessagingTemplate template;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public WebSocketTextController(SimpMessagingTemplate template) {
-        this.template = template;
+    public WebSocketTextController(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
-    @PostMapping("/send")
-    public ResponseEntity <Void> sendMessage(@RequestBody TextMessageDTO textMessageDTO) {
-        template.convertAndSend("/topic/message" , textMessageDTO);
-        return new ResponseEntity <>(HttpStatus.OK);
-    }
-
-    @MessageMapping("/messenger/chat/{id}")
-    @SendTo("/messenger/{id}")
-    public void receiveMessage(@Payload TextMessageDTO textMessageDTO) {
-        // receive message from client
+    @MessageMapping("/chat/{id}")
+    @SendTo("/topic/{id}")
+    public ChatMessage get(@Payload ChatMessage chatMessage, @DestinationVariable Long id) {
+        return chatMessage;
     }
 }

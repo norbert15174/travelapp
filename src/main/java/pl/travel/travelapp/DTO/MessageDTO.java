@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 public class MessageDTO {
+    private Long id;
     private Long friendsId;
     private Long senderId;
     @NotNull
@@ -28,11 +29,13 @@ public class MessageDTO {
     private LocalDateTime date;
     private MessageStatus messageStatus = MessageStatus.NEW;
 
+
     public MessageDTO(FriendMessages messages) {
         this.friendsId = messages.getFriends().getId();
         this.senderId = messages.getSender().getId();
         this.text = messages.getText();
         this.date = messages.getDate();
         this.messageStatus = messages.getMessageStatus();
+        this.id = messages.getId();
     }
 }

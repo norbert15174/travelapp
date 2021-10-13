@@ -13,4 +13,5 @@ public class FriendsDTO {
     private String lastName;
     private String profilePicture;
     private Long friendId;
+    private boolean messagesNew;
 }

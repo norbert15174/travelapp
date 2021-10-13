@@ -51,24 +51,6 @@ public class NewsService implements NewsInterfaces {
         return new ResponseEntity(individualAlbumQueryService.getIndividualAlbumsNews(userId , PageRequest.of(page , 8)) , HttpStatus.OK);
     }
 
-    //@EventListener(ApplicationReadyEvent.class)
-    public void fill() {
-        List <SharedAlbum> sharedAlbums = sharedAlbumRepository.findAll();
-        List <TaggedUser> taggedUsers = taggedPhotoRepository.findAll();
-        Integer i = 0;
-        for (SharedAlbum e : sharedAlbums) {
-            e.setDateTime(LocalDateTime.now().minusMinutes(i));
-            i += 4;
-            sharedAlbumRepository.save(e);
-        }
-        for (TaggedUser e : taggedUsers) {
-            e.setDateTime(LocalDateTime.now().minusMinutes(i));
-            i--;
-            taggedPhotoRepository.save(e);
-        }
-
-    }
-
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity <List <NotificationDTO>> getUserNotification(Principal principal) {

@@ -66,7 +66,7 @@ public class FriendsController {
     }
 
     @PostMapping("/message/{id}")
-    public ResponseEntity <MessageDTO> sendMessage(Principal principal , @PathVariable(name = "id") Long id , @RequestBody MessageDTO messageDTO) {
+    public ResponseEntity <List<MessageDTO>> sendMessage(Principal principal , @PathVariable(name = "id") Long id , @RequestBody MessageDTO messageDTO) {
         return friendsService.sendMessage(principal , id , messageDTO);
     }
 

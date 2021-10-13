@@ -58,15 +58,4 @@ public class IndividualAlbumQueryService implements IIndividualAlbumQueryService
         return individualAlbumRepository.findAlbumById(id);
     }
 
-    //@EventListener(ApplicationReadyEvent.class)
-    public void fillDateInformation() {
-        List <IndividualAlbum> fill = individualAlbumRepository.findAll();
-        Integer i = 0;
-        for (IndividualAlbum f : fill) {
-            f.setDateTime(LocalDateTime.now().minusMinutes(i));
-            individualAlbumRepository.save(f);
-            i++;
-        }
-    }
-
 }
