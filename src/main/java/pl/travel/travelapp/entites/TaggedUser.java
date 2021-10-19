@@ -32,7 +32,6 @@ public class TaggedUser {
     @JsonProperty("date")
     private LocalDateTime dateTime;
 
-
     public Set <TaggedUser> buildTaggedUsers(Set <PersonalData> users) {
         return users.stream().map(user -> new TaggedUser().buildTaggedUser(user)).collect(Collectors.toSet());
     }

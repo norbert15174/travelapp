@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.FriendsDTO;
 import pl.travel.travelapp.DTO.MessageDTO;
-import pl.travel.travelapp.entites.FriendMessages;
-import pl.travel.travelapp.entites.Friends;
-import pl.travel.travelapp.entites.PersonalData;
-import pl.travel.travelapp.entites.SharedAlbum;
+import pl.travel.travelapp.configuration.WebSocketClientConfig;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.entites.enums.MessageStatus;
 import pl.travel.travelapp.interfaces.FriendsInterface;
 import pl.travel.travelapp.interfaces.FriendsMessageInterface;
@@ -23,6 +21,7 @@ import pl.travel.travelapp.services.save.interfaces.IMessageSaveService;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 
@@ -36,9 +35,10 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     private final IMessageDeleteService messageDeleteService;
     private final IMessageQueryService messageQueryService;
     private final IMessageSaveService messageSaveService;
+    private final WebSocketClientConfig webSocketClientConfig;
 
     @Autowired
-    public FriendsService(PersonalService personalService , IndividualAlbumService individualAlbumService , IFriendsQueryService friendsQueryService , IFriendsDeleteService friendsDeleteService , IMessageDeleteService messageDeleteService , IMessageQueryService messageQueryService , IMessageSaveService messageSaveService) {
+    public FriendsService(PersonalService personalService , IndividualAlbumService individualAlbumService , IFriendsQueryService friendsQueryService , IFriendsDeleteService friendsDeleteService , IMessageDeleteService messageDeleteService , IMessageQueryService messageQueryService , IMessageSaveService messageSaveService , WebSocketClientConfig webSocketClientConfig) {
         this.personalService = personalService;
         this.individualAlbumService = individualAlbumService;
         this.friendsQueryService = friendsQueryService;
@@ -46,6 +46,7 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         this.messageDeleteService = messageDeleteService;
         this.messageQueryService = messageQueryService;
         this.messageSaveService = messageSaveService;
+        this.webSocketClientConfig = webSocketClientConfig;
     }
 
     @Override
@@ -89,6 +90,16 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
             FriendMessages message = new FriendMessages(user , friendToSave , messageDTO);
             messageSaveService.save(message);
             Set <MessageDTO> messages = messageSaveService.getMessagesAfter(messageDTO.getDate() , messageDTO.getFriendsId());
+
+            try {
+                Long userId = message.getFriends().getFirstUser().getId() == user.getId() ? message.getFriends().getSecondUser().getId() : message.getFriends().getFirstUser().getId();
+                webSocketClientConfig.webSocketClient(userId , new ChatMessage(userId , id));
+            } catch ( ExecutionException e ) {
+                e.printStackTrace();
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            }
+
             return new ResponseEntity(messages.stream().sorted(Comparator.comparing(MessageDTO::getDate).reversed()).collect(Collectors.toList()) , HttpStatus.CREATED);
         }
         return new ResponseEntity <>(HttpStatus.FORBIDDEN);
@@ -103,6 +114,7 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
         messageDeleteService.deleteById(messageId);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
+
 
     private List <FriendsDTO> getUserFriends(List <Friends> friends , long id) {
         List <FriendsDTO> friendsDTOS = new ArrayList <>();

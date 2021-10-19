@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pl.travel.travelapp.entites.IndividualAlbum;
 import pl.travel.travelapp.entites.SharedAlbum;
 
 import java.util.List;
@@ -23,4 +24,7 @@ public interface SharedAlbumRepository extends JpaRepository <SharedAlbum, Long>
 
     @Query("select sh from SharedAlbum sh where sh.id in :ids")
     Set <SharedAlbum> findAllByIds(Set <Long> ids);
+
+    @Query("select ia from IndividualAlbum ia inner join fetch ia.sharedAlbum sa where sa.userId = :id")
+    List <IndividualAlbum> findIndividualAlbumAvailableAlbumsPage(@Param("id") long id , Pageable page);
 }

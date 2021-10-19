@@ -27,6 +27,6 @@ public class MessageSaveService implements IMessageSaveService {
 
     @Override
     public Set <MessageDTO> getMessagesAfter(LocalDateTime date , Long friendsId) {
-        return friendMessagesRepository.findMessagesAfter(date, friendsId);
+        return friendMessagesRepository.findMessagesAfter(date == null ? LocalDateTime.now().minusHours(1) : date, friendsId);
     }
 }
