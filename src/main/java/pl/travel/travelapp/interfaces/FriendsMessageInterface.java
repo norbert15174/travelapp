@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface FriendsMessageInterface {
 
-    ResponseEntity <List<MessageDTO>> sendMessage(Principal principal , long id , MessageDTO messageDTO);
+    ResponseEntity <List <MessageDTO>> sendMessage(Principal principal , long id , MessageDTO messageDTO);
 
-    ResponseEntity deleteMessage(Principal principal, long messageId);
+    ResponseEntity deleteMessage(Principal principal , long messageId);
 
-    ResponseEntity<List<MessageDTO>> getMessages(Principal principal , Long id , Integer page);
+    ResponseEntity <List <MessageDTO>> getMessageAfter(Principal principal , Long id , MessageDTO messageDTO);
+
+    ResponseEntity <List <MessageDTO>> getMessages(Principal principal , Long id , Integer page);
 }

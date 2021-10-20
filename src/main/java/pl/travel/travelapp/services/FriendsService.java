@@ -20,7 +20,10 @@ import pl.travel.travelapp.services.query.interfaces.IMessageQueryService;
 import pl.travel.travelapp.services.save.interfaces.IMessageSaveService;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -89,7 +92,7 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
             Friends friendToSave = friend.get();
             FriendMessages message = new FriendMessages(user , friendToSave , messageDTO);
             messageSaveService.save(message);
-            Set <MessageDTO> messages = messageSaveService.getMessagesAfter(messageDTO.getDate() , messageDTO.getFriendsId());
+            Set <MessageDTO> messages = messageQueryService.getMessagesAfter(messageDTO.getDate() , messageDTO.getFriendsId());
 
             try {
                 Long userId = message.getFriends().getFirstUser().getId() == user.getId() ? message.getFriends().getSecondUser().getId() : message.getFriends().getFirstUser().getId();
@@ -100,7 +103,7 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
                 e.printStackTrace();
             }
 
-            return new ResponseEntity(messages.stream().sorted(Comparator.comparing(MessageDTO::getDate).reversed()).collect(Collectors.toList()) , HttpStatus.CREATED);
+            return new ResponseEntity(messages , HttpStatus.CREATED);
         }
         return new ResponseEntity <>(HttpStatus.FORBIDDEN);
     }
@@ -116,6 +119,20 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
     }
 
 
+    @Override
+    public ResponseEntity <List <MessageDTO>> getMessageAfter(Principal principal , Long id , MessageDTO messageDTO) {
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <Friends> friend = friendsQueryService.findFriendsByUserIdAndFriendId(user.getId() , id);
+        if ( friend.isPresent() ) {
+            Set <MessageDTO> messages = messageQueryService.getMessagesAfter(messageDTO.getDate() , messageDTO.getFriendsId());
+            Set <FriendMessages> friendMessages = messageQueryService.getUserNewMessages(user.getId() , id);
+            messageSaveService.saveAll(friendMessages.stream().map(FriendMessages::setStatusRecived).collect(Collectors.toList()));
+
+            return new ResponseEntity(messages , HttpStatus.OK);
+        }
+        return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+    }
+
     private List <FriendsDTO> getUserFriends(List <Friends> friends , long id) {
         List <FriendsDTO> friendsDTOS = new ArrayList <>();
         for (Friends friend : friends) {
@@ -125,6 +142,22 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
                 friendsDTOS.add(FriendsObjectMapperClass.mapPersonalDataToFriendsDTO(friend.getFirstUser()));
         }
         return friendsDTOS;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity <List <MessageDTO>> getMessages(Principal principal , Long id , Integer page) {
+        PersonalData user = personalService.getPersonalInformation(principal.getName());
+        Optional <Friends> friend = friendsQueryService.findFriendsByUserIdAndFriendId(user.getId() , id);
+        if ( !friend.isPresent() ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        Set <FriendMessages> friendMessages = messageQueryService.getUserNewMessages(user.getId() , id);
+        for (FriendMessages message : friendMessages) {
+            message.setMessageStatus(MessageStatus.RECEIVED);
+            messageSaveService.save(message);
+        }
+        return new ResponseEntity <>(messageQueryService.getMessages(user.getId() , id , page) , HttpStatus.OK);
     }
 
     private List <FriendsDTO> getUserFriendsWithFriendId(List <Friends> friends , long id) {
@@ -150,21 +183,5 @@ public class FriendsService implements FriendsInterface, FriendsMessageInterface
 
         }
         return friendsDTOS;
-    }
-
-    @Transactional
-    @Override
-    public ResponseEntity <List <MessageDTO>> getMessages(Principal principal , Long id , Integer page) {
-        PersonalData user = personalService.getPersonalInformation(principal.getName());
-        Optional <Friends> friend = friendsQueryService.findFriendsByUserIdAndFriendId(user.getId() , id);
-        if ( !friend.isPresent() ) {
-            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
-        }
-        Set <FriendMessages> friendMessages = messageQueryService.getUserNewMessages(user.getId() , id);
-        for (FriendMessages message : friendMessages) {
-            message.setMessageStatus(MessageStatus.RECEIVED);
-            messageSaveService.save(message);
-        }
-        return new ResponseEntity <>(messageQueryService.getMessages(user.getId() , id , page) , HttpStatus.OK);
     }
 }

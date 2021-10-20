@@ -71,8 +71,13 @@ public class FriendsController {
     }
 
     @GetMapping("/message/{id}")
-    public ResponseEntity <List <MessageDTO>> sendMessage(Principal principal , @PathVariable(name = "id") Long id , @RequestParam Integer page) {
+    public ResponseEntity <List <MessageDTO>> getMessages(Principal principal , @PathVariable(name = "id") Long id , @RequestParam Integer page) {
         return friendsService.getMessages(principal , id , page);
+    }
+
+    @GetMapping("/message/new/{id}")
+    public ResponseEntity <List <MessageDTO>> getMessagesAfter(Principal principal , @PathVariable(name = "id") Long id , @RequestBody MessageDTO messageDTO) {
+        return friendsService.getMessageAfter(principal , id , messageDTO);
     }
 
 

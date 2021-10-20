@@ -3,12 +3,15 @@ package pl.travel.travelapp.services.query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.travel.travelapp.DTO.MessageDTO;
 import pl.travel.travelapp.entites.Friends;
 import pl.travel.travelapp.repositories.FriendsRepository;
 import pl.travel.travelapp.services.query.interfaces.IFriendsQueryService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FriendsQueryService implements IFriendsQueryService {

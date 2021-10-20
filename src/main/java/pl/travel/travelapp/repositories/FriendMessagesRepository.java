@@ -32,6 +32,6 @@ public interface FriendMessagesRepository extends JpaRepository <FriendMessages,
             " where f.id = :friendId and (su.id = :userId or fu.id = :userId) and fms.id <> :userId and fm.messageStatus = pl.travel.travelapp.entites.enums.MessageStatus.NEW")
     Set <FriendMessages> findUserNewMessages(Long userId , Long friendId);
 
-    @Query("select new pl.travel.travelapp.DTO.MessageDTO(m) from FriendMessages m where m.date > :date and m.friends.id = :friendsId")
+    @Query("select new pl.travel.travelapp.DTO.MessageDTO(m) from FriendMessages m where m.date > :date and m.friends.id = :friendsId order by m.date descó")
     Set <MessageDTO> findMessagesAfter(LocalDateTime date , Long friendsId);
 }

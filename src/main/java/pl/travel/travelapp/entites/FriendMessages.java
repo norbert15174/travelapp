@@ -43,4 +43,9 @@ public class FriendMessages {
         this.text = messageDTO.getText();
         this.date = LocalDateTime.now();
     }
+
+    public FriendMessages setStatusRecived() {
+        this.messageStatus = MessageStatus.RECEIVED;
+        return this;
+    }
 }

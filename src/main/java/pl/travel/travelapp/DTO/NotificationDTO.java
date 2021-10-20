@@ -29,7 +29,7 @@ public class NotificationDTO {
     @JsonProperty("date")
     private LocalDateTime dateTime;
 
-    public NotificationDTO(IndividualAlbum album, long id) {
+    public NotificationDTO(IndividualAlbum album , long id) {
         SharedAlbum sharedAlbum = album.getSharedAlbum().stream().filter(tag -> tag.getUserId() == id).findFirst().get();
         this.id = sharedAlbum.getId();
         this.user.setPhoto(album.getOwner().getProfilePicture());
@@ -38,7 +38,7 @@ public class NotificationDTO {
         this.user.setId(album.getOwner().getId());
         this.albumId = album.getId();
         this.dateTime = sharedAlbum.getDateTime();
-        this.status = NotificationStatus.PHOTO_TAG;
+        this.status = NotificationStatus.ALBUM_SHARE;
     }
 
     public NotificationDTO(AlbumPhotos photo , long id) {
@@ -51,17 +51,17 @@ public class NotificationDTO {
         this.dateTime = taggedUser.getDateTime();
         this.albumId = photo.getIndividualAlbum().getId();
         this.photoId = photo.getPhotoId();
-        this.status = NotificationStatus.ALBUM_SHARE;
+        this.status = NotificationStatus.PHOTO_TAG;
     }
 
-    public NotificationDTO(Comments comment, AlbumPhotos photo) {
+    public NotificationDTO(Comments comment , AlbumPhotos photo) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.id = comment.getCommentId();
         this.user.setPhoto(comment.getPhoto());
         this.user.setSurName(comment.getSurName());
         this.user.setName(comment.getName());
         this.user.setId(comment.getUserId());
-        this.dateTime = LocalDateTime.parse(comment.getTime(), dateTimeFormatter);
+        this.dateTime = LocalDateTime.parse(comment.getTime() , dateTimeFormatter);
         this.albumId = photo.getIndividualAlbum().getId();
         this.photoId = photo.getPhotoId();
         this.status = NotificationStatus.COMMENT;

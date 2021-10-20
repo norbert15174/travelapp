@@ -9,6 +9,7 @@ import pl.travel.travelapp.entites.FriendMessages;
 import pl.travel.travelapp.repositories.FriendMessagesRepository;
 import pl.travel.travelapp.services.query.interfaces.IMessageQueryService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -31,12 +32,17 @@ public class MessageQueryService implements IMessageQueryService {
     @Transactional(readOnly = true)
     @Override
     public List <MessageDTO> getMessages(Long userId , Long friendId , Integer page) {
-        return friendMessagesRepository.findMessages(userId, friendId, PageRequest.of(page, 20));
+        return friendMessagesRepository.findMessages(userId , friendId , PageRequest.of(page , 20));
     }
 
     @Transactional(readOnly = true)
     @Override
     public Set <FriendMessages> getUserNewMessages(Long userId , Long friendId) {
-        return friendMessagesRepository.findUserNewMessages(userId, friendId);
+        return friendMessagesRepository.findUserNewMessages(userId , friendId);
+    }
+
+    @Override
+    public Set <MessageDTO> getMessagesAfter(LocalDateTime date , Long friendsId) {
+        return friendMessagesRepository.findMessagesAfter(date == null ? LocalDateTime.now().minusHours(1) : date , friendsId);
     }
 }
