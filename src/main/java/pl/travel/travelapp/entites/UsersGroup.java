@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -19,14 +20,26 @@ public class UsersGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToMany(mappedBy = "groups", cascade = {
-            CascadeType.PERSIST ,
-            CascadeType.MERGE
-    }, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "groups")
     private Set <PersonalData> members = new HashSet <>();
+    @OneToOne(fetch = FetchType.LAZY)
+    private PersonalData owner;
     private String groupName;
     private String description;
     private String groupPicture;
+
+    @OneToMany(
+            mappedBy = "group",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<GroupMemberRequest> groupMemberRequests = new HashSet <>();
+
+    public UsersGroup(GroupCreateDTO group , PersonalData user) {
+        this.description = group.getDescription();
+        this.groupName = group.getGroupName();
+        this.owner = user;
+    }
 
     //private List<GroupAlbums> groupAlbumsList;
     //private List<GroupMessages> messages;
@@ -41,5 +54,6 @@ public class UsersGroup {
         members.remove(member);
         member.getGroups().remove(this);
     }
+
 
 }

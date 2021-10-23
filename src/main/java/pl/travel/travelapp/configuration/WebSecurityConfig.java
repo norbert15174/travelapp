@@ -25,9 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers(HttpMethod.POST,"/auth/**")
-                .antMatchers(HttpMethod.GET,"/auth/**")
-                .antMatchers(HttpMethod.DELETE,"/auth/**")
+                .antMatchers(HttpMethod.POST , "/auth/**")
+                .antMatchers(HttpMethod.GET , "/auth/**")
+                .antMatchers(HttpMethod.DELETE , "/auth/**")
                 .antMatchers("/public/**")
                 .antMatchers("/albums/user/{id}")
                 .antMatchers("/albums/name")
@@ -56,7 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/friends/*").authenticated()
                 .antMatchers("/albums/*").authenticated()
                 .antMatchers("/resources").authenticated()
-                .antMatchers(HttpMethod.PUT,"/auth/password").authenticated()
+                .antMatchers("/group/*").authenticated()
+                .antMatchers(HttpMethod.PUT , "/auth/password").authenticated()
                 .antMatchers("/news/*").authenticated()
                 .and()
                 .addFilterBefore(new JwtFilter(userService) , UsernamePasswordAuthenticationFilter.class);

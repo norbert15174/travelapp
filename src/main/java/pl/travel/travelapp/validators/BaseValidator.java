@@ -1,5 +1,6 @@
 package pl.travel.travelapp.validators;
 
+import com.google.common.base.Strings;
 import org.springframework.validation.Errors;
 
 import java.util.Optional;
@@ -36,6 +37,10 @@ public class BaseValidator<T> {
             return false;
         }
         return true;
+    }
+
+    public boolean validateExist(String value) {
+        return !Strings.isNullOrEmpty(value);
     }
 
 }

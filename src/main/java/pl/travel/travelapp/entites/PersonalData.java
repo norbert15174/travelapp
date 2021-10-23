@@ -30,15 +30,23 @@ public class PersonalData {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PersonalDescription personalDescription;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE},
-                fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     private Set <UsersGroup> groups = new HashSet <>();
+
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<IndividualAlbum> albums = new ArrayList();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<GroupMemberRequest> groupMemberRequests;
+
     public void addGroup(UsersGroup group) {
         groups.add(group);
         group.getMembers().add(this);

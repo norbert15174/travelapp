@@ -75,7 +75,7 @@ public class FriendsController {
         return friendsService.getMessages(principal , id , page);
     }
 
-    @GetMapping("/message/new/{id}")
+    @PostMapping("/message/new/{id}")
     public ResponseEntity <List <MessageDTO>> getMessagesAfter(Principal principal , @PathVariable(name = "id") Long id , @RequestBody MessageDTO messageDTO) {
         return friendsService.getMessageAfter(principal , id , messageDTO);
     }

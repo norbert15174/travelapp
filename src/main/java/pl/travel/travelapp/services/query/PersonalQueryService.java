@@ -1,5 +1,6 @@
 package pl.travel.travelapp.services.query;
 
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import pl.travel.travelapp.services.query.interfaces.IUserQueryService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PersonalQueryService implements IPersonalQueryService {
@@ -39,6 +41,12 @@ public class PersonalQueryService implements IPersonalQueryService {
     @Override
     public List <PersonalData> findAllById(List <Long> ids) {
         return personalDataRepository.findAllById(ids);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Set <PersonalData> findAllById(Set <Long> ids) {
+        return Sets.newHashSet(personalDataRepository.findAllById(ids));
     }
 
     @Transactional(readOnly = true)
