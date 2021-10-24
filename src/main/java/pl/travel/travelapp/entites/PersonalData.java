@@ -47,6 +47,14 @@ public class PersonalData {
     )
     private Set<GroupMemberRequest> groupMemberRequests;
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<GroupNotification> groupNotifications;
+
+
     public void addGroup(UsersGroup group) {
         groups.add(group);
         group.getMembers().add(this);

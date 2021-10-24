@@ -1,5 +1,6 @@
 package pl.travel.travelapp.services.query.interfaces;
 
+import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.groups.GroupGetDTO;
 import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
 import pl.travel.travelapp.entites.GroupMemberRequest;
@@ -19,4 +20,7 @@ public interface IGroupQueryService {
     GroupMemberRequest getGroupRequestById(Long requestId) throws NotFoundException;
 
     Set<GroupRequestDTO> getUserGroupRequests(PersonalData user);
+
+    @Transactional(readOnly = true)
+    Set <GroupMemberRequest> getUserGroupRequestsEntity(PersonalData user);
 }

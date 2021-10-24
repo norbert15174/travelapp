@@ -1,10 +1,7 @@
 package pl.travel.travelapp.entites;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
 
 import javax.persistence.*;
@@ -15,11 +12,11 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 public class UsersGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @ManyToMany(mappedBy = "groups")
     private Set <PersonalData> members = new HashSet <>();
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,7 +30,20 @@ public class UsersGroup {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<GroupMemberRequest> groupMemberRequests = new HashSet <>();
+    private Set <GroupMemberRequest> groupMemberRequests = new HashSet <>();
+    @OneToMany(
+            mappedBy = "group",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set <GroupNotification> groupNotification = new HashSet <>();
+
+    @OneToMany(
+            mappedBy = "group",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set <GroupAlbum> groupAlbum = new HashSet <>();
 
     public UsersGroup(GroupCreateDTO group , PersonalData user) {
         this.description = group.getDescription();

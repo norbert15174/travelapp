@@ -1,6 +1,7 @@
 package pl.travel.travelapp.entites;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -31,9 +32,22 @@ public class TaggedUser {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("date")
     private LocalDateTime dateTime;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AlbumPhotos albumPhoto;
 
-    public Set <TaggedUser> buildTaggedUsers(Set <PersonalData> users) {
-        return users.stream().map(user -> new TaggedUser().buildTaggedUser(user)).collect(Collectors.toSet());
+    public Set <TaggedUser> buildTaggedUsers(Set <PersonalData> users , AlbumPhotos photo) {
+        return users.stream().map(user -> new TaggedUser().buildTaggedUser(user , photo)).collect(Collectors.toSet());
+    }
+
+    public TaggedUser buildTaggedUser(PersonalData user , AlbumPhotos photo) {
+        this.userId = user.getId();
+        this.name = user.getFirstName();
+        this.surName = user.getSurName();
+        this.photo = user.getProfilePicture();
+        this.dateTime = LocalDateTime.now();
+        this.albumPhoto = photo;
+        return this;
     }
 
     public TaggedUser buildTaggedUser(PersonalData user) {
@@ -52,9 +66,9 @@ public class TaggedUser {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (this.getClass() != o.getClass()) return false;
+        if ( this == o ) return true;
+        if ( o == null ) return false;
+        if ( this.getClass() != o.getClass() ) return false;
         TaggedUser user = (TaggedUser) o;
         return getTaggedId() == user.getTaggedId();
     }

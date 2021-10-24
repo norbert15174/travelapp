@@ -1,17 +1,22 @@
 package pl.travel.travelapp.services;
 
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
-import pl.travel.travelapp.DTO.groups.GroupGetDTO;
-import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
-import pl.travel.travelapp.DTO.groups.UpdateGroupDTO;
+import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.groups.*;
 import pl.travel.travelapp.entites.*;
+import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
 import pl.travel.travelapp.exceptions.NotFoundException;
+import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.interfaces.GroupServiceInterface;
 import pl.travel.travelapp.services.query.interfaces.IFriendsQueryService;
 import pl.travel.travelapp.services.query.interfaces.IGroupQueryService;
@@ -20,6 +25,7 @@ import pl.travel.travelapp.services.save.interfaces.IGroupSaveService;
 import pl.travel.travelapp.services.save.interfaces.IPersonalDataSaveService;
 import pl.travel.travelapp.validators.UsersGroupValidator;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,19 +36,27 @@ import java.util.stream.Collectors;
 @Service
 public class GroupService extends UsersGroupValidator implements GroupServiceInterface {
 
+    Storage storage = StorageOptions.getDefaultInstance().getService();
+    @Value("${bucket-name}")
+    private String bucket;
+    @Value("${url-gcp-addr}")
+    private String url;
+
     private final IPersonalQueryService personalQueryService;
     private final IPersonalDataSaveService personalDataSaveService;
     private final IGroupSaveService groupSaveService;
     private final IGroupQueryService groupQueryService;
     private final IFriendsQueryService friendsQueryService;
+    private final GroupNotificationInterface groupNotificationService;
 
     @Autowired
-    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService) {
+    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService , GroupNotificationInterface groupNotificationService) {
         this.personalQueryService = personalQueryService;
         this.personalDataSaveService = personalDataSaveService;
         this.groupSaveService = groupSaveService;
         this.groupQueryService = groupQueryService;
         this.friendsQueryService = friendsQueryService;
+        this.groupNotificationService = groupNotificationService;
     }
 
     @Transactional
@@ -73,6 +87,12 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         if ( !groupToUpdate.getOwner().equals(user) ) {
             return new ResponseEntity <>(HttpStatus.FORBIDDEN);
         }
+        if ( !Strings.isNullOrEmpty(group.getDescription()) ) {
+            groupToUpdate.setDescription(group.getDescription());
+        }
+        if ( !Strings.isNullOrEmpty(group.getGroupName()) ) {
+            groupToUpdate.setGroupName(group.getDescription());
+        }
 
         if ( group.getMembersToDelete() != null && !group.getMembersToDelete().isEmpty() ) {
             Set <PersonalData> membersToDelete = personalQueryService.findAllById(group.getMembersToDelete());
@@ -96,15 +116,10 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
                     if ( !groupRequestUserIds.contains(member.getId()) ) {
                         GroupMemberRequest request = new GroupMemberRequest(groupToUpdate , member);
                         groupSaveService.createMemberRequest(request);
+                        groupNotificationService.createGroupRequest(groupToUpdate , member , user , request);
                     }
                 }
             }
-        }
-        if ( !Strings.isNullOrEmpty(group.getDescription()) ) {
-            groupToUpdate.setDescription(group.getDescription());
-        }
-        if ( !Strings.isNullOrEmpty(group.getGroupName()) ) {
-            groupToUpdate.setDescription(group.getDescription());
         }
         return new ResponseEntity(new GroupGetDTO(groupSaveService.update(groupToUpdate)) , HttpStatus.OK);
     }
@@ -139,6 +154,11 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
         addMembersToGroup(Collections.singleton(groupMemberRequest.getUser().getId()) , groupMemberRequest.getGroup().getOwner() , groupMemberRequest.getGroup());
+        groupMemberRequest.setMember(true);
+        groupSaveService.updateGroupMemberRequest(groupMemberRequest);
+        GroupNotification groupNotification = groupNotificationService.getGroupNotificationByUserAndGroupAndRequestId(user.getId() , groupMemberRequest.getGroup().getId() , groupMemberRequest.getId());
+        groupNotification.setStatus(NotificationGroupStatus.ACCEPTED);
+        groupNotificationService.update(groupNotification);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -166,4 +186,38 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         }
         personalDataSaveService.updateAll(membersToAdd);
     }
+
+    @Transactional
+    @Override
+    public ResponseEntity <List <GroupNotificationDTO>> getUserGroupNotification(Principal principal , Integer size , Integer page) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        return new ResponseEntity(groupNotificationService.getUserGroupNotification(user.getId() , size , page) , HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity <GroupGetDTO> setGroupPhoto(Principal principal , MultipartFile file , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        UsersGroup group = null;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        if ( !group.getOwner().equals(user) ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        try {
+            String path = "group/" + group.getGroupName() + "/id/" + group.getId() + "/picture/main/" + file.getOriginalFilename();
+            BlobId blobId = BlobId.of(bucket , path);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
+            storage.create(blobInfo , file.getBytes());
+            group.setGroupPicture(url + path);
+            return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
+        } catch ( IOException e ) {
+            e.printStackTrace();
+            return new ResponseEntity <>(HttpStatus.NOT_MODIFIED);
+        }
+    }
+
 }

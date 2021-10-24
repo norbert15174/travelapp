@@ -9,4 +9,6 @@ public interface IGroupSaveService {
     UsersGroup update(UsersGroup groupToUpdate);
 
     void createMemberRequest(GroupMemberRequest request);
+
+    void updateGroupMemberRequest(GroupMemberRequest request);
 }

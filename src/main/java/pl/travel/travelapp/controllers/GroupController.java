@@ -3,10 +3,8 @@ package pl.travel.travelapp.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
-import pl.travel.travelapp.DTO.groups.GroupGetDTO;
-import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
-import pl.travel.travelapp.DTO.groups.UpdateGroupDTO;
+import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.groups.*;
 import pl.travel.travelapp.interfaces.GroupServiceInterface;
 
 import java.security.Principal;
@@ -47,6 +45,18 @@ public class GroupController {
     @GetMapping("/user")
     public ResponseEntity <List <GroupRequestDTO>> getUserGroupRequests(Principal principal) {
         return groupService.getUserGroupRequests(principal);
+    }
+
+    @GetMapping("/user/notification")
+    public ResponseEntity <List <GroupNotificationDTO>> getUserNotification(Principal principal ,
+                                                                            @RequestParam(name = "page", defaultValue = "0") Integer page ,
+                                                                            @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return groupService.getUserGroupNotification(principal , page , size);
+    }
+
+    @PostMapping("/photo/{groupId}")
+    public ResponseEntity <GroupGetDTO> setMainPhoto(Principal principal , @RequestParam("file") MultipartFile file , @PathVariable("groupId") Long groupId) {
+        return groupService.setGroupPhoto(principal , file , groupId);
     }
 
 }

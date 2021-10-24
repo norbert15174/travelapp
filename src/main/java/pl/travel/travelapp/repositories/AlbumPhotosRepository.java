@@ -29,7 +29,7 @@ public interface AlbumPhotosRepository extends JpaRepository <AlbumPhotos, Long>
             "where p.photoId=:id and (o.id=:userId or a.isPublic=true or s.userId=:userId)")
     Optional <AlbumPhotos> findCommentsByPhotoId(@Param("id") Long id , @Param("userId") Long userId);
 
-    @Query("select new pl.travel.travelapp.DTO.photos.PhotoDTO(p) from AlbumPhotos p " +
+    @Query("select distinct new pl.travel.travelapp.DTO.photos.PhotoDTO(p) from AlbumPhotos p " +
             "left join p.individualAlbum a " +
             "left join a.owner o " +
             "left join a.sharedAlbum sa " +

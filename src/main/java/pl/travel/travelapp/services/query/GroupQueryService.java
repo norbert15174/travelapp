@@ -51,4 +51,10 @@ public class GroupQueryService implements IGroupQueryService {
         return groupMemberRequestRepository.findUserGroupRequests(user.getId());
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Set <GroupMemberRequest> getUserGroupRequestsEntity(PersonalData user) {
+        return groupMemberRequestRepository.findUserGroupMemberRequest(user.getId());
+    }
+
 }

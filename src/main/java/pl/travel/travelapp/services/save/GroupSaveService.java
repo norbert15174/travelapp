@@ -39,4 +39,10 @@ public class GroupSaveService implements IGroupSaveService {
         groupMemberRequestRepository.save(request);
     }
 
+    @Transactional
+    @Override
+    public void updateGroupMemberRequest(GroupMemberRequest request) {
+        groupMemberRequestRepository.save(request);
+    }
+
 }

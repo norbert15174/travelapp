@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -30,9 +28,11 @@ public class AlbumPhotos {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "photoId")
     private List <Comments> comments = new ArrayList <>();
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Fetch(value = FetchMode.SUBSELECT)
-    @JoinColumn(name = "photoId")
+    @OneToMany(
+            mappedBy = "albumPhoto",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private Set <TaggedUser> taggedList = new HashSet <>();
 
     public void deletePhotoFromAlbum(AlbumPhotos albumPhotos) {

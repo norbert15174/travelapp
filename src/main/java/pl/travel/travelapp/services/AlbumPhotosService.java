@@ -167,14 +167,14 @@ public class AlbumPhotosService implements PhotoInterface {
             }
         }
         if ( albumPhoto.getIndividualAlbum().isPublic() ) {
-            albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userToTag));
+            albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userToTag , albumPhoto));
         } else {
             Set <Long> userSharedIds = albumPhoto.getIndividualAlbum().getSharedAlbum().stream().map(SharedAlbum::getUserId).collect(Collectors.toSet());
             Set <PersonalData> userTagged = userToTag.stream().filter(tag -> userSharedIds.contains(tag.getId())).collect(Collectors.toSet());
-            albumPhoto.addTaggedUser(new TaggedUser().buildTaggedUsers(userTagged));
+            Set <TaggedUser> taggedToSave = new TaggedUser().buildTaggedUsers(userTagged , albumPhoto);
+            taggedPhotoRepository.saveAll(taggedToSave);
         }
-        AlbumPhotos savedAlbum = photoSaveService.save(albumPhoto);
-        return new ResponseEntity(savedAlbum.getTaggedList() , HttpStatus.OK);
+        return new ResponseEntity(albumPhoto.getTaggedList() , HttpStatus.OK);
     }
 
     @Override
@@ -190,8 +190,10 @@ public class AlbumPhotosService implements PhotoInterface {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
         Set <TaggedUser> shared = taggedPhotoRepository.findAllByIds(ids);
-        albumPhoto.deleteTaggedUser(shared);
-        return new ResponseEntity(photoSaveService.save(albumPhoto).getTaggedList() , HttpStatus.OK);
+        shared.forEach(taggedPhotoRepository::delete);
+
+        //albumPhoto.deleteTaggedUser(shared);
+        return new ResponseEntity(albumPhoto.getTaggedList() , HttpStatus.OK);
     }
 
     @Transactional

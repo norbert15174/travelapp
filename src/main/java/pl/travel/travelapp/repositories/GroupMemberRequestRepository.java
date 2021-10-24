@@ -15,4 +15,7 @@ public interface GroupMemberRequestRepository extends JpaRepository <GroupMember
 
     @Query("select new pl.travel.travelapp.DTO.groups.GroupRequestDTO(gmr) from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group where u.id = :userId and gmr.isMember = false order by gmr.dateTime desc")
     Set <GroupRequestDTO> findUserGroupRequests(@Param("userId") Long userId);
+
+    @Query("select gmr from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group where u.id = :userId and gmr.isMember = false order by gmr.dateTime desc")
+    Set <GroupMemberRequest> findUserGroupMemberRequest(@Param("userId") Long id);
 }
