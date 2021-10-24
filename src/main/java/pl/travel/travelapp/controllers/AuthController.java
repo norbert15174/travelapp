@@ -33,7 +33,7 @@ public class AuthController {
     @GetMapping("/register")
     public RedirectView setUserEnable(@RequestParam("token") String token) {
         if ( userService.enableUserAccount(token) ) {
-            return new RedirectView("https://www.baeldung.com/spring-redirect-and-forward");
+            return new RedirectView("http://localhost:3000/auth");
         }
         return new RedirectView("https://www.facebook.com");
     }
