@@ -38,7 +38,7 @@ public class GroupNotificationService implements GroupNotificationInterface {
     @Override
     public List <GroupNotificationDTO> getUserGroupNotification(Long userId , Integer size , Integer pageNumber) {
         List <GroupNotification> groupNotifications = groupNotificationRepository.findPageByUserId(userId , PageRequest.of(size , pageNumber));
-        List<GroupNotificationDTO> notifications = groupNotifications.stream().map(GroupNotificationDTO::new).collect(Collectors.toList());
+        List <GroupNotificationDTO> notifications = groupNotifications.stream().map(GroupNotificationDTO::new).collect(Collectors.toList());
         if ( !groupNotifications.isEmpty() ) {
             Set <GroupNotification> changeStatus = groupNotifications
                     .stream()
@@ -60,14 +60,26 @@ public class GroupNotificationService implements GroupNotificationInterface {
 
     @Transactional
     @Override
+    public void update(GroupNotification groupNotification) {
+        groupNotificationRepository.save(groupNotification);
+    }
+
+    @Transactional
+    @Override
+    public void delete(GroupNotification groupNotification) {
+        groupNotificationRepository.delete(groupNotification);
+    }
+
+    @Transactional
+    @Override
     public GroupNotification createGroupRequest(UsersGroup group , PersonalData user , PersonalData actionUser , GroupMemberRequest request) {
         return create(GroupNotificationCreator.createGroupRequestNotification(group , user , actionUser , request));
     }
 
     @Transactional
     @Override
-    public void update(GroupNotification groupNotification) {
-        groupNotificationRepository.save(groupNotification);
+    public GroupNotification createRemoveUserFromGroup(UsersGroup group , PersonalData user) {
+        return create(GroupNotificationCreator.createRemoveUserFromGroup(group , user));
     }
 
 

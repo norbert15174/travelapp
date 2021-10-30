@@ -18,6 +18,7 @@ import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
 import pl.travel.travelapp.exceptions.NotFoundException;
 import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.interfaces.GroupServiceInterface;
+import pl.travel.travelapp.services.delete.interfaces.IGroupDeleteService;
 import pl.travel.travelapp.services.query.interfaces.IFriendsQueryService;
 import pl.travel.travelapp.services.query.interfaces.IGroupQueryService;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
@@ -48,15 +49,17 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
     private final IGroupQueryService groupQueryService;
     private final IFriendsQueryService friendsQueryService;
     private final GroupNotificationInterface groupNotificationService;
+    private final IGroupDeleteService groupDeleteService;
 
     @Autowired
-    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService , GroupNotificationInterface groupNotificationService) {
+    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService , GroupNotificationInterface groupNotificationService , IGroupDeleteService groupDeleteService) {
         this.personalQueryService = personalQueryService;
         this.personalDataSaveService = personalDataSaveService;
         this.groupSaveService = groupSaveService;
         this.groupQueryService = groupQueryService;
         this.friendsQueryService = friendsQueryService;
         this.groupNotificationService = groupNotificationService;
+        this.groupDeleteService = groupDeleteService;
     }
 
     @Transactional
@@ -142,6 +145,27 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
 
     @Transactional
     @Override
+    public ResponseEntity deleteGroupRequest(Principal principal , Long requestId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        GroupMemberRequest groupMemberRequest = null;
+        try {
+            groupMemberRequest = groupQueryService.getGroupRequestById(requestId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        if ( !groupMemberRequest.getUser().equals(user) ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        GroupNotification groupNotification = groupNotificationService.getGroupNotificationByUserAndGroupAndRequestId(user.getId() , groupMemberRequest.getGroup().getId() , groupMemberRequest.getId());
+        if ( !groupNotification.getStatus().equals(NotificationGroupStatus.ACCEPTED) ) {
+            groupNotificationService.delete(groupNotification);
+        }
+        groupDeleteService.deleteMemberRequest(requestId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
     public ResponseEntity acceptGroupRequest(Principal principal , Long requestId) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         GroupMemberRequest groupMemberRequest = null;
@@ -218,6 +242,104 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
             e.printStackTrace();
             return new ResponseEntity <>(HttpStatus.NOT_MODIFIED);
         }
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity leaveGroup(Principal principal , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        UsersGroup group = null;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        if ( !group.isMember(user) ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        group.removeMember(user);
+        groupSaveService.update(group);
+        personalDataSaveService.update(user);
+        GroupMemberRequest request = groupQueryService.getGroupMemberRequestByGroupIdAndUserId(groupId , user.getId());
+        GroupNotification groupNotification = groupNotificationService.getGroupNotificationByUserAndGroupAndRequestId(user.getId() , groupId , request.getId());
+        if ( !groupNotification.getStatus().equals(NotificationGroupStatus.ACCEPTED) ) {
+            groupNotificationService.delete(groupNotification);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity <GroupGetDTO> changeOwner(Principal principal , Long groupId , Long userId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        PersonalData newOwner = null;
+        UsersGroup group = null;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+            newOwner = personalQueryService.getById(userId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity(HttpStatus.FOUND);
+        }
+        if ( !group.getOwner().equals(user) ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        if ( !group.isMember(newOwner) ) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        group.setOwner(newOwner);
+        return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity <GroupGetDTO> removeMemberFromGroup(Principal principal , Long groupId , Long userId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        PersonalData removeUser = null;
+        UsersGroup group = null;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+            removeUser = personalQueryService.getById(userId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity(HttpStatus.FOUND);
+        }
+        if ( !group.getOwner().equals(user) ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        if ( !group.isMember(removeUser) ) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        group.removeMember(removeUser);
+        personalDataSaveService.update(removeUser);
+        groupNotificationService.createRemoveUserFromGroup(group , user);
+        return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity deleteGroup(Principal principal , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        UsersGroup group = null;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity(HttpStatus.FOUND);
+        }
+        if ( !group.getOwner().equals(user) ) {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        if ( group.getMembers().size() > 1 ) {
+            return new ResponseEntity("You cannot delete as long as group has members" , HttpStatus.BAD_REQUEST);
+        }
+        group.removeMember(user);
+        personalDataSaveService.update(user);
+        groupDeleteService.delete(group);
+        return new ResponseEntity <>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity <List <GroupGetDTO>> getUserGroups(Principal principal) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        return new ResponseEntity (groupQueryService.getUserGroups(user.getId()), HttpStatus.OK);
     }
 
 }

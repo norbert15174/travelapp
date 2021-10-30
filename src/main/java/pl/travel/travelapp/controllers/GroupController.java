@@ -59,4 +59,33 @@ public class GroupController {
         return groupService.setGroupPhoto(principal , file , groupId);
     }
 
+    @PutMapping("/owner/{groupId}")
+    public ResponseEntity <GroupGetDTO> changeOwner(Principal principal , @PathVariable("groupId") Long groupId , @RequestParam(name = "userId") Long userId) {
+        return groupService.changeOwner(principal , groupId , userId);
+    }
+
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity leaveGroup(Principal principal , @PathVariable(name = "groupId") Long groupId) {
+        return groupService.leaveGroup(principal , groupId);
+    }
+
+    @DeleteMapping("/user/{requestId}")
+    public ResponseEntity <GroupGetDTO> deleteGroupRequest(@PathVariable(name = "requestId") Long requestId , Principal principal) {
+        return groupService.deleteGroupRequest(principal , requestId);
+    }
+
+    @DeleteMapping("/member/{groupId}")
+    public ResponseEntity <GroupGetDTO> removeMemberFromGroup(Principal principal , @PathVariable(name = "groupId") Long groupId , @RequestParam(name = "userId") Long userId) {
+        return groupService.removeMemberFromGroup(principal , groupId , userId);
+    }
+
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity <GroupGetDTO> deleteGroup(Principal principal , @PathVariable(name = "groupId") Long groupId) {
+        return groupService.deleteGroup(principal , groupId);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GroupGetDTO>> getUserGroups(Principal principal){
+        return groupService.getUserGroups(principal);
+    }
 }

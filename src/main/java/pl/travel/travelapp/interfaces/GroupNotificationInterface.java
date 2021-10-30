@@ -20,4 +20,8 @@ public interface GroupNotificationInterface {
     GroupNotification createGroupRequest(UsersGroup group , PersonalData user , PersonalData actionUser , GroupMemberRequest request);
 
     void update(GroupNotification groupNotification);
+
+    GroupNotification createRemoveUserFromGroup(UsersGroup group , PersonalData user);
+
+    void delete(GroupNotification groupNotification);
 }

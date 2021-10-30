@@ -54,6 +54,9 @@ public class UsersGroup {
     //private List<GroupAlbums> groupAlbumsList;
     //private List<GroupMessages> messages;
 
+    public boolean isMember(PersonalData member){
+        return getMembers().contains(member);
+    }
 
     public void addMember(PersonalData member) {
         members.add(member);

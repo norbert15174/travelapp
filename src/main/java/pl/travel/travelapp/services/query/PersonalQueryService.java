@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.exceptions.NotFoundException;
 import pl.travel.travelapp.repositories.PersonalDataRepository;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
 import pl.travel.travelapp.services.query.interfaces.IUserQueryService;
@@ -35,6 +36,12 @@ public class PersonalQueryService implements IPersonalQueryService {
     @Override
     public Optional <PersonalData> findById(Long id) {
         return personalDataRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PersonalData getById(Long id) throws NotFoundException {
+        return findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Transactional(readOnly = true)

@@ -18,4 +18,7 @@ public interface GroupMemberRequestRepository extends JpaRepository <GroupMember
 
     @Query("select gmr from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group where u.id = :userId and gmr.isMember = false order by gmr.dateTime desc")
     Set <GroupMemberRequest> findUserGroupMemberRequest(@Param("userId") Long id);
+
+    @Query("select gmr from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group g where g.id = :groupId and u.id = :userId and gmr.isMember = true")
+    GroupMemberRequest findGroupMemberRequestByGroupIdAndUserId(@Param("groupId") Long groupId , @Param("userId") Long id);
 }

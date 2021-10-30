@@ -1,6 +1,7 @@
 package pl.travel.travelapp.services.query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.groups.GroupGetDTO;
@@ -13,6 +14,7 @@ import pl.travel.travelapp.repositories.GroupMemberRequestRepository;
 import pl.travel.travelapp.repositories.GroupRepository;
 import pl.travel.travelapp.services.query.interfaces.IGroupQueryService;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -55,6 +57,18 @@ public class GroupQueryService implements IGroupQueryService {
     @Override
     public Set <GroupMemberRequest> getUserGroupRequestsEntity(PersonalData user) {
         return groupMemberRequestRepository.findUserGroupMemberRequest(user.getId());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public GroupMemberRequest getGroupMemberRequestByGroupIdAndUserId(Long groupId , Long id) {
+        return groupMemberRequestRepository.findGroupMemberRequestByGroupIdAndUserId(groupId , id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List <GroupGetDTO> getUserGroups(Long userId) {
+        return groupRepository.findUserGroups(userId);
     }
 
 }

@@ -2,6 +2,7 @@ package pl.travel.travelapp.services.query.interfaces;
 
 import pl.travel.travelapp.entites.Friends;
 import pl.travel.travelapp.entites.PersonalData;
+import pl.travel.travelapp.exceptions.NotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +13,8 @@ public interface IPersonalQueryService {
     PersonalData getPersonalInformation(String username);
 
     Optional <PersonalData> findById(Long id);
+
+    PersonalData getById(Long id) throws NotFoundException;
 
     List <PersonalData> findAllById(List <Long> ids);
 
