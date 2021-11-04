@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,11 +21,13 @@ public class AlbumPhotos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long photoId;
     private String photoUrl;
+    @Size(max = 1000)
     private String description;
     private String photoName;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private IndividualAlbum individualAlbum;
+    @Size(max = 500)
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "photoId")
     private List <Comments> comments = new ArrayList <>();

@@ -13,6 +13,8 @@ public interface GroupNotificationInterface {
 
     GroupNotification getGroupNotificationByUserAndGroupAndRequestId(Long userId , Long groupId , Long requestId);
 
+    GroupNotification getGroupNotificationAcceptedByUserAndGroupAndRequestId(Long userId , Long groupId , Long requestId);
+
     List <GroupNotificationDTO> getUserGroupNotification(Long userId , Integer size , Integer pageNumber);
 
     GroupNotification create(GroupNotification groupNotification);

@@ -1,7 +1,17 @@
 package pl.travel.travelapp.entites;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.kafka.common.protocol.types.Field;
+
 import javax.persistence.*;
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class GroupAlbum {
 
@@ -11,6 +21,7 @@ public class GroupAlbum {
 
     private String albumMainPhoto;
     private String albumBackgroundPhoto;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UsersGroup group;

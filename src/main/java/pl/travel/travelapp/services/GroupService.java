@@ -73,6 +73,27 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         UsersGroup created = groupSaveService.create(new UsersGroup(group , user));
         user.addGroup(created);
         personalDataSaveService.update(user);
+
+        if ( group.getMembersToAdd() != null && !group.getMembersToAdd().isEmpty() ) {
+            Set <PersonalData> membersToAdd = personalQueryService.findAllById(group.getMembersToAdd());
+            List <Friends> friends = friendsQueryService.findFriendsByUserId(user.getId());
+            Set <PersonalData> users = new HashSet <>();
+            for (Friends friend : friends) {
+                users.add(friend.getSecondUser());
+                users.add(friend.getFirstUser());
+            }
+            users.remove(user);
+            Set <Long> groupRequestUserIds = created.getGroupMemberRequests().stream().map(GroupMemberRequest::getUser).map(PersonalData::getId).collect(Collectors.toSet());
+            for (PersonalData member : membersToAdd) {
+                if ( users.contains(member) ) {
+                    if ( !groupRequestUserIds.contains(member.getId()) ) {
+                        GroupMemberRequest request = new GroupMemberRequest(created , member);
+                        groupSaveService.createMemberRequest(request);
+                        groupNotificationService.createGroupRequest(created , member , user , request);
+                    }
+                }
+            }
+        }
         return new ResponseEntity(new GroupGetDTO(created) , HttpStatus.CREATED);
     }
 
@@ -94,13 +115,17 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
             groupToUpdate.setDescription(group.getDescription());
         }
         if ( !Strings.isNullOrEmpty(group.getGroupName()) ) {
-            groupToUpdate.setGroupName(group.getDescription());
+            groupToUpdate.setGroupName(group.getGroupName());
         }
 
         if ( group.getMembersToDelete() != null && !group.getMembersToDelete().isEmpty() ) {
             Set <PersonalData> membersToDelete = personalQueryService.findAllById(group.getMembersToDelete());
             for (PersonalData member : membersToDelete) {
                 groupToUpdate.removeMember(member);
+                GroupMemberRequest request = groupQueryService.getGroupMemberRequestByGroupIdAndUserId(group.getId() , member.getId());
+                if ( request != null ) {
+                    groupDeleteService.deleteMemberRequest(request.getId());
+                }
             }
             personalDataSaveService.updateAll(membersToDelete);
         }
@@ -257,13 +282,15 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         if ( !group.isMember(user) ) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
+        if ( group.getOwner().equals(user) ) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         group.removeMember(user);
         groupSaveService.update(group);
         personalDataSaveService.update(user);
         GroupMemberRequest request = groupQueryService.getGroupMemberRequestByGroupIdAndUserId(groupId , user.getId());
-        GroupNotification groupNotification = groupNotificationService.getGroupNotificationByUserAndGroupAndRequestId(user.getId() , groupId , request.getId());
-        if ( !groupNotification.getStatus().equals(NotificationGroupStatus.ACCEPTED) ) {
-            groupNotificationService.delete(groupNotification);
+        if ( request != null ) {
+            groupDeleteService.deleteMemberRequest(request.getId());
         }
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -311,6 +338,10 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         group.removeMember(removeUser);
         personalDataSaveService.update(removeUser);
         groupNotificationService.createRemoveUserFromGroup(group , user);
+        GroupMemberRequest request = groupQueryService.getGroupMemberRequestByGroupIdAndUserId(groupId , userId);
+        if ( request != null ) {
+            groupDeleteService.deleteMemberRequest(request.getId());
+        }
         return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
     }
 
@@ -339,7 +370,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
     @Override
     public ResponseEntity <List <GroupGetDTO>> getUserGroups(Principal principal) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
-        return new ResponseEntity (groupQueryService.getUserGroups(user.getId()), HttpStatus.OK);
+        return new ResponseEntity(groupQueryService.getUserGroups(user.getId()) , HttpStatus.OK);
     }
 
 }

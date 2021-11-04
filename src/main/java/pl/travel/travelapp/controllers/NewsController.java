@@ -23,12 +23,12 @@ public class NewsController {
     }
 
     @GetMapping
-    public ResponseEntity <IndividualAlbumDTO> getNews(@RequestParam("page") Integer page , Principal principal) {
+    public ResponseEntity <List <IndividualAlbumDTO>> getNews(@RequestParam("page") Integer page , Principal principal) {
         return newsService.getActualNews(page , principal);
     }
 
     @GetMapping("/notification")
-    public ResponseEntity<List <NotificationDTO>> getUserNotification(Principal principal){
+    public ResponseEntity <List <NotificationDTO>> getUserNotification(Principal principal) {
         return newsService.getUserNotification(principal);
     }
 

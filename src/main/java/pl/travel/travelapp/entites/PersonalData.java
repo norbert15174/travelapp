@@ -16,14 +16,14 @@ public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(min = 4 , max = 20)
+    @Size(min = 3 , max = 20)
     private String firstName;
-    @Size(min = 4 , max = 20)
+    @Size(min = 3 , max = 20)
     private String surName;
     private long phoneNumber;
     private String profilePicture;
     private String backgroundPicture;
-    
+
     private LocalDate birthDate;
     @OneToOne(fetch = FetchType.EAGER)
     private Country Nationality;

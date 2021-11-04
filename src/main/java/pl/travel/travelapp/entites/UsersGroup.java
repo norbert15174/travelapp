@@ -5,6 +5,7 @@ import lombok.*;
 import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,9 @@ public class UsersGroup {
     private Set <PersonalData> members = new HashSet <>();
     @OneToOne(fetch = FetchType.LAZY)
     private PersonalData owner;
+    @Size(max = 50)
     private String groupName;
+    @Size(max = 600)
     private String description;
     private String groupPicture;
 
@@ -50,9 +53,6 @@ public class UsersGroup {
         this.groupName = group.getGroupName();
         this.owner = user;
     }
-
-    //private List<GroupAlbums> groupAlbumsList;
-    //private List<GroupMessages> messages;
 
     public boolean isMember(PersonalData member){
         return getMembers().contains(member);

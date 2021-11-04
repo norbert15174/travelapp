@@ -36,6 +36,12 @@ public class GroupNotificationService implements GroupNotificationInterface {
 
     @Transactional
     @Override
+    public GroupNotification getGroupNotificationAcceptedByUserAndGroupAndRequestId(Long userId , Long groupId , Long requestId) {
+        return groupNotificationRepository.findGroupNotificationAcceptedByUserAndGroupAndRequestId(userId , groupId , requestId);
+    }
+
+    @Transactional
+    @Override
     public List <GroupNotificationDTO> getUserGroupNotification(Long userId , Integer size , Integer pageNumber) {
         List <GroupNotification> groupNotifications = groupNotificationRepository.findPageByUserId(userId , PageRequest.of(size , pageNumber));
         List <GroupNotificationDTO> notifications = groupNotifications.stream().map(GroupNotificationDTO::new).collect(Collectors.toList());

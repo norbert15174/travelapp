@@ -88,4 +88,5 @@ public class GroupController {
     public ResponseEntity<List<GroupGetDTO>> getUserGroups(Principal principal){
         return groupService.getUserGroups(principal);
     }
+
 }

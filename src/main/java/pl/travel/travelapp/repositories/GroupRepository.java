@@ -16,6 +16,6 @@ public interface GroupRepository extends JpaRepository <UsersGroup, Long> {
     @Query("SELECT g FROM UsersGroup g inner join fetch g.owner inner join fetch g.members where g.id = :groupId")
     Optional <UsersGroup> findGroupById(Long groupId);
 
-    @Query("SELECT distinct new pl.travel.travelapp.DTO.groups.GroupGetDTO(g, true) FROM UsersGroup g inner join g.members m where m.id = :userId")
+    @Query("SELECT distinct new pl.travel.travelapp.DTO.groups.GroupGetDTO(g, false) FROM UsersGroup g inner join g.members m where m.id = :userId")
     List <GroupGetDTO> findUserGroups(@Param("userId") Long userId);
 }

@@ -22,4 +22,12 @@ public interface GroupNotificationRepository extends JpaRepository <GroupNotific
             "inner join fetch gn.user u " +
             "where u.id = :userId and g.id = :groupId and gn.groupRequestId = :requestId and gn.status <> pl.travel.travelapp.entites.enums.NotificationGroupStatus.ACCEPTED")
     GroupNotification findGroupNotificationByUserAndGroupAndRequestId(@Param("userId") Long userId , @Param("groupId") Long groupId , @Param("requestId") Long requestId);
+
+    @Query("select gn from GroupNotification gn " +
+            "inner join fetch gn.group g " +
+            "inner join fetch gn.actionUser " +
+            "inner join fetch gn.user u " +
+            "where u.id = :userId and g.id = :groupId and gn.groupRequestId = :requestId and gn.status = pl.travel.travelapp.entites.enums.NotificationGroupStatus.ACCEPTED")
+    GroupNotification findGroupNotificationAcceptedByUserAndGroupAndRequestId(@Param("userId") Long userId , @Param("groupId") Long groupId , @Param("requestId") Long requestId);
+
 }

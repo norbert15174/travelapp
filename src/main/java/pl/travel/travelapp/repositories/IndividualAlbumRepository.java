@@ -10,6 +10,7 @@ import pl.travel.travelapp.entites.IndividualAlbum;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbum, Long> {
@@ -41,12 +42,12 @@ public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbu
             " where a.id =:id and o.id =:userId")
     Optional <IndividualAlbum> findIndividualAlbumByOwnerAndReturnFullInformation(long id , long userId);
 
-    @Query("select new pl.travel.travelapp.DTO.IndividualAlbumDTO(a) from IndividualAlbum a" +
+    @Query("select distinct new pl.travel.travelapp.DTO.IndividualAlbumDTO(a) from IndividualAlbum a" +
             " left join a.owner o" +
             " left join a.sharedAlbum s" +
             " where a.id = :userId or o.id =:userId or a.isPublic = true" +
             " order by a.dateTime desc")
-    List <IndividualAlbumDTO> findIndividualAlbumNews(Long userId , Pageable page);
+    List<IndividualAlbumDTO> findIndividualAlbumNews(Long userId , Pageable page);
 
     @Query("select new pl.travel.travelapp.DTO.IndividualAlbumDTO(a) from IndividualAlbum a" +
             " left join a.owner o" +
@@ -60,5 +61,5 @@ public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbu
             " left join a.sharedAlbum s" +
             " where a.isPublic = true and a.id = :id" +
             " order by a.dateTime desc")
-    Optional<AlbumDTO> findAlbumById(Long id);
+    Optional <AlbumDTO> findAlbumById(Long id);
 }

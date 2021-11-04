@@ -46,7 +46,7 @@ public class NewsService implements NewsInterfaces {
 
     @Override
     @Transactional
-    public ResponseEntity <IndividualAlbumDTO> getActualNews(Integer page , Principal principal) {
+    public ResponseEntity <List <IndividualAlbumDTO>> getActualNews(Integer page , Principal principal) {
         Long userId = personalQueryService.getPersonalInformation(principal.getName()).getId();
         return new ResponseEntity(individualAlbumQueryService.getIndividualAlbumsNews(userId , PageRequest.of(page , 8)) , HttpStatus.OK);
     }
@@ -58,7 +58,7 @@ public class NewsService implements NewsInterfaces {
         List <FriendsRequest> friendsRequests = friendsRequestService.findRequestsByPrincipalList(principal);
         List <IndividualAlbum> sharedAlbums = sharedAlbumRepository.findIndividualAlbumAvailableAlbumsPage(userId , PageRequest.of(0 , 10));
         List <AlbumPhotos> albumPhotos = taggedPhotoRepository.findAllPageByUserId(userId , PageRequest.of(0 , 10));
-        List <AlbumPhotos>  albumPhotosComment = commentsRepository.findPhotoUserComment(userId , PageRequest.of(0 , 10));
+        List <AlbumPhotos> albumPhotosComment = commentsRepository.findPhotoUserComment(userId , PageRequest.of(0 , 10));
         List <NotificationDTO> comments = new ArrayList <>();
         albumPhotosComment.forEach(photo -> {
             comments.addAll(photo.getComments().stream().filter(comment -> !comment.getUserId().equals(userId)).map(comment -> new NotificationDTO(comment , photo)).collect(Collectors.toList()));

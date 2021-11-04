@@ -13,6 +13,7 @@ import pl.travel.travelapp.DTO.MessageDTO;
 import pl.travel.travelapp.entites.enums.MessageStatus;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,7 @@ public class FriendMessages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Size(max = 500)
     @NotNull
     private String text;
     @Column(columnDefinition = "TIMESTAMP")
