@@ -337,7 +337,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         }
         group.removeMember(removeUser);
         personalDataSaveService.update(removeUser);
-        groupNotificationService.createRemoveUserFromGroup(group , user);
+        groupNotificationService.createRemoveUserFromGroup(group , removeUser);
         GroupMemberRequest request = groupQueryService.getGroupMemberRequestByGroupIdAndUserId(groupId , userId);
         if ( request != null ) {
             groupDeleteService.deleteMemberRequest(request.getId());
