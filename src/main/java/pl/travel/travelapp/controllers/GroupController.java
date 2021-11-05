@@ -9,6 +9,7 @@ import pl.travel.travelapp.interfaces.GroupServiceInterface;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/group")
@@ -85,8 +86,13 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupGetDTO>> getUserGroups(Principal principal){
+    public ResponseEntity <List <GroupGetDTO>> getUserGroups(Principal principal) {
         return groupService.getUserGroups(principal);
+    }
+
+    @GetMapping("/request/{groupId}")
+    public ResponseEntity <Set <GroupRequestGetDTO>> getGroupMemberRequest(Principal principal , @PathVariable(name = "groupId") Long groupId) {
+        return groupService.getGroupMemberRequest(principal , groupId);
     }
 
 }

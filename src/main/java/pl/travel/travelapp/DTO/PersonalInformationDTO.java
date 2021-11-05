@@ -22,4 +22,5 @@ public class PersonalInformationDTO {
         this.surName = user.getSurName();
         this.photo = user.getProfilePicture();
     }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.groups.GroupGetDTO;
 import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
+import pl.travel.travelapp.DTO.groups.GroupRequestGetDTO;
 import pl.travel.travelapp.entites.GroupMemberRequest;
 import pl.travel.travelapp.entites.PersonalData;
 import pl.travel.travelapp.entites.UsersGroup;
@@ -69,6 +70,12 @@ public class GroupQueryService implements IGroupQueryService {
     @Override
     public List <GroupGetDTO> getUserGroups(Long userId) {
         return groupRepository.findUserGroups(userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Set <GroupRequestGetDTO> getGroupMemberRequest(Long groupId) {
+        return groupMemberRequestRepository.findGroupMemberRequest(groupId);
     }
 
 }

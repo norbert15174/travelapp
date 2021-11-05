@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.groups.GroupGetDTO;
 import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
+import pl.travel.travelapp.DTO.groups.GroupRequestGetDTO;
 import pl.travel.travelapp.entites.GroupMemberRequest;
 import pl.travel.travelapp.entites.PersonalData;
 import pl.travel.travelapp.entites.UsersGroup;
@@ -28,4 +29,6 @@ public interface IGroupQueryService {
     GroupMemberRequest getGroupMemberRequestByGroupIdAndUserId(Long groupId , Long id);
 
     List<GroupGetDTO> getUserGroups(Long id);
+
+    Set <GroupRequestGetDTO> getGroupMemberRequest(Long groupId);
 }

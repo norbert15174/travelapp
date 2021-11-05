@@ -373,4 +373,19 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         return new ResponseEntity(groupQueryService.getUserGroups(user.getId()) , HttpStatus.OK);
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity <Set <GroupRequestGetDTO>> getGroupMemberRequest(Principal principal , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        try {
+            UsersGroup group = groupQueryService.getGroupById(groupId);
+            if ( !group.getMembers().contains(user) ) {
+                return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+            }
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(groupQueryService.getUserGroups(user.getId()) , HttpStatus.OK);
+    }
+
 }

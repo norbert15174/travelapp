@@ -69,4 +69,16 @@ public class GroupNotification {
         return type.equals(GroupNotificationType.PHOTO_MARKED);
     }
 
+    public boolean isRemoveUser() {
+        return type.equals(GroupNotificationType.REMOVE_USER);
+    }
+
+    public boolean isChangeGroupOwner() {
+        return type.equals(GroupNotificationType.CHANGE_GROUP_OWNER);
+    }
+
+    public boolean isChangeAlbumOwner() {
+        return type.equals(GroupNotificationType.CHANGE_ALBUM_OWNER);
+    }
+
 }

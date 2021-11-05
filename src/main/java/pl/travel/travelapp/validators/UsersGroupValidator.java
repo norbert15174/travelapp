@@ -1,7 +1,12 @@
 package pl.travel.travelapp.validators;
 
+import org.springframework.http.ResponseEntity;
 import pl.travel.travelapp.DTO.groups.GroupCreateDTO;
+import pl.travel.travelapp.DTO.groups.GroupRequestGetDTO;
 import pl.travel.travelapp.entites.ValidationErrors;
+
+import java.security.Principal;
+import java.util.Set;
 
 public abstract class UsersGroupValidator extends BaseValidator {
 
@@ -14,5 +19,4 @@ public abstract class UsersGroupValidator extends BaseValidator {
         }
         return errors;
     }
-
 }

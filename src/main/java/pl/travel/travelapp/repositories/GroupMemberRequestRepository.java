@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pl.travel.travelapp.DTO.groups.GroupRequestDTO;
+import pl.travel.travelapp.DTO.groups.GroupRequestGetDTO;
 import pl.travel.travelapp.entites.GroupMemberRequest;
 
 import java.util.Optional;
@@ -21,4 +22,7 @@ public interface GroupMemberRequestRepository extends JpaRepository <GroupMember
 
     @Query("select gmr from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group g where g.id = :groupId and u.id = :userId and gmr.isMember = true")
     GroupMemberRequest findGroupMemberRequestByGroupIdAndUserId(@Param("groupId") Long groupId , @Param("userId") Long id);
+
+    @Query("select new pl.travel.travelapp.DTO.groups.GroupRequestGetDTO(gmr) from GroupMemberRequest gmr inner join gmr.user u inner join gmr.group g where g.id = :groupId and gmr.isMember = false")
+    Set <GroupRequestGetDTO> findGroupMemberRequest(@Param("groupId") Long groupId);
 }

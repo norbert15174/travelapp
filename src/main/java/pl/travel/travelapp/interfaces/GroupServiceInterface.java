@@ -6,6 +6,7 @@ import pl.travel.travelapp.DTO.groups.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 public interface GroupServiceInterface {
     ResponseEntity <GroupGetDTO> create(GroupCreateDTO group , Principal principal);
@@ -33,4 +34,6 @@ public interface GroupServiceInterface {
     ResponseEntity deleteGroup(Principal principal , Long groupId);
 
     ResponseEntity<List<GroupGetDTO>> getUserGroups(Principal principal);
+
+    ResponseEntity <Set <GroupRequestGetDTO>> getGroupMemberRequest(Principal principal , Long groupId);
 }
