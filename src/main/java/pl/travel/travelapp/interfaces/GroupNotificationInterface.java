@@ -26,4 +26,6 @@ public interface GroupNotificationInterface {
     GroupNotification createRemoveUserFromGroup(UsersGroup group , PersonalData user);
 
     void delete(GroupNotification groupNotification);
+
+    GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId);
 }

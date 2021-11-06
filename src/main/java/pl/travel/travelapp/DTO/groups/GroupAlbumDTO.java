@@ -1,0 +1,48 @@
+package pl.travel.travelapp.DTO.groups;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
+import pl.travel.travelapp.entites.Coordinates;
+import pl.travel.travelapp.entites.GroupAlbum;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class GroupAlbumDTO {
+
+    private Long id;
+    private PersonalInformationDTO albumOwner;
+    private PersonalInformationDTO groupOwner;
+    private List <GroupPhotoAlbumEnterDTO> photos = new ArrayList <>();
+    private String description;
+    private String mainPhoto;
+    private String backgroundPhoto;
+    private Coordinates coordinates;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime time;
+
+    public GroupAlbumDTO(GroupAlbum album) {
+        this.id = album.getId();
+        this.albumOwner = new PersonalInformationDTO(album.getOwner());
+        this.groupOwner = new PersonalInformationDTO(album.getGroup().getOwner());
+        if ( !album.getPhotos().isEmpty() ) {
+            this.photos.addAll(album.getPhotos().stream().map(GroupPhotoAlbumEnterDTO::new).collect(Collectors.toList()));
+        }
+
+        this.description = album.getDescription();
+        this.backgroundPhoto = album.getAlbumBackgroundPhoto();
+        this.coordinates = album.getCoordinate();
+        this.time = album.getDateTime();
+    }
+
+}

@@ -40,6 +40,7 @@ public class GroupNotification {
     private GroupNotificationType type;
     private NotificationGroupStatus status;
     private Long groupRequestId;
+    private Long groupAlbumId;
 
     public boolean isNotificationSeen() {
         return status.equals(NotificationGroupStatus.SEEN);

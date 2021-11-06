@@ -88,5 +88,10 @@ public class GroupNotificationService implements GroupNotificationInterface {
         return create(GroupNotificationCreator.createRemoveUserFromGroup(group , user));
     }
 
+    @Transactional
+    @Override
+    public GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId) {
+        return create(GroupNotificationCreator.createNewAlbum(group , user, albumId));
+    }
 
 }

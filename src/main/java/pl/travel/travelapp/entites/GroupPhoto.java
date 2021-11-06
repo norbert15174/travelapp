@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Setter
@@ -37,14 +38,14 @@ public class GroupPhoto {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set <GroupPhotoTagged> tagged;
+    private Set <GroupPhotoTagged> tagged = new HashSet <>();
 
     @OneToMany(
             mappedBy = "photo",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set <GroupPhotoComments> comments;
+    private Set <GroupPhotoComments> comments = new HashSet <>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
