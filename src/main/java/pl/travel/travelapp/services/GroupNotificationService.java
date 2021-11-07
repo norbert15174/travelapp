@@ -14,6 +14,7 @@ import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
 import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.repositories.GroupNotificationRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,7 +92,36 @@ public class GroupNotificationService implements GroupNotificationInterface {
     @Transactional
     @Override
     public GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId) {
-        return create(GroupNotificationCreator.createNewAlbum(group , user, albumId));
+        return create(GroupNotificationCreator.createNewAlbum(group , user , albumId));
     }
+
+    @Override
+    public GroupNotification changedAlbumOwner(UsersGroup group , PersonalData user , Long albumId , PersonalData groupOwner) {
+        return create(GroupNotificationCreator.changedAlbumOwner(group , user , albumId , groupOwner));
+    }
+
+    @Override
+    public GroupNotification tagUser(UsersGroup group , PersonalData user , Long albumId , Long photoId , PersonalData actionUser) {
+        return create(GroupNotificationCreator.tagUser(group , user , albumId , photoId , actionUser));
+    }
+
+    @Override
+    public void deleteAllByUserIdAndPhotoId(Set <PersonalData> users , Long photoId) {
+        groupNotificationRepository.deleteGroupNotificationByUserIdsAndPhoto(users.stream().map(PersonalData::getId).collect(Collectors.toSet()) , photoId);
+    }
+
+    @Override
+    public void createCommentNotificationIfNeeded(UsersGroup group , PersonalData owner , Long groupAlbumId , Long photoId , PersonalData actionUser) {
+        List <GroupNotification> groupNotifications = groupNotificationRepository.findByUserIdAndPhotoIdAfterDate(owner.getId() , photoId , LocalDateTime.now().minusMinutes(10));
+        if ( !groupNotifications.isEmpty() ) {
+            GroupNotification notification = groupNotifications.get(0);
+            notification.setActionUser(actionUser);
+            notification.setDateTime(LocalDateTime.now());
+            groupNotificationRepository.save(notification);
+            return;
+        }
+        create(GroupNotificationCreator.createCommentNotification(group , owner , groupAlbumId , photoId , actionUser));
+    }
+
 
 }

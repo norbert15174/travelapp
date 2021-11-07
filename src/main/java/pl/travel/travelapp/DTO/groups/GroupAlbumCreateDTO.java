@@ -15,6 +15,7 @@ public class GroupAlbumCreateDTO {
     private String description;
     private String name;
     private CoordinatesDTO coordinates;
+    private Long newOwnerId;
 
     public boolean canBeSave() {
         return !Strings.isNullOrEmpty(description) &&
@@ -25,5 +26,22 @@ public class GroupAlbumCreateDTO {
                 !(coordinates.getLat() > 90 || coordinates.getLat() < -90) &&
                 !Strings.isNullOrEmpty(coordinates.getPlace());
     }
+
+    public boolean hasValidCooridantes() {
+        return coordinates != null &&
+                !Strings.isNullOrEmpty(coordinates.getCountry()) &&
+                !(coordinates.getLang() > 180 || coordinates.getLang() < -180) &&
+                !(coordinates.getLat() > 90 || coordinates.getLat() < -90) &&
+                !Strings.isNullOrEmpty(coordinates.getPlace());
+    }
+
+    public boolean hasName() {
+        return !Strings.isNullOrEmpty(name);
+    }
+
+    public boolean hasDescription() {
+        return !Strings.isNullOrEmpty(description);
+    }
+
 
 }

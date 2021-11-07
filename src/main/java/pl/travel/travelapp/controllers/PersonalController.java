@@ -1,9 +1,7 @@
 package pl.travel.travelapp.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.PersonalDataDTO;
@@ -52,12 +50,12 @@ public class PersonalController {
     }
 
     @GetMapping("/profile/full/{id}")
-    public ResponseEntity<PersonalDataDtoWithIndividualAlbumsDTO> getProfileInformationWithAlbums(@PathVariable("id") long id , Principal principal){
-        return personalService.getUserProfileInformationWithAlbums(principal, id);
+    public ResponseEntity <PersonalDataDtoWithIndividualAlbumsDTO> getProfileInformationWithAlbums(@PathVariable("id") long id , Principal principal) {
+        return personalService.getUserProfileInformationWithAlbums(principal , id);
     }
 
     @GetMapping("/profile/basic")
-    public ResponseEntity<PersonalInformationDTO> getBasicUserInformation(Principal principal){
+    public ResponseEntity <PersonalInformationDTO> getBasicUserInformation(Principal principal) {
         return personalService.getBasicUserInformation(principal);
     }
 }

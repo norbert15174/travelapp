@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pl.travel.travelapp.entites.PersonalData;
 
 import java.util.Optional;
+import java.util.Set;
 
 
 @Repository
@@ -27,4 +28,7 @@ public interface PersonalDataRepository extends JpaRepository <PersonalData, Lon
 
     @Query("SELECT p from PersonalData p left join fetch p.personalDescription left join fetch p.Nationality where p.id = :idUser")
     Optional <PersonalData> findPersonalDataOptionalById(long idUser);
+
+    @Query("SELECT p from PersonalData p left join fetch p.personalDescription left join fetch p.Nationality where p.id in :idUsers")
+    Set <PersonalData> getUsersByIds(Set <Long> idUsers);
 }

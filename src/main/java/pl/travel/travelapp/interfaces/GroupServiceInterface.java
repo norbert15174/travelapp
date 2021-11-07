@@ -36,4 +36,6 @@ public interface GroupServiceInterface {
     ResponseEntity<List<GroupGetDTO>> getUserGroups(Principal principal);
 
     ResponseEntity <Set <GroupRequestGetDTO>> getGroupMemberRequest(Principal principal , Long groupId);
+
+    ResponseEntity <Set <GroupAlbumGetDTO>> getGroupAlbums(Principal principal , Long groupId);
 }

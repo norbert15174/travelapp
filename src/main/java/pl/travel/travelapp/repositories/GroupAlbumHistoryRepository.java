@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface GroupAlbumHistoryRepository extends JpaRepository <GroupAlbumHistory, Long> {
-    @Query("select new pl.travel.travelapp.DTO.groups.GroupAlbumHistoryDTO(h) from GroupAlbumHistory h inner join h.user where h.album.id = :groupAlbumId")
+    @Query("select new pl.travel.travelapp.DTO.groups.GroupAlbumHistoryDTO(h) from GroupAlbumHistory h inner join h.user where h.album.id = :groupAlbumId order by h.dateTime desc")
     List <GroupAlbumHistoryDTO> getAlbumHistoryByGroupAlbumId(@Param("groupAlbumId") Long groupAlbumId , Pageable page);
 }

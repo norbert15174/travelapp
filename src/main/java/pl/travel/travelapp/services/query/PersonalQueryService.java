@@ -63,4 +63,10 @@ public class PersonalQueryService implements IPersonalQueryService {
         return personalDataRepository.findPersonalDataWithAlbumsByUserId(id);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Set <PersonalData> getUsersByIds(Set <Long> usersToTag) {
+        return personalDataRepository.getUsersByIds(usersToTag);
+    }
+
 }

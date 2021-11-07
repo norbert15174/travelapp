@@ -95,4 +95,9 @@ public class GroupController {
         return groupService.getGroupMemberRequest(principal , groupId);
     }
 
+    @GetMapping("/{groupId}/albums")
+    public ResponseEntity <Set <GroupAlbumGetDTO>> getGroupAlbums(Principal principal , @PathVariable(name = "groupId") Long groupId) {
+        return groupService.getGroupAlbums(principal , groupId);
+    }
+
 }

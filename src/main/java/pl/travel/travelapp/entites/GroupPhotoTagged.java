@@ -9,7 +9,6 @@ import javax.persistence.*;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class GroupPhotoTagged {
@@ -21,4 +20,9 @@ public class GroupPhotoTagged {
     private GroupPhoto photo;
     @OneToOne
     private PersonalData tagged;
+
+    public GroupPhotoTagged(GroupPhoto photo , PersonalData tagged) {
+        this.photo = photo;
+        this.tagged = tagged;
+    }
 }

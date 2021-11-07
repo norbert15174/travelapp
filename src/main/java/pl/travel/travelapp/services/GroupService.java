@@ -388,4 +388,24 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         return new ResponseEntity(groupQueryService.getUserGroups(user.getId()) , HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity <Set <GroupAlbumGetDTO>> getGroupAlbums(Principal principal , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        UsersGroup group;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+            if ( !group.getMembers().contains(user) ) {
+                return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+            }
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        if ( !group.getGroupAlbum().isEmpty() ) {
+            Set <GroupAlbumGetDTO> albums = group.getGroupAlbum().stream().map(GroupAlbumGetDTO::new).collect(Collectors.toSet());
+            return new ResponseEntity(albums , HttpStatus.OK);
+        }
+        return new ResponseEntity <>(new HashSet <>() , HttpStatus.OK);
+    }
+
 }

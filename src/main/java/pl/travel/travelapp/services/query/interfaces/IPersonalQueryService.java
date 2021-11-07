@@ -22,4 +22,5 @@ public interface IPersonalQueryService {
 
     PersonalData getPersonalInformationWithAlbums(String username);
 
+    Set<PersonalData> getUsersByIds(Set<Long> usersToTag);
 }

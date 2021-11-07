@@ -33,4 +33,10 @@ public class GroupPhotoComments {
     @JsonProperty("date")
     private LocalDateTime dateTime;
 
+    public GroupPhotoComments(PersonalData user , GroupPhoto photo , String text) {
+        this.photo = photo;
+        this.comment = text;
+        this.commentedBy = user;
+        this.dateTime = LocalDateTime.now();
+    }
 }

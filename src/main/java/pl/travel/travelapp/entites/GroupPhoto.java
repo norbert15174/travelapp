@@ -52,5 +52,14 @@ public class GroupPhoto {
     @JsonProperty("date")
     private LocalDateTime dateTime;
 
+    public void addTagged(GroupPhotoTagged taggedUser) {
+        this.tagged.add(taggedUser);
+        taggedUser.setPhoto(this);
+    }
+
+    public void untag(Set <GroupPhotoTagged> groupPhotoTaggeds) {
+        this.tagged.removeAll(groupPhotoTaggeds);
+    }
+
 
 }
