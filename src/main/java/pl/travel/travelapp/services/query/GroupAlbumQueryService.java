@@ -3,6 +3,7 @@ package pl.travel.travelapp.services.query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.travel.travelapp.DTO.groups.GroupAlbumFullDTO;
 import pl.travel.travelapp.entites.GroupAlbum;
 import pl.travel.travelapp.exceptions.NotFoundException;
 import pl.travel.travelapp.repositories.GroupAlbumRepository;
@@ -24,5 +25,10 @@ public class GroupAlbumQueryService implements IGroupAlbumQueryService {
         return groupAlbumRepository.findById(groupAlbumId).orElseThrow(NotFoundException::new);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public GroupAlbumFullDTO getGroupAlbumByIdWithPhotos(Long groupAlbumId) {
+        return groupAlbumRepository.findGroupAlbumByIdWithPhotos(groupAlbumId);
+    }
 
 }

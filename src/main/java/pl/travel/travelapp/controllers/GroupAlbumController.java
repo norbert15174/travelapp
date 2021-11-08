@@ -3,10 +3,7 @@ package pl.travel.travelapp.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.travel.travelapp.DTO.groups.GroupAlbumCreateDTO;
-import pl.travel.travelapp.DTO.groups.GroupAlbumDTO;
-import pl.travel.travelapp.DTO.groups.GroupAlbumHistoryDTO;
-import pl.travel.travelapp.DTO.groups.GroupPhotoDTO;
+import pl.travel.travelapp.DTO.groups.*;
 import pl.travel.travelapp.interfaces.GroupAlbumInterface;
 import pl.travel.travelapp.interfaces.GroupPhotoInterface;
 
@@ -54,6 +51,11 @@ public class GroupAlbumController {
     @GetMapping("/{groupAlbumId}/photos")
     public ResponseEntity <List <GroupPhotoDTO>> getGroupPhotoByGroupAlbumId(Principal principal , @PathVariable("groupAlbumId") Long groupAlbumId , @RequestParam Integer page) {
         return groupPhotoService.getGroupPhotoByGroupAlbumId(principal , groupAlbumId , page);
+    }
+
+    @GetMapping("/{groupAlbumId}/full")
+    public ResponseEntity<GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , @PathVariable("groupAlbumId") Long groupAlbumId) {
+        return groupAlbumService.getGroupAlbumFullInformation(principal , groupAlbumId);
     }
 
 }

@@ -60,4 +60,5 @@ public class GroupPhotoController {
         return groupPhotoService.addComments(principal , groupPhotoId , commentGroupCreateDTO);
     }
 
+
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.groups.GroupAlbumCreateDTO;
 import pl.travel.travelapp.DTO.groups.GroupAlbumDTO;
+import pl.travel.travelapp.DTO.groups.GroupAlbumFullDTO;
 import pl.travel.travelapp.DTO.groups.GroupAlbumHistoryDTO;
 import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.exceptions.NotFoundException;
@@ -225,6 +226,22 @@ public class GroupAlbumService implements GroupAlbumInterface {
         GroupAlbum created = groupAlbumSaveService.save(groupAlbum);
         groupAlbumHistoryService.setGroupAlbumBackgroundPicture(groupAlbum , user);
         return new ResponseEntity <>(new GroupAlbumDTO(created) , HttpStatus.OK);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity <GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , Long groupAlbumId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        GroupAlbum album;
+        try {
+            album = groupAlbumQueryService.getGroupAlbumById(groupAlbumId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        if ( !album.getGroup().getMembers().contains(user) ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity <>(groupAlbumQueryService.getGroupAlbumByIdWithPhotos(groupAlbumId) , HttpStatus.OK);
     }
 
 }

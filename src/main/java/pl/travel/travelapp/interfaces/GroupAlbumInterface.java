@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import pl.travel.travelapp.DTO.groups.GroupAlbumCreateDTO;
 import pl.travel.travelapp.DTO.groups.GroupAlbumDTO;
+import pl.travel.travelapp.DTO.groups.GroupAlbumFullDTO;
 import pl.travel.travelapp.DTO.groups.GroupAlbumHistoryDTO;
 
 import java.security.Principal;
@@ -19,4 +20,6 @@ public interface GroupAlbumInterface {
     ResponseEntity <GroupAlbumDTO> setMainAlbumPhoto(Principal principal , MultipartFile file , Long groupAlbumId);
 
     ResponseEntity <GroupAlbumDTO> setBackgroundAlbumPhoto(Principal principal , MultipartFile file , Long groupAlbumId);
+
+    ResponseEntity<GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , Long groupAlbumId);
 }

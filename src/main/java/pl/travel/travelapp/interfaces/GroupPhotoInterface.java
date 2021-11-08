@@ -3,10 +3,7 @@ package pl.travel.travelapp.interfaces;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import pl.travel.travelapp.DTO.groups.CommentGroupCreateDTO;
-import pl.travel.travelapp.DTO.groups.GroupCommentsDTO;
-import pl.travel.travelapp.DTO.groups.GroupPhotoAlbumEnterDTO;
-import pl.travel.travelapp.DTO.groups.GroupPhotoDTO;
+import pl.travel.travelapp.DTO.groups.*;
 
 import java.security.Principal;
 import java.util.List;
