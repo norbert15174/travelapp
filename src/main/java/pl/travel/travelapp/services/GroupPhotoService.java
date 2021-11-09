@@ -88,7 +88,7 @@ public class GroupPhotoService implements GroupPhotoInterface {
             } catch ( IOException e ) {
                 return new ResponseEntity <>(HttpStatus.NOT_MODIFIED);
             }
-            photo.setPhoto(photoUrl);
+            photo.setPhoto(url + photoUrl);
             groupPhotos.add(photo);
         }
         Set <GroupPhotoAlbumEnterDTO> crated = groupPhotoSaveService.saveAll(groupPhotos);
@@ -120,7 +120,7 @@ public class GroupPhotoService implements GroupPhotoInterface {
         } catch ( IOException e ) {
             return new ResponseEntity <>(HttpStatus.NOT_MODIFIED);
         }
-        photo.setPhoto(photoUrl);
+        photo.setPhoto(url + photoUrl);
         photo.setDescription(description);
         GroupPhotoAlbumEnterDTO crated = groupPhotoSaveService.save(photo);
         groupAlbumHistoryService.addNewPhoto(groupAlbum , user);
@@ -207,7 +207,7 @@ public class GroupPhotoService implements GroupPhotoInterface {
                     GroupPhotoTagged tagged = new GroupPhotoTagged(photo , userToTag);
                     GroupPhotoTagged created = groupPhotoSaveService.saveTagged(tagged);
                     photo.addTagged(created);
-                    groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId(), user);
+                    groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId() , user);
                 }
             }
         } else {
@@ -218,7 +218,7 @@ public class GroupPhotoService implements GroupPhotoInterface {
                 GroupPhotoTagged tagged = new GroupPhotoTagged(photo , userToTag);
                 GroupPhotoTagged created = groupPhotoSaveService.saveTagged(tagged);
                 photo.addTagged(created);
-                groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId(), user);
+                groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId() , user);
             }
         }
 
@@ -285,7 +285,7 @@ public class GroupPhotoService implements GroupPhotoInterface {
 
 
     private String addPhoto(MultipartFile file , String groupName , Long groupId , Long albumId) throws IOException {
-        String path = "group/" + groupName + "/id/" + groupId + "/picture/album/" + albumId + "/" + file.getOriginalFilename();
+        String path = "group/id/" + groupId + "/picture/album/" + albumId + "/" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket , path);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
         storage.create(blobInfo , file.getBytes());
