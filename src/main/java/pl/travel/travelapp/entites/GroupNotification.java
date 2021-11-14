@@ -42,6 +42,7 @@ public class GroupNotification {
     private Long groupRequestId;
     private Long groupAlbumId;
     private Long groupPhotoId;
+    private String albumName;
 
     public boolean isNotificationSeen() {
         return status.equals(NotificationGroupStatus.SEEN);

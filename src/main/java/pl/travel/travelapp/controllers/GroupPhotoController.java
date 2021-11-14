@@ -60,5 +60,9 @@ public class GroupPhotoController {
         return groupPhotoService.addComments(principal , groupPhotoId , commentGroupCreateDTO);
     }
 
+    @DeleteMapping("/{groupPhotoId}")
+    public ResponseEntity deletePhoto(Principal principal , @PathVariable("groupPhotoId") Long groupPhotoId) {
+        return groupPhotoService.deletePhoto(principal , groupPhotoId);
+    }
 
 }

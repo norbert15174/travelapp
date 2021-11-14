@@ -21,6 +21,7 @@ import pl.travel.travelapp.interfaces.GroupAlbumInterface;
 import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.repositories.CoordinatesRepository;
 import pl.travel.travelapp.repositories.CountryRepository;
+import pl.travel.travelapp.services.delete.interfaces.IGroupAlbumDeleteService;
 import pl.travel.travelapp.services.delete.interfaces.IGroupDeleteService;
 import pl.travel.travelapp.services.query.interfaces.IGroupAlbumQueryService;
 import pl.travel.travelapp.services.query.interfaces.IGroupPhotoQueryService;
@@ -54,8 +55,9 @@ public class GroupAlbumService implements GroupAlbumInterface {
     private final GroupAlbumHistoryInterface groupAlbumHistoryService;
     private final IGroupAlbumSaveService groupAlbumSaveService;
     private final IGroupAlbumQueryService groupAlbumQueryService;
+    private final IGroupAlbumDeleteService groupAlbumDeleteService;
 
-    public GroupAlbumService(IGroupPhotoQueryService groupPhotoQueryService , IGroupPhotoSaveService groupPhotoSaveService , IGroupDeleteService groupDeleteService , GroupNotificationInterface groupNotificationInterface , IGroupQueryService groupQueryService , IPersonalQueryService personalQueryService , CoordinatesRepository coordinatesRepository , CountryRepository countryRepository , GroupAlbumHistoryInterface groupAlbumHistoryService , IGroupAlbumSaveService groupAlbumSaveService , IGroupAlbumQueryService groupAlbumQueryService) {
+    public GroupAlbumService(IGroupPhotoQueryService groupPhotoQueryService , IGroupPhotoSaveService groupPhotoSaveService , IGroupDeleteService groupDeleteService , GroupNotificationInterface groupNotificationInterface , IGroupQueryService groupQueryService , IPersonalQueryService personalQueryService , CoordinatesRepository coordinatesRepository , CountryRepository countryRepository , GroupAlbumHistoryInterface groupAlbumHistoryService , IGroupAlbumSaveService groupAlbumSaveService , IGroupAlbumQueryService groupAlbumQueryService , IGroupAlbumDeleteService groupAlbumDeleteService) {
         this.groupPhotoQueryService = groupPhotoQueryService;
         this.groupPhotoSaveService = groupPhotoSaveService;
         this.groupDeleteService = groupDeleteService;
@@ -67,6 +69,7 @@ public class GroupAlbumService implements GroupAlbumInterface {
         this.groupAlbumHistoryService = groupAlbumHistoryService;
         this.groupAlbumSaveService = groupAlbumSaveService;
         this.groupAlbumQueryService = groupAlbumQueryService;
+        this.groupAlbumDeleteService = groupAlbumDeleteService;
     }
 
     @Transactional
@@ -243,6 +246,28 @@ public class GroupAlbumService implements GroupAlbumInterface {
             return new ResponseEntity <>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity <>(groupAlbumQueryService.getGroupAlbumByIdWithPhotos(groupAlbumId) , HttpStatus.OK);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity deleteAlbum(Principal principal , Long groupAlbumId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        GroupAlbum groupAlbum;
+        try {
+            groupAlbum = groupAlbumQueryService.getGroupAlbumById(groupAlbumId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
+        }
+        if ( !groupAlbum.getOwner().equals(user) && !groupAlbum.getGroup().getOwner().equals(user) ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        for (PersonalData userNotification : groupAlbum.getGroup().getMembers()) {
+            if ( !userNotification.equals(user) ) {
+                groupNotificationInterface.deleteAlbum(groupAlbum.getGroup() , userNotification , groupAlbum , user);
+            }
+        }
+        groupAlbumDeleteService.delete(groupAlbum);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }

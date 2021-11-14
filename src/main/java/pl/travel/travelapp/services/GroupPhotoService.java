@@ -288,6 +288,23 @@ public class GroupPhotoService implements GroupPhotoInterface, GroupChangeInterf
         return new ResponseEntity(groupComments , HttpStatus.CREATED);
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity deletePhoto(Principal principal, Long groupPhotoId){
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        GroupPhoto photo;
+        try {
+            photo = groupPhotoQueryService.getPhotoById(groupPhotoId);
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        if ( !photo.getOwner().equals(user) && !photo.getAlbum().getOwner().equals(user) && !photo.getAlbum().getGroup().getOwner().equals(user) ) {
+            return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+        }
+        groupPhotoDeleteService.delete(photo);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
     private String addPhoto(MultipartFile file , String groupName , Long groupId , Long albumId) throws IOException {
         String path = "group/id/" + groupId + "/picture/album/" + albumId + "/" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket , path);

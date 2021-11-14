@@ -1,10 +1,7 @@
 package pl.travel.travelapp.interfaces;
 
 import pl.travel.travelapp.DTO.groups.GroupNotificationDTO;
-import pl.travel.travelapp.entites.GroupMemberRequest;
-import pl.travel.travelapp.entites.GroupNotification;
-import pl.travel.travelapp.entites.PersonalData;
-import pl.travel.travelapp.entites.UsersGroup;
+import pl.travel.travelapp.entites.*;
 
 import java.util.List;
 import java.util.Set;
@@ -36,4 +33,6 @@ public interface GroupNotificationInterface {
     void deleteAllByUserIdAndPhotoId(Set <PersonalData> collect , Long photoId);
 
     void createCommentNotificationIfNeeded(UsersGroup group , PersonalData owner , Long id , Long id1, PersonalData actionUser);
+
+    void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum,  PersonalData user);
 }

@@ -25,4 +25,6 @@ public interface GroupPhotoInterface {
     ResponseEntity <GroupPhotoDTO> unTagUsers(Principal principal , Long photoId , Set <Long> usersToUntag);
 
     ResponseEntity <GroupCommentsDTO> addComments(Principal principal , Long photoId , CommentGroupCreateDTO commentGroupCreateDTO);
+
+    ResponseEntity deletePhoto(Principal principal , Long groupPhotoId);
 }

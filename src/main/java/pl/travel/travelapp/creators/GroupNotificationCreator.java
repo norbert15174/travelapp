@@ -1,9 +1,6 @@
 package pl.travel.travelapp.creators;
 
-import pl.travel.travelapp.entites.GroupMemberRequest;
-import pl.travel.travelapp.entites.GroupNotification;
-import pl.travel.travelapp.entites.PersonalData;
-import pl.travel.travelapp.entites.UsersGroup;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.entites.enums.GroupNotificationType;
 import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
 
@@ -41,6 +38,13 @@ public class GroupNotificationCreator {
         return groupNotification;
     }
 
+    public static GroupNotification createCommentNotification(UsersGroup group , PersonalData owner , Long groupAlbumId , Long photoId , PersonalData actionUser) {
+        GroupNotification groupNotification = create(group , owner , GroupNotificationType.PHOTO_COMMENT , actionUser);
+        groupNotification.setGroupAlbumId(groupAlbumId);
+        groupNotification.setGroupPhotoId(photoId);
+        return groupNotification;
+    }
+
     private static GroupNotification create(UsersGroup group , PersonalData user , GroupNotificationType type , PersonalData actionUser) {
         GroupNotification groupNotification = new GroupNotification();
         groupNotification.setActionUser(actionUser);
@@ -52,11 +56,9 @@ public class GroupNotificationCreator {
         return groupNotification;
     }
 
-
-    public static GroupNotification createCommentNotification(UsersGroup group , PersonalData owner , Long groupAlbumId , Long photoId , PersonalData actionUser) {
-        GroupNotification groupNotification = create(group , owner , GroupNotificationType.PHOTO_COMMENT , actionUser);
-        groupNotification.setGroupAlbumId(groupAlbumId);
-        groupNotification.setGroupPhotoId(photoId);
+    public static GroupNotification deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum , PersonalData user) {
+        GroupNotification groupNotification = create(group , userNotification , GroupNotificationType.DELETE_ALBUM , user);
+        groupNotification.setAlbumName(groupAlbum.getName());
         return groupNotification;
     }
 }

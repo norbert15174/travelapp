@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.travel.travelapp.DTO.groups.GroupNotificationDTO;
 import pl.travel.travelapp.creators.GroupNotificationCreator;
-import pl.travel.travelapp.entites.GroupMemberRequest;
-import pl.travel.travelapp.entites.GroupNotification;
-import pl.travel.travelapp.entites.PersonalData;
-import pl.travel.travelapp.entites.UsersGroup;
+import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
 import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.repositories.GroupNotificationRepository;
@@ -121,6 +118,11 @@ public class GroupNotificationService implements GroupNotificationInterface {
             return;
         }
         create(GroupNotificationCreator.createCommentNotification(group , owner , groupAlbumId , photoId , actionUser));
+    }
+
+    @Override
+    public void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum, PersonalData user) {
+        create(GroupNotificationCreator.deleteAlbum(group, userNotification, groupAlbum, user));
     }
 
 

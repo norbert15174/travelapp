@@ -58,4 +58,9 @@ public class GroupAlbumController {
         return groupAlbumService.getGroupAlbumFullInformation(principal , groupAlbumId);
     }
 
+    @DeleteMapping("/{groupAlbumId}")
+    public ResponseEntity deleteAlbumById(Principal principal , @PathVariable("groupAlbumId") Long groupAlbumId) {
+        return groupAlbumService.deleteAlbum(principal , groupAlbumId);
+    }
+
 }

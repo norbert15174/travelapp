@@ -22,4 +22,6 @@ public interface GroupAlbumInterface {
     ResponseEntity <GroupAlbumDTO> setBackgroundAlbumPhoto(Principal principal , MultipartFile file , Long groupAlbumId);
 
     ResponseEntity<GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , Long groupAlbumId);
+
+    ResponseEntity deleteAlbum(Principal principal , Long groupAlbumId);
 }
