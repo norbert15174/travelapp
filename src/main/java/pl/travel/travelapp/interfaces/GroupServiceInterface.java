@@ -2,6 +2,7 @@ package pl.travel.travelapp.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.DTO.groups.*;
 
 import java.security.Principal;
@@ -38,4 +39,6 @@ public interface GroupServiceInterface {
     ResponseEntity <Set <GroupRequestGetDTO>> getGroupMemberRequest(Principal principal , Long groupId);
 
     ResponseEntity <Set <GroupAlbumGetDTO>> getGroupAlbums(Principal principal , Long groupId);
+
+    ResponseEntity <Set <PersonalInformationDTO>> getGroupMembers(Principal principal , Long groupId);
 }

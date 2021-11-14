@@ -24,6 +24,7 @@ public class GroupAlbumGetDTO {
     private String mainPhoto;
     private String backgroundPhoto;
     private Coordinates coordinate;
+    private Long groupId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime time;
 
@@ -36,6 +37,7 @@ public class GroupAlbumGetDTO {
         this.mainPhoto = album.getAlbumMainPhoto();
         this.coordinate = album.getCoordinate();
         this.time = album.getDateTime();
+        this.groupId = album.getGroup().getId();
     }
 
 }

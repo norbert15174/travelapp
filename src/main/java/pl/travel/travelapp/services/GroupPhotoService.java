@@ -19,6 +19,7 @@ import pl.travel.travelapp.DTO.groups.GroupPhotoDTO;
 import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.exceptions.NotFoundException;
 import pl.travel.travelapp.interfaces.GroupAlbumHistoryInterface;
+import pl.travel.travelapp.interfaces.GroupChangeInterface;
 import pl.travel.travelapp.interfaces.GroupNotificationInterface;
 import pl.travel.travelapp.interfaces.GroupPhotoInterface;
 import pl.travel.travelapp.services.delete.interfaces.IGroupPhotoDeleteService;
@@ -36,7 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class GroupPhotoService implements GroupPhotoInterface {
+public class GroupPhotoService implements GroupPhotoInterface, GroupChangeInterface {
 
     Storage storage = StorageOptions.getDefaultInstance().getService();
     @Value("${bucket-name}")
@@ -218,7 +219,9 @@ public class GroupPhotoService implements GroupPhotoInterface {
                 GroupPhotoTagged tagged = new GroupPhotoTagged(photo , userToTag);
                 GroupPhotoTagged created = groupPhotoSaveService.saveTagged(tagged);
                 photo.addTagged(created);
-                groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId() , user);
+                if ( !user.equals(photo.getOwner()) ) {
+                    groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId() , user);
+                }
             }
         }
 
@@ -277,12 +280,13 @@ public class GroupPhotoService implements GroupPhotoInterface {
         }
         GroupPhotoComments comment = new GroupPhotoComments(user , photo , commentGroupCreateDTO.getText());
         groupPhotoSaveService.saveComment(comment);
-        groupNotificationService.createCommentNotificationIfNeeded(photo.getAlbum().getGroup() , photo.getAlbum().getOwner() , photo.getAlbum().getId() , photo.getId() , user);
+        if ( !user.equals(photo.getOwner()) ) {
+            groupNotificationService.createCommentNotificationIfNeeded(photo.getAlbum().getGroup() , photo.getAlbum().getOwner() , photo.getAlbum().getId() , photo.getId() , user);
+        }
 
         List <GroupCommentsDTO> groupComments = groupPhotoQueryService.getPhotoCommentsByPhotoId(photoId);
         return new ResponseEntity(groupComments , HttpStatus.CREATED);
     }
-
 
     private String addPhoto(MultipartFile file , String groupName , Long groupId , Long albumId) throws IOException {
         String path = "group/id/" + groupId + "/picture/album/" + albumId + "/" + file.getOriginalFilename();

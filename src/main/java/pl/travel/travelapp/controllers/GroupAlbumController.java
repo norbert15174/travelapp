@@ -28,9 +28,9 @@ public class GroupAlbumController {
         return groupAlbumService.create(principal , model , groupId);
     }
 
-    @PutMapping("/{groupId}")
-    public ResponseEntity <GroupAlbumDTO> update(Principal principal , @RequestBody GroupAlbumCreateDTO model , @PathVariable(name = "groupId") Long groupId) {
-        return groupAlbumService.update(principal , model , groupId);
+    @PutMapping("/{groupAlbumId }")
+    public ResponseEntity <GroupAlbumDTO> update(Principal principal , @RequestBody GroupAlbumCreateDTO model , @PathVariable(name = "groupAlbumId ") Long groupAlbumId) {
+        return groupAlbumService.update(principal , model , groupAlbumId);
     }
 
     @GetMapping("/history/{groupAlbumId}")
@@ -54,7 +54,7 @@ public class GroupAlbumController {
     }
 
     @GetMapping("/{groupAlbumId}/full")
-    public ResponseEntity<GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , @PathVariable("groupAlbumId") Long groupAlbumId) {
+    public ResponseEntity <GroupAlbumFullDTO> getGroupAlbumFullInformation(Principal principal , @PathVariable("groupAlbumId") Long groupAlbumId) {
         return groupAlbumService.getGroupAlbumFullInformation(principal , groupAlbumId);
     }
 

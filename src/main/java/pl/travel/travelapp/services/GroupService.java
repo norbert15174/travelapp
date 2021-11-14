@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.DTO.groups.*;
 import pl.travel.travelapp.entites.*;
 import pl.travel.travelapp.entites.enums.NotificationGroupStatus;
@@ -22,6 +23,8 @@ import pl.travel.travelapp.services.delete.interfaces.IGroupDeleteService;
 import pl.travel.travelapp.services.query.interfaces.IFriendsQueryService;
 import pl.travel.travelapp.services.query.interfaces.IGroupQueryService;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
+import pl.travel.travelapp.services.save.interfaces.IGroupAlbumSaveService;
+import pl.travel.travelapp.services.save.interfaces.IGroupPhotoSaveService;
 import pl.travel.travelapp.services.save.interfaces.IGroupSaveService;
 import pl.travel.travelapp.services.save.interfaces.IPersonalDataSaveService;
 import pl.travel.travelapp.validators.UsersGroupValidator;
@@ -50,9 +53,11 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
     private final IFriendsQueryService friendsQueryService;
     private final GroupNotificationInterface groupNotificationService;
     private final IGroupDeleteService groupDeleteService;
+    private final IGroupPhotoSaveService photoSaveService;
+    private final IGroupAlbumSaveService groupAlbumSaveService;
 
     @Autowired
-    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService , GroupNotificationInterface groupNotificationService , IGroupDeleteService groupDeleteService) {
+    public GroupService(IPersonalQueryService personalQueryService , IPersonalDataSaveService personalDataSaveService , IGroupSaveService groupSaveService , IGroupQueryService groupQueryService , IFriendsQueryService friendsQueryService , GroupNotificationInterface groupNotificationService , IGroupDeleteService groupDeleteService , IGroupPhotoSaveService photoSaveService , IGroupAlbumSaveService groupAlbumSaveService) {
         this.personalQueryService = personalQueryService;
         this.personalDataSaveService = personalDataSaveService;
         this.groupSaveService = groupSaveService;
@@ -60,6 +65,8 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         this.friendsQueryService = friendsQueryService;
         this.groupNotificationService = groupNotificationService;
         this.groupDeleteService = groupDeleteService;
+        this.photoSaveService = photoSaveService;
+        this.groupAlbumSaveService = groupAlbumSaveService;
     }
 
     @Transactional
@@ -126,6 +133,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
                 if ( request != null ) {
                     groupDeleteService.deleteMemberRequest(request.getId());
                 }
+                changeAlbumAndPhotoOwner(groupToUpdate , member);
             }
             personalDataSaveService.updateAll(membersToDelete);
         }
@@ -342,6 +350,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         if ( request != null ) {
             groupDeleteService.deleteMemberRequest(request.getId());
         }
+        changeAlbumAndPhotoOwner(group , removeUser);
         return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
     }
 
@@ -406,6 +415,46 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
             return new ResponseEntity(albums , HttpStatus.OK);
         }
         return new ResponseEntity <>(new HashSet <>() , HttpStatus.OK);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity <Set <PersonalInformationDTO>> getGroupMembers(Principal principal , Long groupId) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        UsersGroup group;
+        try {
+            group = groupQueryService.getGroupById(groupId);
+            if ( !group.getMembers().contains(user) ) {
+                return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+            }
+        } catch ( NotFoundException e ) {
+            return new ResponseEntity <>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity <>(group.getMembers().stream().map(PersonalInformationDTO::new).collect(Collectors.toSet()) , HttpStatus.OK);
+    }
+
+    private void changeAlbumAndPhotoOwner(UsersGroup group , PersonalData owner) {
+        Set <GroupAlbum> groupAlbumsToChange = new HashSet <>();
+        Set <GroupPhoto> groupPhotosToChange = new HashSet <>();
+        PersonalData groupOwner = group.getOwner();
+        for (GroupAlbum groupAlbum : group.getGroupAlbum()) {
+            if ( groupAlbum.getOwner().equals(owner) ) {
+                groupAlbum.setOwner(groupOwner);
+                groupAlbumsToChange.add(groupAlbum);
+            }
+            for (GroupPhoto photo : groupAlbum.getPhotos()) {
+                if ( photo.getOwner().equals(owner) ) {
+                    photo.setOwner(groupOwner);
+                    groupPhotosToChange.add(photo);
+                }
+            }
+        }
+        if ( !groupAlbumsToChange.isEmpty() ) {
+            groupAlbumSaveService.saveAll(groupAlbumsToChange);
+        }
+        if ( !groupPhotosToChange.isEmpty() ) {
+            photoSaveService.saveAll(groupPhotosToChange);
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.DTO.groups.*;
 import pl.travel.travelapp.interfaces.GroupServiceInterface;
 
@@ -98,6 +99,11 @@ public class GroupController {
     @GetMapping("/{groupId}/albums")
     public ResponseEntity <Set <GroupAlbumGetDTO>> getGroupAlbums(Principal principal , @PathVariable(name = "groupId") Long groupId) {
         return groupService.getGroupAlbums(principal , groupId);
+    }
+
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity <Set <PersonalInformationDTO>> getGroupMembers(Principal principal , @PathVariable(name = "groupId") Long groupId) {
+        return groupService.getGroupMembers(principal , groupId);
     }
 
 }

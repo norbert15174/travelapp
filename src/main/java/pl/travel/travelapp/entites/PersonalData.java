@@ -1,6 +1,9 @@
 package pl.travel.travelapp.entites;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -16,9 +19,9 @@ public class PersonalData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(min = 3 , max = 20)
+    @Size(min = 3, max = 20)
     private String firstName;
-    @Size(min = 3 , max = 20)
+    @Size(min = 3, max = 20)
     private String surName;
     private long phoneNumber;
     private String profilePicture;
@@ -38,21 +41,21 @@ public class PersonalData {
     private Set <UsersGroup> groups = new HashSet <>();
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<IndividualAlbum> albums = new ArrayList();
+    private List <IndividualAlbum> albums = new ArrayList();
 
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<GroupMemberRequest> groupMemberRequests;
+    private Set <GroupMemberRequest> groupMemberRequests;
 
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<GroupNotification> groupNotifications;
+    private Set <GroupNotification> groupNotifications;
 
 
     public void addGroup(UsersGroup group) {
@@ -75,4 +78,16 @@ public class PersonalData {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if ( this == o ) return true;
+        if ( o == null || getClass() != o.getClass() ) return false;
+        PersonalData that = (PersonalData) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

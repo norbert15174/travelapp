@@ -40,6 +40,8 @@ public class GroupNotificationDTO {
         this.type = groupNotification.getType();
         this.status = groupNotification.getStatus();
         this.groupRequestId = groupNotification.getGroupRequestId();
+        this.pictureId = groupNotification.getGroupPhotoId();
+        this.groupAlbumId = groupNotification.getGroupAlbumId();
     }
 
 }

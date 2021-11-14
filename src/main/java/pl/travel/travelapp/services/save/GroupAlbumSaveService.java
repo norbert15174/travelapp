@@ -6,6 +6,8 @@ import pl.travel.travelapp.entites.GroupAlbum;
 import pl.travel.travelapp.repositories.GroupAlbumRepository;
 import pl.travel.travelapp.services.save.interfaces.IGroupAlbumSaveService;
 
+import java.util.Set;
+
 @Service
 public class GroupAlbumSaveService implements IGroupAlbumSaveService {
 
@@ -19,6 +21,12 @@ public class GroupAlbumSaveService implements IGroupAlbumSaveService {
     @Override
     public GroupAlbum save(GroupAlbum album) {
         return groupAlbumRepository.save(album);
+    }
+
+    @Transactional
+    @Override
+    public void saveAll(Set <GroupAlbum> groupAlbumsToChange) {
+        groupAlbumRepository.saveAll(groupAlbumsToChange);
     }
 
 }

@@ -124,6 +124,7 @@ public class GroupAlbumService implements GroupAlbumInterface {
                 return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
             }
             Coordinates coordinate = new Coordinates(model.getCoordinates() , country.get());
+            groupAlbum.setCoordinate(coordinate);
         }
         if ( model.hasName() ) {
             groupAlbum.setName(model.getName());
