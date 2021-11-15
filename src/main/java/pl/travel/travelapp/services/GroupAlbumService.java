@@ -108,7 +108,7 @@ public class GroupAlbumService implements GroupAlbumInterface {
     @Transactional
     @Override
     public ResponseEntity <GroupAlbumDTO> update(Principal principal , GroupAlbumCreateDTO model , Long groupAlbumId) {
-        if ( !(model.hasValidCooridantes() || model.hasDescription() || model.hasName()) ) {
+        if ( !(model.hasValidCooridantes() || model.hasDescription() || model.hasName() || (model.getNewOwnerId() != null && model.getNewOwnerId() > 0)) ) {
             return new ResponseEntity <>(HttpStatus.BAD_REQUEST);
         }
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
