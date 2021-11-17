@@ -65,4 +65,9 @@ public class GroupPhotoController {
         return groupPhotoService.deletePhoto(principal , groupPhotoId);
     }
 
+    @DeleteMapping("/photos")
+    public ResponseEntity deletePhoto(Principal principal , @RequestBody Set <Long> photosIds) {
+        return groupPhotoService.deletePhotos(principal , photosIds);
+    }
+
 }

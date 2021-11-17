@@ -305,6 +305,23 @@ public class GroupPhotoService implements GroupPhotoInterface, GroupChangeInterf
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity deletePhotos(Principal principal , Set <Long> groupPhotoIds) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        Set <GroupPhoto> photos = groupPhotoQueryService.getPhotosByIds(groupPhotoIds);
+        Set <GroupPhoto> photosToDelete = new HashSet <>();
+        for (GroupPhoto photo : photos) {
+            if ( !photo.getOwner().equals(user) && !photo.getAlbum().getOwner().equals(user) && !photo.getAlbum().getGroup().getOwner().equals(user) ) {
+                return new ResponseEntity <>(HttpStatus.FORBIDDEN);
+            }
+            photosToDelete.add(photo);
+
+        }
+        groupPhotoDeleteService.deleteAll(photos);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
     private String addPhoto(MultipartFile file , String groupName , Long groupId , Long albumId) throws IOException {
         String path = "group/id/" + groupId + "/picture/album/" + albumId + "/" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucket , path);

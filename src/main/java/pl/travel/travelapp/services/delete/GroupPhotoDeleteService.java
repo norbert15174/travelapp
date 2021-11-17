@@ -29,4 +29,9 @@ public class GroupPhotoDeleteService implements IGroupPhotoDeleteService {
     public void delete(GroupPhoto photo) {
         groupPhotoRepository.delete(photo);
     }
+
+    @Override
+    public void deleteAll(Set <GroupPhoto> photos) {
+        groupPhotoRepository.deleteAll(photos);
+    }
 }

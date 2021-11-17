@@ -1,5 +1,6 @@
 package pl.travel.travelapp.services.query;
 
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import pl.travel.travelapp.repositories.GroupPhotoRepository;
 import pl.travel.travelapp.services.query.interfaces.IGroupPhotoQueryService;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GroupPhotoQueryService implements IGroupPhotoQueryService {
@@ -41,5 +43,10 @@ public class GroupPhotoQueryService implements IGroupPhotoQueryService {
     @Override
     public List <GroupCommentsDTO> getPhotoCommentsByPhotoId(Long photoId) {
         return groupPhotoCommentRepository.findPhotoCommentsByPhotoId(photoId);
+    }
+
+    @Override
+    public Set <GroupPhoto> getPhotosByIds(Set <Long> groupPhotoIds) {
+        return Sets.newHashSet(groupPhotoRepository.findAllById(groupPhotoIds));
     }
 }

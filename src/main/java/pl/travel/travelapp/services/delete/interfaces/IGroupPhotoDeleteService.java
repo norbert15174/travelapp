@@ -9,4 +9,6 @@ public interface IGroupPhotoDeleteService {
     void untag(Set<GroupPhotoTagged> untag);
 
     void delete(GroupPhoto photo);
+
+    void deleteAll(Set<GroupPhoto> photos);
 }

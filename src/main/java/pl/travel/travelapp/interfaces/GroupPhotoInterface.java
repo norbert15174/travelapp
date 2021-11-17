@@ -27,4 +27,6 @@ public interface GroupPhotoInterface {
     ResponseEntity <GroupCommentsDTO> addComments(Principal principal , Long photoId , CommentGroupCreateDTO commentGroupCreateDTO);
 
     ResponseEntity deletePhoto(Principal principal , Long groupPhotoId);
+
+    ResponseEntity deletePhotos(Principal principal , Set <Long> groupPhotoIds);
 }
