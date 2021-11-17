@@ -394,7 +394,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
         } catch ( NotFoundException e ) {
             return new ResponseEntity <>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(groupQueryService.getUserGroups(user.getId()) , HttpStatus.OK);
+        return new ResponseEntity(groupQueryService.getGroupMemberRequest(groupId) , HttpStatus.OK);
     }
 
     @Transactional(readOnly = true)

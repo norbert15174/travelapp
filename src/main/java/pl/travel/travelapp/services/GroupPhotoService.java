@@ -219,7 +219,7 @@ public class GroupPhotoService implements GroupPhotoInterface, GroupChangeInterf
                 GroupPhotoTagged tagged = new GroupPhotoTagged(photo , userToTag);
                 GroupPhotoTagged created = groupPhotoSaveService.saveTagged(tagged);
                 photo.addTagged(created);
-                if ( !user.equals(photo.getOwner()) ) {
+                if ( !userToTag.equals(photo.getOwner()) ) {
                     groupNotificationService.tagUser(photo.getAlbum().getGroup() , created.getTagged() , photo.getAlbum().getId() , photo.getId() , user);
                 }
             }
@@ -290,7 +290,7 @@ public class GroupPhotoService implements GroupPhotoInterface, GroupChangeInterf
 
     @Transactional
     @Override
-    public ResponseEntity deletePhoto(Principal principal, Long groupPhotoId){
+    public ResponseEntity deletePhoto(Principal principal , Long groupPhotoId) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         GroupPhoto photo;
         try {

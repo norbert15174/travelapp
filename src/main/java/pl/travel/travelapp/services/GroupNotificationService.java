@@ -88,8 +88,8 @@ public class GroupNotificationService implements GroupNotificationInterface {
 
     @Transactional
     @Override
-    public GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId) {
-        return create(GroupNotificationCreator.createNewAlbum(group , user , albumId));
+    public GroupNotification createNewAlbum(UsersGroup group , PersonalData user , PersonalData actionUser , Long albumId) {
+        return create(GroupNotificationCreator.createNewAlbum(group , user , actionUser , albumId));
     }
 
     @Override
@@ -121,8 +121,8 @@ public class GroupNotificationService implements GroupNotificationInterface {
     }
 
     @Override
-    public void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum, PersonalData user) {
-        create(GroupNotificationCreator.deleteAlbum(group, userNotification, groupAlbum, user));
+    public void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum , PersonalData user) {
+        create(GroupNotificationCreator.deleteAlbum(group , userNotification , groupAlbum , user));
     }
 
 

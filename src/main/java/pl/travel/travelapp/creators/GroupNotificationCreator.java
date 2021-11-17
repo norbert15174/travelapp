@@ -19,8 +19,8 @@ public class GroupNotificationCreator {
         return create(group , user , GroupNotificationType.REMOVE_USER , group.getOwner());
     }
 
-    public static GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId) {
-        GroupNotification groupNotification = create(group , user , GroupNotificationType.NEW_ALBUM , group.getOwner());
+    public static GroupNotification createNewAlbum(UsersGroup group , PersonalData user , PersonalData actionUser , Long albumId) {
+        GroupNotification groupNotification = create(group , user , GroupNotificationType.NEW_ALBUM , actionUser);
         groupNotification.setGroupAlbumId(albumId);
         return groupNotification;
     }

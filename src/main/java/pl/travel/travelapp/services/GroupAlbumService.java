@@ -97,7 +97,7 @@ public class GroupAlbumService implements GroupAlbumInterface {
         GroupAlbum created = groupAlbumSaveService.save(album);
         for (PersonalData userNotification : group.getMembers()) {
             if ( !userNotification.equals(user) ) {
-                groupNotificationInterface.createNewAlbum(group , userNotification , created.getId());
+                groupNotificationInterface.createNewAlbum(group , userNotification , user , created.getId());
             }
         }
         groupAlbumHistoryService.createGroupAlbum(album , user);

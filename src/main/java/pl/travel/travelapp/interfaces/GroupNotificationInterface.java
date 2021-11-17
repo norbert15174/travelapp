@@ -24,7 +24,7 @@ public interface GroupNotificationInterface {
 
     void delete(GroupNotification groupNotification);
 
-    GroupNotification createNewAlbum(UsersGroup group , PersonalData user , Long albumId);
+    GroupNotification createNewAlbum(UsersGroup group , PersonalData user , PersonalData actionUser , Long albumId);
 
     GroupNotification changedAlbumOwner(UsersGroup group , PersonalData user , Long albumId , PersonalData owner);
 
@@ -32,7 +32,7 @@ public interface GroupNotificationInterface {
 
     void deleteAllByUserIdAndPhotoId(Set <PersonalData> collect , Long photoId);
 
-    void createCommentNotificationIfNeeded(UsersGroup group , PersonalData owner , Long id , Long id1, PersonalData actionUser);
+    void createCommentNotificationIfNeeded(UsersGroup group , PersonalData owner , Long id , Long id1 , PersonalData actionUser);
 
-    void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum,  PersonalData user);
+    void deleteAlbum(UsersGroup group , PersonalData userNotification , GroupAlbum groupAlbum , PersonalData user);
 }
