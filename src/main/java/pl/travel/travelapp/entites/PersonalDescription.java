@@ -15,7 +15,9 @@ public class PersonalDescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Size(max = 600)
     private String interest;
+    @Size(max = 400)
     private String about;
     private String visitedCountries;
 
