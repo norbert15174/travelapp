@@ -98,6 +98,11 @@ public class GroupNotificationService implements GroupNotificationInterface {
     }
 
     @Override
+    public GroupNotification changeGroupOwner(UsersGroup group , PersonalData user , PersonalData groupOwner) {
+        return create(GroupNotificationCreator.changedGroupOwner(group , user , groupOwner));
+    }
+
+    @Override
     public GroupNotification tagUser(UsersGroup group , PersonalData user , Long albumId , Long photoId , PersonalData actionUser) {
         return create(GroupNotificationCreator.tagUser(group , user , albumId , photoId , actionUser));
     }

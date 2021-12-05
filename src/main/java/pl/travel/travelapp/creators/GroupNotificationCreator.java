@@ -61,4 +61,9 @@ public class GroupNotificationCreator {
         groupNotification.setAlbumName(groupAlbum.getName());
         return groupNotification;
     }
+
+    public static GroupNotification changedGroupOwner(UsersGroup group , PersonalData user , PersonalData groupOwner) {
+        GroupNotification groupNotification = create(group , groupOwner , GroupNotificationType.CHANGE_GROUP_OWNER , user);
+        return groupNotification;
+    }
 }

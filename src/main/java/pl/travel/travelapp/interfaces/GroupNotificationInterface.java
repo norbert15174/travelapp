@@ -28,6 +28,8 @@ public interface GroupNotificationInterface {
 
     GroupNotification changedAlbumOwner(UsersGroup group , PersonalData user , Long albumId , PersonalData owner);
 
+    GroupNotification changeGroupOwner(UsersGroup group , PersonalData user , PersonalData groupOwner);
+
     GroupNotification tagUser(UsersGroup group , PersonalData user , Long albumId , Long photoId , PersonalData actionUser);
 
     void deleteAllByUserIdAndPhotoId(Set <PersonalData> collect , Long photoId);

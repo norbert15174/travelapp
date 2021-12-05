@@ -322,6 +322,7 @@ public class GroupService extends UsersGroupValidator implements GroupServiceInt
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         group.setOwner(newOwner);
+        groupNotificationService.changeGroupOwner(group, newOwner, user);
         return new ResponseEntity <>(new GroupGetDTO(groupSaveService.update(group)) , HttpStatus.OK);
     }
 
