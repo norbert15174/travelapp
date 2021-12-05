@@ -1,6 +1,7 @@
 package pl.travel.travelapp.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,5 +65,10 @@ public class PersonalController {
     @GetMapping("/search")
     public ResponseEntity <List <PersonalInformationDTO>> getUsersBySearchCriteria(Principal principal , UserSearchCriteria criteria , @RequestParam(name = "page", defaultValue = "0") Integer page) {
         return personalService.getUsersBySearchCriteria(principal , criteria , page);
+    }
+
+    @GetMapping("/logged")
+    public ResponseEntity isUserLogged() {
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
