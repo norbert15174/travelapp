@@ -17,17 +17,17 @@ import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.entites.*;
+import pl.travel.travelapp.exceptions.CountryNotFoundException;
 import pl.travel.travelapp.mappers.IndividualAlbumToBasicIndividualAlbumDTOMapper;
 import pl.travel.travelapp.mappers.PersonalDataObjectMapperClass;
 import pl.travel.travelapp.repositories.*;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
+import pl.travel.travelapp.specification.criteria.UserSearchCriteria;
+import pl.travel.travelapp.validators.user.CountryValidator;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,18 +39,19 @@ public class PersonalService {
     @Value("${url-gcp-addr}")
     private String url;
 
-    private PersonalDataRepository personalDataRepository;
-    private PersonalDescriptionRepository personalDescriptionRepository;
-    private CountryRepository countryRepository;
-    private UserRepository userRepository;
-    private IndividualAlbumRepository individualAlbumRepository;
-    private IPersonalQueryService personalQueryService;
-    private SharedAlbumRepository sharedAlbumRepository;
-    private TaggedPhotoRepository taggedPhotoRepository;
-    private CommentsRepository commentsRepository;
+    private final PersonalDataRepository personalDataRepository;
+    private final PersonalDescriptionRepository personalDescriptionRepository;
+    private final CountryRepository countryRepository;
+    private final UserRepository userRepository;
+    private final IndividualAlbumRepository individualAlbumRepository;
+    private final IPersonalQueryService personalQueryService;
+    private final SharedAlbumRepository sharedAlbumRepository;
+    private final TaggedPhotoRepository taggedPhotoRepository;
+    private final CommentsRepository commentsRepository;
+    private final CountryValidator countryValidator;
 
     @Autowired
-    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository , IPersonalQueryService personalQueryService , SharedAlbumRepository sharedAlbumRepository , TaggedPhotoRepository taggedPhotoRepository , CommentsRepository commentsRepository) {
+    public PersonalService(PersonalDataRepository personalDataRepository , PersonalDescriptionRepository personalDescriptionRepository , CountryRepository countryRepository , UserRepository userRepository , IndividualAlbumRepository individualAlbumRepository , IPersonalQueryService personalQueryService , SharedAlbumRepository sharedAlbumRepository , TaggedPhotoRepository taggedPhotoRepository , CommentsRepository commentsRepository , CountryValidator countryValidator) {
         this.personalDataRepository = personalDataRepository;
         this.personalDescriptionRepository = personalDescriptionRepository;
         this.countryRepository = countryRepository;
@@ -60,6 +61,7 @@ public class PersonalService {
         this.sharedAlbumRepository = sharedAlbumRepository;
         this.taggedPhotoRepository = taggedPhotoRepository;
         this.commentsRepository = commentsRepository;
+        this.countryValidator = countryValidator;
     }
 
     public ResponseEntity <PersonalDataDTO> getUserProfile(Principal user) {
@@ -205,6 +207,18 @@ public class PersonalService {
     public ResponseEntity <PersonalInformationDTO> getBasicUserInformation(Principal principal) {
         PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
         return new ResponseEntity(new PersonalInformationDTO(user) , HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity <List <PersonalInformationDTO>> getUsersBySearchCriteria(Principal principal , UserSearchCriteria criteria , Integer page) {
+        try {
+            if ( criteria.isFromExist() ) {
+                countryValidator.validate(Collections.singleton(criteria.getFrom()));
+            }
+        } catch ( CountryNotFoundException ex ) {
+            return new ResponseEntity(ex.getMessage() , HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(personalQueryService.getUsersBySearchCriteria(criteria , page) , HttpStatus.OK);
     }
 
     private void setCorrectDataInTaggedAndSharedUser(PersonalData userProfile) {

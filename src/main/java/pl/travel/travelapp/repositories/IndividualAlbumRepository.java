@@ -2,6 +2,7 @@ package pl.travel.travelapp.repositories;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pl.travel.travelapp.DTO.IndividualAlbumDTO;
@@ -10,10 +11,9 @@ import pl.travel.travelapp.entites.IndividualAlbum;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
-public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbum, Long> {
+public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbum, Long>, JpaSpecificationExecutor <IndividualAlbum> {
     @Query("select a from IndividualAlbum a left join fetch a.owner o where o.id =:id and a.isPublic = true")
     List <IndividualAlbum> findUserPublicAlbumsByUserId(long id);
 
@@ -47,7 +47,7 @@ public interface IndividualAlbumRepository extends JpaRepository <IndividualAlbu
             " left join a.sharedAlbum s" +
             " where a.id = :userId or o.id =:userId or a.isPublic = true" +
             " order by a.dateTime desc")
-    List<IndividualAlbumDTO> findIndividualAlbumNews(Long userId , Pageable page);
+    List <IndividualAlbumDTO> findIndividualAlbumNews(Long userId , Pageable page);
 
     @Query("select new pl.travel.travelapp.DTO.IndividualAlbumDTO(a) from IndividualAlbum a" +
             " left join a.owner o" +

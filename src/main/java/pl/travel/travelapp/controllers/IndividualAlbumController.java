@@ -9,6 +9,7 @@ import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.interfaces.IndividualAlbumInterface;
 import pl.travel.travelapp.services.IndividualAlbumService;
+import pl.travel.travelapp.specification.criteria.AlbumSearchCriteria;
 
 import java.security.Principal;
 import java.util.List;
@@ -80,8 +81,13 @@ public class IndividualAlbumController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity <BasicIndividualAlbumDTO> modifyAlbum(Principal principal ,@RequestBody BasicIndividualAlbumDTO basicIndividualAlbumDTO, @PathVariable(name = "id") Long id){
-        return individualAlbumService.modifyAlbum(principal,basicIndividualAlbumDTO,id);
+    public ResponseEntity <BasicIndividualAlbumDTO> modifyAlbum(Principal principal , @RequestBody BasicIndividualAlbumDTO basicIndividualAlbumDTO , @PathVariable(name = "id") Long id) {
+        return individualAlbumService.modifyAlbum(principal , basicIndividualAlbumDTO , id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity <List <BasicIndividualAlbumDTO>> getAlbumsBySearchCriteria(Principal principal , AlbumSearchCriteria criteria , @RequestParam(name = "page", defaultValue = "0") Integer page) {
+        return individualAlbumService.getAlbumsByCriteria(principal , criteria , page);
     }
 
 

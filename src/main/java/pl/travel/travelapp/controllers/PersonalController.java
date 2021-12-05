@@ -8,8 +8,10 @@ import pl.travel.travelapp.DTO.PersonalDataDTO;
 import pl.travel.travelapp.DTO.PersonalDataDtoWithIndividualAlbumsDTO;
 import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.services.PersonalService;
+import pl.travel.travelapp.specification.criteria.UserSearchCriteria;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -57,5 +59,10 @@ public class PersonalController {
     @GetMapping("/profile/basic")
     public ResponseEntity <PersonalInformationDTO> getBasicUserInformation(Principal principal) {
         return personalService.getBasicUserInformation(principal);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity <List <PersonalInformationDTO>> getUsersBySearchCriteria(Principal principal , UserSearchCriteria criteria , @RequestParam(name = "page", defaultValue = "0") Integer page) {
+        return personalService.getUsersBySearchCriteria(principal , criteria , page);
     }
 }

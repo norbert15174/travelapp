@@ -9,7 +9,6 @@ import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.entites.PersonalData;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 

@@ -27,6 +27,7 @@ import pl.travel.travelapp.mappers.PersonalDataAlbumsToAlbumsDTOMapperClass;
 import pl.travel.travelapp.repositories.*;
 import pl.travel.travelapp.services.query.interfaces.IIndividualAlbumQueryService;
 import pl.travel.travelapp.services.query.interfaces.IPersonalQueryService;
+import pl.travel.travelapp.specification.criteria.AlbumSearchCriteria;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -308,11 +309,13 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity <List <IndividualAlbumDTO>> getPublicAlbumsMainWeb() {
         return new ResponseEntity <>(individualAlbumQueryService.getPublicAlbums() , HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity <AlbumDTO> getPublicAlbumById(Long id) {
         Optional <AlbumDTO> album = individualAlbumQueryService.getAlbumById(id);
@@ -321,6 +324,15 @@ public class IndividualAlbumService implements IndividualAlbumInterface, Coordin
         }
         return new ResponseEntity(album.get() , HttpStatus.OK);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity <List <BasicIndividualAlbumDTO>> getAlbumsByCriteria(Principal principal , AlbumSearchCriteria criteria , Integer page) {
+        PersonalData user = personalQueryService.getPersonalInformation(principal.getName());
+        criteria.setUserId(user.getId());
+        return new ResponseEntity (individualAlbumQueryService.getAlbumsByCriteria(criteria, page), HttpStatus.OK);
+    }
+
 
     public Set <SharedAlbum> findAllUserSharedAlbumsByOwnerAndSharedUserId(long id , long ownerId) {
         return sharedAlbumRepository.findAllUserSharedAlbumsBySharedUserId(id , ownerId);

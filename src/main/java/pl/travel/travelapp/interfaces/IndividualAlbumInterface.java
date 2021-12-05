@@ -8,6 +8,7 @@ import pl.travel.travelapp.DTO.IndividualAlbumDTO;
 import pl.travel.travelapp.DTO.albums.AlbumDTO;
 import pl.travel.travelapp.builders.IndividualAlbumFullInformationBuilder;
 import pl.travel.travelapp.entites.IndividualAlbum;
+import pl.travel.travelapp.specification.criteria.AlbumSearchCriteria;
 
 import java.security.Principal;
 import java.util.List;
@@ -50,4 +51,6 @@ public interface IndividualAlbumInterface {
     ResponseEntity<List<IndividualAlbumDTO>> getPublicAlbumsMainWeb();
 
     ResponseEntity<AlbumDTO> getPublicAlbumById(Long id);
+
+    ResponseEntity<List <BasicIndividualAlbumDTO>> getAlbumsByCriteria(Principal principal , AlbumSearchCriteria criteria , Integer page);
 }

@@ -1,8 +1,10 @@
 package pl.travel.travelapp.services.query.interfaces;
 
+import pl.travel.travelapp.DTO.PersonalInformationDTO;
 import pl.travel.travelapp.entites.Friends;
 import pl.travel.travelapp.entites.PersonalData;
 import pl.travel.travelapp.exceptions.NotFoundException;
+import pl.travel.travelapp.specification.criteria.UserSearchCriteria;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +25,6 @@ public interface IPersonalQueryService {
     PersonalData getPersonalInformationWithAlbums(String username);
 
     Set<PersonalData> getUsersByIds(Set<Long> usersToTag);
+
+    List<PersonalInformationDTO> getUsersBySearchCriteria(UserSearchCriteria criteria, Integer page);
 }
